@@ -1,0 +1,22 @@
+{
+  "name": "productionapp",
+  "version": "1.0.0",
+  "description": "A production calibration helper application.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JuliaF929/ProductionRepo.git"
+  },
+  "author": "Julia",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JuliaF929/ProductionRepo/issues"
+  },
+  "homepage": "https://github.com/JuliaF929/ProductionRepo#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
