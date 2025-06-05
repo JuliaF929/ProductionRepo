@@ -1,0 +1,19 @@
+# Node.js dependencies
+server/node_modules/
+
+# Optional npm cache directory
+.npm/
+
+# dotenv environment variables file
+server/.env
+
+# Logs
+server/logs/
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# VSCode settings
+.vscode/
