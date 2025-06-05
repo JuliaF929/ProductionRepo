@@ -6,8 +6,17 @@ const mongoose = require('mongoose');
 const Item = require('../models/items');
 
 router.get('/', (req, res, next) => {
-    res.status(HTTP_STATUS.OK).json({
-        message: "Handling GET requests to /items"
+    Item.find()
+    .exec()
+    .then (docs => {
+        console.log(docs);
+        res.status(HTTP_STATUS.OK).json(docs);
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(HTTP_STATUS.BAD_REQUEST).json({
+            error: err
+        });
     })
 });
 
@@ -20,27 +29,37 @@ router.post('/', (req, res, next) => {
     });
     item.save().then(result => {
         console.log(result);
+
+        res.status(HTTP_STATUS.CREATED).json({
+            message: "Handling POST requests to /items",
+            createdItem: item
+        });
     }).catch(err =>{
         console.log(err);
+        res.status(HTTPSTATUS.INTERNAL_SERVER_ERROR).json({
+            error: err
+        });
     })
-    res.status(HTTP_STATUS.CREATED).json({
-        message: "Handling POST requests to /items",
-        createdItem: item
-    })
+    
 });
 
 router.get('/:itemSN', (req, res, next) => {
-    const itemSN = req.params.itemSN;
-    if (itemSN == 'realSNForItem') {
-        res.status(HTTP_STATUS.OK).json({
-            message: 'This is really realSNForItem',
-            id: itemSN
-        });
-    } else {
-        res.status(HTTP_STATUS.OK).json({
-            message: 'Kukuriku'
-        });
-    }
+    const sn = req.params.itemSN;
+    Item.findOne({ serialNumber: sn })
+    .exec()
+    .then(doc => {
+        console.log(doc);
+        if (doc) /*not null*/{
+            res.status(HTTP_STATUS.OK).json(doc)
+        } else {
+         res.status(HTTP_STATUS.NOT_FOUND).json({message: `Item with ${sn} was not found.`})   
+        }
+        
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({error: err});
+    });
 });
 
 module.exports = router;
