@@ -1,6 +1,9 @@
 const express = require('express');
 const { HTTP_STATUS, STRING_CONSTANTS } = require('../../../shared/constants');
 const router = express.Router();
+const mongoose = require('mongoose');
+
+const Item = require('../models/items');
 
 router.get('/', (req, res, next) => {
     res.status(HTTP_STATUS.OK).json({
@@ -9,8 +12,20 @@ router.get('/', (req, res, next) => {
 });
 
 router.post('/', (req, res, next) => {
-    res.status(HTTP_STATUS.OK).json({
-        message: "Handling POST requests to /items"
+    const item = new Item({
+        _id: new mongoose.Types.ObjectId(),
+        serialNumber: req.body.serialNumber,
+        name: req.body.name
+
+    });
+    item.save().then(result => {
+        console.log(result);
+    }).catch(err =>{
+        console.log(err);
+    })
+    res.status(HTTP_STATUS.CREATED).json({
+        message: "Handling POST requests to /items",
+        createdItem: item
     })
 });
 
