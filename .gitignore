@@ -1,5 +1,6 @@
 # Node.js dependencies
 server/node_modules/
+process-eng-app/node_modules/
 
 # Optional npm cache directory
 .npm/
