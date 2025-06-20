@@ -4,7 +4,7 @@ const app = require('./app');
 const logger = require('./logger');
 const { version } = require('./package.json');
 
-const port = process.env.PORT || 2789;
+const port = process.env.PORT || 5000;
 
 const server = http.createServer(app);
 server.listen(port, () => {
