@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
+
+const DESCRIPTION_MAX_CHARS = 60;
+const GENERAL_STRING_MAX_CHARS = 5;
 
 const availableParametersTypes = ['string', 'double', 'integer'];
 
@@ -8,23 +11,12 @@ function ItemTypePage() {
   const [description, setDescription] = useState('');
   const [SNPrefix, setSNPrefix] = useState('');
   const [selectedTestApps, setSelectedTestApps] = useState([]);
-  const [currentSelection, setCurrentSelection] = useState('');
-  const [allItemTypes, setAllItemTypes] = useState([]); 
+  //const [currentSelection, setCurrentSelection] = useState('');
+  //const [allItemTypes, setAllItemTypes] = useState([]); 
   const { action } = useParams(); // "create" or "edit"
-  const [testAppComponents, setTestAppComponents] = useState([
-    {
-      id: 1,
-      selectedAppName: '',
-      selectedAppVersion: ''
-    }
-  ]);
-  const [parameterComponents, setParameterComponents] = useState([
-    {
-      id: 1,
-      selectedParameterType: '',
-    }
-  ]);
-
+  const [testAppComponents, setTestAppComponents] = useState([]);
+  const [parameterComponents, setParameterComponents] = useState([]);
+  const navigate = useNavigate();
 
   const handleAddItemTypeOnServer = async (itemTypeName) => {
     try {
@@ -48,6 +40,27 @@ function ItemTypePage() {
       console.error('Error:', error);
     }
   };
+
+  const validateItemTypeData = (name, description, SNPrefix) => {
+
+    //validations before pushing to the server
+    if (!name) {
+      return { isValid: false, message: 'Item Type Name is required.' };
+    }
+
+    if (name.length > GENERAL_STRING_MAX_CHARS )  {
+      return { isValid: false, message: 'Item Type name has to be shorter than ' + GENERAL_STRING_MAX_CHARS + ' characters.' };
+    }
+
+    if (description.length > DESCRIPTION_MAX_CHARS)  {
+     return { isValid: false, message: 'Item Type Description has to be shorter than ' + DESCRIPTION_MAX_CHARS + 'characters.' };
+   }
+   if (SNPrefix.length > GENERAL_STRING_MAX_CHARS )  {
+    return { isValid: false, message: 'Item Type SN Prefix has to be shorter than ' + GENERAL_STRING_MAX_CHARS + 'characters.'};
+  }
+
+  return {isValid: true, message: ''};
+};
   
   //currently mocked function, shall be replaced by 
   //getting real test application names and versions from the server
@@ -62,32 +75,19 @@ function ItemTypePage() {
 
   // Create/Edit item type and return to prev. screen
   const handleAddItemType = () => {
-    if (!name) {
-      alert('Item Type Name is required.');
-      console.log("Item Type Name is required.");
-      return;
-    }
-/*
-    if (selectedTestApps.length === 0) {
-      alert('Please select at least one Test Application.');
-      return;
-    }
-*/
-    const newItem = {
-      name,
-      apps: [...selectedTestApps],
-    };
-
-    setAllItemTypes([...allItemTypes, newItem]);
 
     console.log("before handleAddItemTypeOnServer, new item type name = " + name);
+    const { isValid, message } = validateItemTypeData(name, description, SNPrefix);
+    if (isValid == false) {
+        alert(message);
+        console.log(message);
+    }
+
     handleAddItemTypeOnServer(name);
+    //return to previous screen
+    navigate(-1);
     console.log("after handleAddItemTypeOnServer, new item type name = " + name);
 
-    // Clear form
-    setName('');
-    setSelectedTestApps([]);
-    setCurrentSelection('');
   };
 
   const allTestApplicationsForItemType = GetAllTestApplicationsForItemTypeFromServer(action);
