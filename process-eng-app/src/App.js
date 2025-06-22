@@ -3,7 +3,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import ItemTypesPage from './pages/ItemTypesPage';
 import TestApplicationsPage from './pages/TestApplicationsPage';
-import CreateItemTypePage from './pages/CreateItemTypePage';
+import ItemTypePage from './pages/ItemTypePage';
 
 function Navbar() {
   return (
@@ -21,7 +21,7 @@ function App() {
       <Routes>
         <Route path="/item-types" element={<ItemTypesPage />} />
         <Route path="/test-applications" element={<TestApplicationsPage />} />
-        <Route path="/item-types/create" element={<CreateItemTypePage />} />
+        <Route path="/item-types/:action" element={<ItemTypePage />} />
         <Route path="*" element={<ItemTypesPage />} />
       </Routes>
     </Router>

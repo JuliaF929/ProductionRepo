@@ -11,6 +11,10 @@ function ItemTypesPage() {
       <button className="btn btn-primary mb-3" onClick={() => navigate('/item-types/create')}>
         Create new Item Type
       </button>
+      <button className="btn btn-primary mb-3" onClick={() => navigate('/item-types/edit')}>
+        Edit Item Type
+      </button>
+
       <table className="table">
         <thead>
           <tr>
