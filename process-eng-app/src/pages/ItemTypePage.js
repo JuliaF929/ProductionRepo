@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
+const availableParametersTypes = ['string', 'double', 'integer'];
+
 function ItemTypePage() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -14,6 +16,12 @@ function ItemTypePage() {
       id: 1,
       selectedAppName: '',
       selectedAppVersion: ''
+    }
+  ]);
+  const [parameterComponents, setParameterComponents] = useState([
+    {
+      id: 1,
+      selectedParameterType: '',
     }
   ]);
 
@@ -59,12 +67,12 @@ function ItemTypePage() {
       console.log("Item Type Name is required.");
       return;
     }
-
+/*
     if (selectedTestApps.length === 0) {
       alert('Please select at least one Test Application.');
       return;
     }
-
+*/
     const newItem = {
       name,
       apps: [...selectedTestApps],
@@ -95,6 +103,24 @@ function ItemTypePage() {
     ]);
   };
 
+  const onAddAnotherParameter = () => {
+    setParameterComponents(prev => [
+      ...prev,
+      {
+        id: Date.now(), // or some unique id
+        selectedParameterType: ''
+      }
+    ]);
+  };
+
+  const removeTestAppComponent = (id) => {
+    setTestAppComponents(prev => prev.filter(app => app.id !== id));
+  };
+
+  const removeParameterComponent = (id) => {
+    setParameterComponents(prev => prev.filter(param => param.id !== id));
+  };
+
   return (
     <div className="container mt-4">
   <h2 className="mb-4">{action === 'create' ? 'Create Item Type' : 'Edit Item Type'}</h2>
@@ -110,6 +136,8 @@ function ItemTypePage() {
   <div className="mb-4">
     <ItemTypeForm name={SNPrefix} onNameChange={setSNPrefix} label={'Item Serial Number Prefix'}/>
   </div>
+
+  <hr style={{ borderTop: '3px solid green' }} />
 
   {testAppComponents.map((app, index) => (
   <TestApplicationComponent
@@ -128,10 +156,29 @@ function ItemTypePage() {
       updated[index].selectedAppVersion = newVersion;
       setTestAppComponents(updated);
     }}
+    onRemoveTestApplication={() => removeTestAppComponent(app.id)}
   />
 ))}
 
-  <button className="btn btn-secondary" onClick={onAddAnotherTestApp}>Add Another Test App</button>
+
+<button className="btn btn-secondary" onClick={onAddAnotherTestApp}>Add Another Test App</button>
+
+<hr style={{ borderTop: '3px solid magenta' }} />
+
+{parameterComponents.map((param) => (
+  <ParameterComponent
+    key={param.id}
+    availableParametersTypes={availableParametersTypes}
+    selectedParameterType={param.selectedParameterType}
+    onSelectParameterType={() => {}}
+    onRemoveParameter={() => removeParameterComponent(param.id)}
+  />
+))}
+
+<button className="btn btn-secondary" onClick={onAddAnotherParameter}>Add Another Parameter</button>
+
+<hr style={{ borderTop: '3px solid blue' }} />
+
 
   <div className="mb-5">
     <button
@@ -165,7 +212,8 @@ function TestApplicationComponent({
   selectedAppName,
   selectedAppVersion,
   onSelectAppName,
-  onSelectAppVersion
+  onSelectAppVersion,
+  onRemoveTestApplication
 }) {
   const appNames = [...new Set(testAppsFromServer.map(app => app.appName))];
   const versionsForSelectedApp = testAppsFromServer
@@ -198,31 +246,45 @@ function TestApplicationComponent({
           <option key={ver} value={ver}>{ver}</option>
         ))}
       </select>
+
+      <button className="btn btn-secondary" onClick={onRemoveTestApplication}>Remove</button>
     </div>
   );
 }
 
-function TestAppSelector({ testApps, selectedApp, onSelectApp, onAdd }) {
+function ParameterComponent({
+  availableParametersTypes, selectedParameterType, onSelectParameterType, onRemoveParameter
+}) 
+{
+
   return (
     <div className="mb-3">
-      <label htmlFor="testAppSelect" className="form-label">Add Test Application</label>
-      <div className="d-flex gap-2">
-        <select
-          className="form-select"
-          id="testAppSelect"
-          value={selectedApp}
-          onChange={(e) => onSelectApp(e.target.value)}
-        >
-          <option value="">-- Select Test Application --</option>
-          {testApps.map(app => (
-            <option key={app} value={app}>{app}</option>
-          ))}
-        </select>
-        <button className="btn btn-secondary" onClick={onAdd}>Add</button>
-      </div>
+      <label className="form-label">Parameter</label>
+      <input
+        type="text"
+        className="form-control"
+        id="ParameterName"
+      />
+
+      <select
+        className="form-select"
+        value={selectedParameterType}
+        onChange={(e) => onSelectParameterType(e.target.value)}>
+        <option value="">-- Select Parameter Type --</option>
+        {availableParametersTypes.map(type => (
+          <option key={type} value={type}>{type}</option>
+        ))}
+      </select>
+
+      <input
+        type="text"
+        className="form-control"
+        id="ParameterValue"
+      />
+
+      <button className="btn btn-secondary" onClick={onRemoveParameter}>Remove</button>
     </div>
   );
 }
-
 
 export default ItemTypePage;
