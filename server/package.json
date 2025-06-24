@@ -22,6 +22,7 @@
     "express": "^5.1.0",
     "googleapis": "^150.0.1",
     "mongoose": "^8.15.1",
+    "uuid": "^11.1.0",
     "winston": "^3.17.0"
   }
 }

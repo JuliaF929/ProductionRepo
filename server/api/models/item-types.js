@@ -1,7 +1,9 @@
 class ItemType {
-    constructor({ _id, name }) {
+    constructor({ _id, name, description, SNPrefix }) {
       this._id = _id;
       this.name = name;
+      this.description = description;
+      this.SNPrefix = SNPrefix;
     }
   }
   

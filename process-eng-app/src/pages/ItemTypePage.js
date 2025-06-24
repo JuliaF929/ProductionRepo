@@ -18,7 +18,7 @@ function ItemTypePage() {
   const [parameterComponents, setParameterComponents] = useState([]);
   const navigate = useNavigate();
 
-  const handleAddItemTypeOnServer = async (itemTypeName) => {
+  const handleAddItemTypeOnServer = async (name, description, SNPrefix) => {
     try {
       const response = await fetch('http://localhost:5000/item-types', {
         method: 'POST',
@@ -26,16 +26,27 @@ function ItemTypePage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: itemTypeName,
+          name: name,
+          description: description,
+          SNPrefix: SNPrefix
         }),
       });
   
+      // Print the raw response text
+      const rawBody = await response.text();
+      console.log('Raw response body:', rawBody);
+
       if (!response.ok) {
-        throw new Error('Failed to add item type with name ' + itemTypeName);
+        throw new Error('Failed to add item type with name ' + name);
       }
   
-      const result = await response.json();
-      console.log('Success:', result);
+      try {
+        const result = JSON.parse(rawBody);
+        console.log('Parsed JSON:', result);
+      } catch (e) {
+        console.warn('Response is not valid JSON');
+      }
+
     } catch (error) {
       console.error('Error:', error);
     }
@@ -53,10 +64,10 @@ function ItemTypePage() {
     }
 
     if (description.length > DESCRIPTION_MAX_CHARS)  {
-     return { isValid: false, message: 'Item Type Description has to be shorter than ' + DESCRIPTION_MAX_CHARS + 'characters.' };
+     return { isValid: false, message: 'Item Type Description has to be shorter than ' + DESCRIPTION_MAX_CHARS + ' characters.' };
    }
    if (SNPrefix.length > GENERAL_STRING_MAX_CHARS )  {
-    return { isValid: false, message: 'Item Type SN Prefix has to be shorter than ' + GENERAL_STRING_MAX_CHARS + 'characters.'};
+    return { isValid: false, message: 'Item Type SN Prefix has to be shorter than ' + GENERAL_STRING_MAX_CHARS + ' characters.'};
   }
 
   return {isValid: true, message: ''};
@@ -76,14 +87,15 @@ function ItemTypePage() {
   // Create/Edit item type and return to prev. screen
   const handleAddItemType = () => {
 
-    console.log("before handleAddItemTypeOnServer, new item type name = " + name);
+    console.log("before handleAddItemTypeOnServer, new item type name = " + name + ' ' + description + ' ' + SNPrefix);
     const { isValid, message } = validateItemTypeData(name, description, SNPrefix);
     if (isValid == false) {
         alert(message);
         console.log(message);
+        return;
     }
 
-    handleAddItemTypeOnServer(name);
+    handleAddItemTypeOnServer(name, description, SNPrefix);
     //return to previous screen
     navigate(-1);
     console.log("after handleAddItemTypeOnServer, new item type name = " + name);
