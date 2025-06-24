@@ -14,6 +14,12 @@ function ItemTypesPage() {
       <button className="btn btn-primary mb-3" onClick={() => navigate('/item-types/edit')}>
         Edit Item Type
       </button>
+      <button className="btn btn-primary mb-3" onClick={() => navigate('/item-types/getAllItemTypes')}>
+        Get All Item Types
+      </button>
+      <button className="btn btn-primary mb-3" onClick={() => navigate('/item-types/deleteItemType')}>
+        Delete Item Type
+      </button>
 
       <table className="table">
         <thead>

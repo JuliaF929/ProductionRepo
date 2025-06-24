@@ -13,10 +13,67 @@ function ItemTypePage() {
   const [selectedTestApps, setSelectedTestApps] = useState([]);
   //const [currentSelection, setCurrentSelection] = useState('');
   //const [allItemTypes, setAllItemTypes] = useState([]); 
-  const { action } = useParams(); // "create" or "edit"
+  const { action } = useParams(); // "create" or "edit" or "getAllItemTypes"
   const [testAppComponents, setTestAppComponents] = useState([]);
   const [parameterComponents, setParameterComponents] = useState([]);
   const navigate = useNavigate();
+
+  const handleDeleteItemTypeOnServer = async (uuid) => {
+    try {
+      const response = await fetch('http://localhost:5000/item-types', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          uuid: uuid,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to delete item type with ${uuid}`);
+      }
+  
+      const itemTypes = await response.json();
+      console.log(`Item type ${uuid} was successfully deleted.`);
+  
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+  
+  if (action === "deleteItemType")
+  {
+    handleDeleteItemTypeOnServer('ad53663d-bd2a-46d0-b6f5-7705156792bf');
+    return;
+  }
+
+  const handleGetAllItemTypesOnServer = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/item-types', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to get item types');
+      }
+  
+      const itemTypes = await response.json();
+      console.log(itemTypes);
+  
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+  
+  if (action === "getAllItemTypes")
+  {
+    handleGetAllItemTypesOnServer();
+    return;
+  }
 
   const handleAddItemTypeOnServer = async (name, description, SNPrefix) => {
     try {
