@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 const DESCRIPTION_MAX_CHARS = 60;
@@ -17,17 +17,19 @@ function ItemTypePage() {
   const [testAppComponents, setTestAppComponents] = useState([]);
   const [parameterComponents, setParameterComponents] = useState([]);
   const navigate = useNavigate();
+  const deleteTriggered = useRef(false);
+  const getAllTriggered = useRef(false);
+  const addTriggered = useRef(false);
 
   const handleDeleteItemTypeOnServer = async (uuid) => {
     try {
-      const response = await fetch('http://localhost:5000/item-types', {
+      if (deleteTriggered.current) return; // Prevent second call
+        
+      deleteTriggered.current = true;
+
+      console.log(`Got ${uuid} for deletion in handleDeleteItemTypeOnServer`);
+      const response = await fetch(`http://localhost:5000/item-types/${uuid}`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          uuid: uuid,
-        }),
       });
   
       if (!response.ok) {
@@ -44,12 +46,16 @@ function ItemTypePage() {
   
   if (action === "deleteItemType")
   {
-    handleDeleteItemTypeOnServer('ad53663d-bd2a-46d0-b6f5-7705156792bf');
+    handleDeleteItemTypeOnServer('ItemTypeXID5');
     return;
   }
 
   const handleGetAllItemTypesOnServer = async () => {
     try {
+      if (getAllTriggered.current) return; // Prevent second call
+        
+      getAllTriggered.current = true;
+
       const response = await fetch('http://localhost:5000/item-types', {
         method: 'GET',
         headers: {
@@ -77,6 +83,11 @@ function ItemTypePage() {
 
   const handleAddItemTypeOnServer = async (name, description, SNPrefix) => {
     try {
+      
+      if (addTriggered.current) return; // Prevent second call
+        
+      addTriggered.current = true;
+      
       const response = await fetch('http://localhost:5000/item-types', {
         method: 'POST',
         headers: {

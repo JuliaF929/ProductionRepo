@@ -52,10 +52,15 @@ async function getAllRows(spreadsheetId, sheetName, lastColumnName) {
 }
 
 async function getSheetIdByName(spreadsheetId, sheetName) {
+  
+  logger.debug(`Going to getSheetIdByName spreadsheetId: ${spreadsheetId}, sheetName: ${sheetName}`);
+
   const client = await auth.getClient();
   const sheets = google.sheets({ version: 'v4', auth: client });
 
   const response = await sheets.spreadsheets.get({ spreadsheetId });
+
+  logger.debug(`In getSheetIdByName got response ${response} for spreadsheetId: ${spreadsheetId}, sheetName: ${sheetName}`);
 
   const sheet = response.data.sheets.find(
     s => s.properties.title === sheetName
@@ -89,6 +94,8 @@ async function deleteRowByUUID(spreadsheetId, sheetName, sheetId, lastColumnName
 
   const absoluteRowIndex = rowIndex + 2; // A2 = row 2, so +1 for header, +1 for 0-based
 
+  logger.debug(`In deleteRowByUUID, absoluteRowIndex=${absoluteRowIndex}, startIndex=${absoluteRowIndex - 1}, endIndex=${absoluteRowIndex}`);
+
   await sheets.spreadsheets.batchUpdate({
     spreadsheetId,
     resource: {
@@ -110,4 +117,4 @@ async function deleteRowByUUID(spreadsheetId, sheetName, sheetId, lastColumnName
 
 }
 
-module.exports = { appendRow, getAllRows, deleteRowByUUID };
+module.exports = { appendRow, getAllRows, deleteRowByUUID, getSheetIdByName };
