@@ -1,7 +1,7 @@
 const { google } = require('googleapis');
 const path = require('path');
 
-const logger = require('./logger');
+const logger = require('../../logger');
 
 const auth = new google.auth.GoogleAuth({
   keyFile: path.join(__dirname, 'productionapp-463314-77556795ce19.json'), 

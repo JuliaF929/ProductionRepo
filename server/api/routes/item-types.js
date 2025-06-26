@@ -1,11 +1,11 @@
 const express = require('express');
-const constants = require('../../../shared/constants');
 const router = express.Router();
-//const mongoose = require('mongoose');
 const logger = require('../../logger');
-const sheets = require('../../sheets')
 
 const ItemType = require('../models/item-types');
+
+// Later can swap this line to use a MongoDB or another repository
+const itemTypeRepository = require('../../repositories/itemTypeRepositorySheets');
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -23,12 +23,8 @@ router.post('/', async (req, res, next) => {
 
     try
      {
-        await sheets.appendRow(constants.ITEM_TYPES_SPREADSHEET_ID, 
-                               constants.ITEM_TYPES_SHEET_NAME, 
-                               [itemType._id, 
-                                itemType.name, 
-                                itemType.description, 
-                                itemType.SNPrefix]);
+        await itemTypeRepository.addItemType(itemType);
+
         res.status(201).json({
           message: 'Row added successfully',
           receivedItemType: itemType.name,
@@ -48,9 +44,8 @@ router.post('/', async (req, res, next) => {
 
 router.get('/', async (req, res) => {
   try {
-    const rows = await sheets.getAllRows(constants.ITEM_TYPES_SPREADSHEET_ID, 
-                                  constants.ITEM_TYPES_SHEET_NAME, 
-                                  'D');
+
+    const rows = await itemTypeRepository.getAllItemTypes();
     const itemTypes = rows.map(row => ({
       uuid: row[0],
       name: row[1],
@@ -73,20 +68,11 @@ router.get('/', async (req, res) => {
 
 router.delete('/:uuid', async (req, res) => {
 
-  const sheetId = await sheets.getSheetIdByName(constants.ITEM_TYPES_SPREADSHEET_ID, constants.ITEM_TYPES_SHEET_NAME);
-  if (sheetId === null) {
-    logger.error(`Sheet with name ${constants.ITEM_TYPES_SPREADSHEET_ID} not found.`);
-    return res.status(400).json({ message: 'Sheet not found' });
-  }
-
   const uuid = req.params.uuid;
   
   try {
-    const deleteResult = await sheets.deleteRowByUUID(constants.ITEM_TYPES_SPREADSHEET_ID, 
-                                               constants.ITEM_TYPES_SHEET_NAME, 
-                                               sheetId,
-                                               'D',
-                                               uuid);      
+
+    const deleteResult = await itemTypeRepository.deleteItemTypeByUUID(req.params.uuid);
 
     if (deleteResult === false  ) {
       return res.status(404).json({ message: 'Item not found' });

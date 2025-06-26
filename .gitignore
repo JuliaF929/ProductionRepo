@@ -7,7 +7,7 @@ process-eng-app/node_modules/
 
 # dotenv environment variables file
 server/.env
-server/productionapp-463314-77556795ce19.json
+server/dal/sheets/productionapp-463314-77556795ce19.json
 
 # Logs
 server/logs/
