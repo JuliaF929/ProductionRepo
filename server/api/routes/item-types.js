@@ -18,8 +18,12 @@ router.post('/', async (req, res, next) => {
         SNPrefix: req.body.SNPrefix
     });
 
-    // Just log the itemType instead of saving
-    logger.debug("Received item type: " + itemType.name + ' ' + itemType.description + ' ' + itemType.SNPrefix);
+    // Just log the itemType 
+    logger.debug(`Received item type: ${itemType.name}, ${itemType.description}, ${itemType.SNPrefix}`);
+
+    //null - No replacer function
+    //Pretty-print with 2 spaces
+    logger.debug(`Received parameters: ${JSON.stringify(req.body.parameterDefaults, null, 2)}`); 
 
     try
      {

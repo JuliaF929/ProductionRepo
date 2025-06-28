@@ -30,6 +30,27 @@ async function appendRow(spreadsheetId, sheetName, rowValues) {
   logger.debug(`Append response: ${response.data}`);
 }
 
+
+async function getRowsByValue(spreadsheetId, sheetName, lastColumnName, valueToFilterBy, columnNumberToFilterBy) {
+
+  logger.debug(`Going to get all rows where a specific column matches a given value from spreadsheetId: ${spreadsheetId}, sheetName: ${sheetName}, lastColumnName: ${lastColumnName}, columnNumberToFilterBy: ${columnNumberToFilterBy}, valueToFilterBy: ${valueToFilterBy}`);
+
+  const rows = getAllRows(spreadsheetId, sheetName, lastColumnName);
+
+  logger.debug(`Got all rows by getAllRows, count: ${(await rows).length}`);
+  logger.debug(`Starting filterring by valueToFilterBy: ${valueToFilterBy} at columnNumberToFilterBy: ${columnNumberToFilterBy}`);
+
+  // Filter rows by column match 
+  const matchingRows = rows.filter((row, index) => {
+    return row[columnNumberToFilterBy - 1] === valueToFilterBy;
+  });
+
+  logger.debug(`In getRowsByValue got matchingRows count: ${matchingRows.length}`);
+
+  return matchingRows;
+}
+
+
 async function getAllRows(spreadsheetId, sheetName, lastColumnName) {
 
   logger.debug(`Going to get all rows from spreadsheetId: ${spreadsheetId}, sheetName: ${sheetName}`);
@@ -117,4 +138,4 @@ async function deleteRowByUUID(spreadsheetId, sheetName, sheetId, lastColumnName
 
 }
 
-module.exports = { appendRow, getAllRows, deleteRowByUUID, getSheetIdByName };
+module.exports = { appendRow, getAllRows, getRowsByValue, deleteRowByUUID, getSheetIdByName };

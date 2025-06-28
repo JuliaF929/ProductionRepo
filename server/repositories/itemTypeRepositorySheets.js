@@ -1,10 +1,12 @@
 // repositories/itemTypeRepositorySheets.js
 const sheets = require('../dal/sheets/sheets');
-const constants = require('../../shared/constants');
+
+const ITEM_TYPES_SPREADSHEET_ID = '1voxpnpkFEZs8UOZKfHk4jK2C6jbvfwsul68NYxwvze0'; // From the sheet URL
+const ITEM_TYPES_SHEET_NAME     = 'ItemTypes'; 
 
 module.exports = {
   addItemType: async (itemType) => {
-    await sheets.appendRow(constants.ITEM_TYPES_SPREADSHEET_ID, constants.ITEM_TYPES_SHEET_NAME, [
+    await sheets.appendRow(ITEM_TYPES_SPREADSHEET_ID, ITEM_TYPES_SHEET_NAME, [
       itemType._id,
       itemType.name,
       itemType.description,
@@ -13,7 +15,7 @@ module.exports = {
   },
 
   getAllItemTypes: async () => {
-    const rows = await sheets.getAllRows(constants.ITEM_TYPES_SPREADSHEET_ID, constants.ITEM_TYPES_SHEET_NAME, 'D');
+    const rows = await sheets.getAllRows(ITEM_TYPES_SPREADSHEET_ID, ITEM_TYPES_SHEET_NAME, 'D');
     return rows.map(row => ({
       uuid: row[0],
       name: row[1],
@@ -23,12 +25,12 @@ module.exports = {
   },
 
   deleteItemTypeByUUID: async (uuid) => {
-    const sheetId = await sheets.getSheetIdByName(constants.ITEM_TYPES_SPREADSHEET_ID, constants.ITEM_TYPES_SHEET_NAME);
+    const sheetId = await sheets.getSheetIdByName(ITEM_TYPES_SPREADSHEET_ID, ITEM_TYPES_SHEET_NAME);
     if (sheetId === null)
     {
-        logger.error(`Sheet with name ${constants.ITEM_TYPES_SPREADSHEET_ID} not found.`);
+        logger.error(`Sheet with name ${ITEM_TYPES_SPREADSHEET_ID} not found.`);
         return false;
     }
-    return sheets.deleteRowByUUID(constants.ITEM_TYPES_SPREADSHEET_ID, constants.ITEM_TYPES_SHEET_NAME, sheetId, 'D', uuid);
+    return sheets.deleteRowByUUID(ITEM_TYPES_SPREADSHEET_ID, ITEM_TYPES_SHEET_NAME, sheetId, 'D', uuid);
   },
 };

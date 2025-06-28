@@ -10,12 +10,12 @@ function ItemTypePage() {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [SNPrefix, setSNPrefix] = useState('');
+  const [parameterDefaults, setParameterDefaults] = useState([]);
   const [selectedTestApps, setSelectedTestApps] = useState([]);
   //const [currentSelection, setCurrentSelection] = useState('');
   //const [allItemTypes, setAllItemTypes] = useState([]); 
   const { action } = useParams(); // "create" or "edit" or "getAllItemTypes"
   const [testAppComponents, setTestAppComponents] = useState([]);
-  const [parameterComponents, setParameterComponents] = useState([]);
   const navigate = useNavigate();
   const deleteTriggered = useRef(false);
   const getAllTriggered = useRef(false);
@@ -81,13 +81,13 @@ function ItemTypePage() {
     return;
   }
 
-  const handleAddItemTypeOnServer = async (name, description, SNPrefix) => {
+  const handleAddItemTypeOnServer = async (name, description, SNPrefix, parameterDefaults) => {
     try {
       
-      if (addTriggered.current) return; // Prevent second call
-        
+      if (addTriggered.current) return; // Prevent second call  
+
       addTriggered.current = true;
-      
+  
       const response = await fetch('http://localhost:5000/item-types', {
         method: 'POST',
         headers: {
@@ -96,7 +96,8 @@ function ItemTypePage() {
         body: JSON.stringify({
           name: name,
           description: description,
-          SNPrefix: SNPrefix
+          SNPrefix: SNPrefix,
+          parameterDefaults: parameterDefaults //Sending full parameter array
         }),
       });
   
@@ -138,6 +139,9 @@ function ItemTypePage() {
     return { isValid: false, message: 'Item Type SN Prefix has to be shorter than ' + GENERAL_STRING_MAX_CHARS + ' characters.'};
   }
 
+  //TODO: Validation of all paramters
+  //TODO: Validation of all test applications
+
   return {isValid: true, message: ''};
 };
   
@@ -163,7 +167,7 @@ function ItemTypePage() {
         return;
     }
 
-    handleAddItemTypeOnServer(name, description, SNPrefix);
+    handleAddItemTypeOnServer(name, description, SNPrefix, parameterDefaults);
     //return to previous screen
     navigate(-1);
     console.log("after handleAddItemTypeOnServer, new item type name = " + name);
@@ -183,12 +187,12 @@ function ItemTypePage() {
     ]);
   };
 
-  const onAddAnotherParameter = () => {
-    setParameterComponents(prev => [
+  const onAddAnotherParameterDefault = () => {
+    setParameterDefaults(prev => [
       ...prev,
       {
         id: Date.now(), // or some unique id
-        selectedParameterType: ''
+        name: '', description: '', type: '', value: ''
       }
     ]);
   };
@@ -197,8 +201,17 @@ function ItemTypePage() {
     setTestAppComponents(prev => prev.filter(app => app.id !== id));
   };
 
-  const removeParameterComponent = (id) => {
-    setParameterComponents(prev => prev.filter(param => param.id !== id));
+  const removeParameterDefault = (id) => {
+    setParameterDefaults(prev => prev.filter(param => param.id !== id));
+  };
+
+  const handleParameterDefaultChange = (id, field, value) => {
+    const updated = parameterDefaults.map(param =>
+      param.id === id
+        ? { ...param, [field]: value }
+        : param
+    );
+    setParameterDefaults(updated);
   };
 
   return (
@@ -245,17 +258,19 @@ function ItemTypePage() {
 
 <hr style={{ borderTop: '3px solid magenta' }} />
 
-{parameterComponents.map((param) => (
+{parameterDefaults.map((param) => (
   <ParameterComponent
     key={param.id}
+    id={param.id}
     availableParametersTypes={availableParametersTypes}
     selectedParameterType={param.selectedParameterType}
     onSelectParameterType={() => {}}
-    onRemoveParameter={() => removeParameterComponent(param.id)}
+    onRemoveParameter={() => removeParameterDefault(param.id)}
+    onChange={handleParameterDefaultChange}
   />
 ))}
 
-<button className="btn btn-secondary" onClick={onAddAnotherParameter}>Add Another Parameter</button>
+<button className="btn btn-secondary" onClick={onAddAnotherParameterDefault}>Add Another Parameter</button>
 
 <hr style={{ borderTop: '3px solid blue' }} />
 
@@ -333,7 +348,12 @@ function TestApplicationComponent({
 }
 
 function ParameterComponent({
-  availableParametersTypes, selectedParameterType, onSelectParameterType, onRemoveParameter
+                              id, 
+                              availableParametersTypes, 
+                              selectedParameterType, 
+                              onSelectParameterType, 
+                              onRemoveParameter, 
+                              onChange
 }) 
 {
 
@@ -344,12 +364,20 @@ function ParameterComponent({
         type="text"
         className="form-control"
         id="ParameterName"
+        onChange={(e) => onChange(id, 'name', e.target.value)}
+      />
+      <input
+        type="text"
+        className="form-control"
+        id="ParameterDescription"
+        onChange={(e) => onChange(id, 'description', e.target.value)}
       />
 
       <select
         className="form-select"
         value={selectedParameterType}
-        onChange={(e) => onSelectParameterType(e.target.value)}>
+        onChange={(e) => onChange(id, 'type', e.target.value)}
+        >
         <option value="">-- Select Parameter Type --</option>
         {availableParametersTypes.map(type => (
           <option key={type} value={type}>{type}</option>
@@ -360,6 +388,7 @@ function ParameterComponent({
         type="text"
         className="form-control"
         id="ParameterValue"
+        onChange={(e) => onChange(id, 'value', e.target.value)}
       />
 
       <button className="btn btn-secondary" onClick={onRemoveParameter}>Remove</button>

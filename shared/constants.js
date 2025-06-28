@@ -13,13 +13,8 @@ const HTTP_STATUS = {
     STAMSTRING_2: "This is a dummy string 2",
   };
 
-  //julia - prefer to be placed in some config?
-const ITEM_TYPES_SPREADSHEET_ID = '1voxpnpkFEZs8UOZKfHk4jK2C6jbvfwsul68NYxwvze0'; // From the sheet URL
-const ITEM_TYPES_SHEET_NAME     = 'ItemTypes'; 
-  
+ 
   module.exports = {
     HTTP_STATUS,
-    STRING_CONSTANTS,
-    ITEM_TYPES_SPREADSHEET_ID,
-    ITEM_TYPES_SHEET_NAME
+    STRING_CONSTANTS
   };
