@@ -81,7 +81,7 @@ async function getSheetIdByName(spreadsheetId, sheetName) {
 
   const response = await sheets.spreadsheets.get({ spreadsheetId });
 
-  logger.debug(`In getSheetIdByName got response ${response} for spreadsheetId: ${spreadsheetId}, sheetName: ${sheetName}`);
+  logger.debug(`In getSheetIdByName got response for spreadsheetId: ${spreadsheetId}, sheetName: ${sheetName}`);
 
   const sheet = response.data.sheets.find(
     s => s.properties.title === sheetName
@@ -138,4 +138,20 @@ async function deleteRowByUUID(spreadsheetId, sheetName, sheetId, lastColumnName
 
 }
 
-module.exports = { appendRow, getAllRows, getRowsByValue, deleteRowByUUID, getSheetIdByName };
+async function runBatchUpdate(spreadsheetId, requests) {
+
+  logger.debug(`Going to runBatchUpdate in spreadsheetId: ${spreadsheetId}`);
+
+  const authClient = await auth.getClient();
+  const sheets = google.sheets({ version: 'v4', auth: authClient });
+
+  logger.debug(`Authenticated successfully with Google Sheets API in runBatchUpdate.`);
+
+  return sheets.spreadsheets.batchUpdate({
+    spreadsheetId,
+    resource: { requests },
+  });
+  
+}
+
+module.exports = { appendRow, getAllRows, getRowsByValue, deleteRowByUUID, getSheetIdByName, runBatchUpdate };

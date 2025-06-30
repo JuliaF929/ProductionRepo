@@ -180,7 +180,7 @@ function ItemTypePage() {
     setTestAppComponents(prev => [
       ...prev,
       {
-        id: Date.now(), // or some unique id
+        _id: Date.now(), // unique id only for frontend
         selectedAppName: '',
         selectedAppVersion: ''
       }
@@ -191,8 +191,8 @@ function ItemTypePage() {
     setParameterDefaults(prev => [
       ...prev,
       {
-        id: Date.now(), // or some unique id
-        name: '', description: '', type: '', value: ''
+        _id: Date.now(), // unique id only for frontend
+        name: '', description: '', type: '', defaultValue: ''
       }
     ]);
   };
@@ -388,7 +388,7 @@ function ParameterComponent({
         type="text"
         className="form-control"
         id="ParameterValue"
-        onChange={(e) => onChange(id, 'value', e.target.value)}
+        onChange={(e) => onChange(id, 'defaultValue', e.target.value)}
       />
 
       <button className="btn btn-secondary" onClick={onRemoveParameter}>Remove</button>

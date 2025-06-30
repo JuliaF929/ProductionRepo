@@ -9,4 +9,4 @@ class ParameterDefault {
     }
   }
   
-  module.exports = ItemType;
+  module.exports = ParameterDefault;

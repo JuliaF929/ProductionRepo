@@ -1,21 +1,11 @@
-// module.exports = {
-//     addParameterDefault: async (parameterDefault) => { /* Implement for Sheets or MongoDB or other DB*/ },
-//     getAllParameterDefaults: async () => { /* Implement for Sheets or MongoDB or other DB*/ },
-//     getAllParameterDefaultsForItemType: async (itemTypeID) => { /* Implement for Sheets or MongoDB or other DB*/ }, 
-//     deleteParameterDefault: async (uuid) => { /* Implement for Sheets or MongoDB or other DB*/ }
-//   };
-
 // repositories/parameterDefaultRepositorySheets.js
 const sheets = require('../dal/sheets/sheets');
-
-const PARAMETER_DEFAULTS_SPREADSHEET_ID = '12GNb3F-uzd0XnaZ3HB1wfU53fXZaFngG1If5eMgo6aQ'; // From the sheet URL
-const PARAMETER_DEFAULTS_SHEET_NAME     = 'ParameterDefaults'; 
-const LastColumnName = 'F';
-const ItemTypeIDColumnName = 'F';
+const logger = require('../logger');
+const sheetsConstants = require('../dal/sheets/sheetsConstants');
 
 module.exports = {
     addParameterDefault: async (parameterDefault) => {
-    await sheets.appendRow(PARAMETER_DEFAULTS_SPREADSHEET_ID, PARAMETER_DEFAULTS_SHEET_NAME, [
+    await sheets.appendRow(sheetsConstants.ITEM_TYPES_SPREADSHEET_ID, sheetsConstants.PARAMETER_DEFAULTS_SHEET_NAME, [
         parameterDefault._id,
         parameterDefault.name,
         parameterDefault.description,
@@ -26,7 +16,7 @@ module.exports = {
   },
 
   getAllParameterDefaults: async () => {
-    const rows = await sheets.getAllRows(PARAMETER_DEFAULTS_SPREADSHEET_ID, PARAMETER_DEFAULTS_SHEET_NAME, LastColumnName);
+    const rows = await sheets.getAllRows(sheetsConstants.ITEM_TYPES_SPREADSHEET_ID, sheetsConstants.PARAMETER_DEFAULTS_SHEET_NAME, sheetsConstants.ParameterDefaultsLastColumnName);
     return rows.map(row => ({
       uuid: row[0],
       name: row[1],
@@ -38,11 +28,11 @@ module.exports = {
   },
 
   getAllParameterDefaultsForItemType: async(itemTypeID) => {
-    const rows = await sheets.getRowsByValue(PARAMETER_DEFAULTS_SPREADSHEET_ID, 
-                                             PARAMETER_DEFAULTS_SHEET_NAME, 
-                                             LastColumnName, 
+    const rows = await sheets.getRowsByValue(sheetsConstants.ITEM_TYPES_SPREADSHEET_ID, 
+                                             sheetsConstants.PARAMETER_DEFAULTS_SHEET_NAME, 
+                                             sheetsConstants.ParameterDefaultsLastColumnName, 
                                              itemTypeID, 
-                                             ItemTypeIDColumnName);
+                                             sheetsConstants.ParameterDefaultsLastColumnName);
     return rows.map(row => ({
       uuid: row[0],
       name: row[1],
@@ -54,12 +44,12 @@ module.exports = {
   },
 
   deleteParameterDefault: async (uuid) => {
-    const sheetId = await sheets.getSheetIdByName(PARAMETER_DEFAULTS_SPREADSHEET_ID, PARAMETER_DEFAULTS_SHEET_NAME);
+    const sheetId = await sheets.getSheetIdByName(sheetsConstants.ITEM_TYPES_SPREADSHEET_ID, sheetsConstants.PARAMETER_DEFAULTS_SHEET_NAME);
     if (sheetId === null)
     {
-        logger.error(`Sheet with name ${PARAMETER_DEFAULTS_SPREADSHEET_ID} not found.`);
+        logger.error(`Sheet with name ${sheetsConstants.ITEM_TYPES_SPREADSHEET_ID} not found.`);
         return false;
     }
-    return sheets.deleteRowByUUID(PARAMETER_DEFAULTS_SPREADSHEET_ID, PARAMETER_DEFAULTS_SHEET_NAME, sheetId, LastColumnName, uuid);
+    return sheets.deleteRowByUUID(sheetsConstants.ITEM_TYPES_SPREADSHEET_ID, sheetsConstants.PARAMETER_DEFAULTS_SHEET_NAME, sheetId, sheetsConstants.ParameterDefaultsLastColumnName, uuid);
   },
 };

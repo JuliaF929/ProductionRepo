@@ -6,6 +6,7 @@ const ItemType = require('../models/item-types');
 
 // Later can swap this line to use a MongoDB or another repository
 const itemTypeRepository = require('../../repositories/itemTypeRepositorySheets');
+const itemTypeAtomicTransaction = require('../../repositories/itemTypeAtomicTransactionsSheets');
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -21,13 +22,18 @@ router.post('/', async (req, res, next) => {
     // Just log the itemType 
     logger.debug(`Received item type: ${itemType.name}, ${itemType.description}, ${itemType.SNPrefix}`);
 
-    //null - No replacer function
-    //Pretty-print with 2 spaces
-    logger.debug(`Received parameters: ${JSON.stringify(req.body.parameterDefaults, null, 2)}`); 
+    // Map over parameterDefaults and assign new uuidv4 to _id
+    const parameterDefaultsWithUUID = (req.body.parameterDefaults || []).map(param => ({
+      ...param,
+      _id: uuidv4()
+    }));
+
+    logger.debug(`Received parameters: ${JSON.stringify(parameterDefaultsWithUUID, null, 2)}`); 
 
     try
      {
-        await itemTypeRepository.addItemType(itemType);
+        
+        await itemTypeAtomicTransaction.addAtomicItemType(itemType, parameterDefaultsWithUUID);
 
         res.status(201).json({
           message: 'Row added successfully',
