@@ -6,7 +6,7 @@ const GENERAL_STRING_MAX_CHARS = 5;
 
 const availableParametersTypes = ['string', 'double', 'integer'];
 
-function ItemTypePage() {
+function ItemTypePage({action}) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [SNPrefix, setSNPrefix] = useState('');
@@ -14,12 +14,14 @@ function ItemTypePage() {
   const [selectedTestApps, setSelectedTestApps] = useState([]);
   //const [currentSelection, setCurrentSelection] = useState('');
   //const [allItemTypes, setAllItemTypes] = useState([]); 
-  const { action } = useParams(); // "create" or "edit" or "getAllItemTypes"
+  //const { action } = useParams(); // "create" or "edit" or "getAllItemTypes"
   const [testAppComponents, setTestAppComponents] = useState([]);
   const navigate = useNavigate();
   const deleteTriggered = useRef(false);
   const getAllTriggered = useRef(false);
   const addTriggered = useRef(false);
+
+  console.log(`action is ${action}`);
 
   const handleDeleteItemTypeOnServer = async (uuid) => {
     try {
