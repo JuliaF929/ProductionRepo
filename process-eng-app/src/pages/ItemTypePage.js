@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import TextComponent from '../components/TextComponent';
 
 const DESCRIPTION_MAX_CHARS = 60;
 const GENERAL_STRING_MAX_CHARS = 5;
@@ -14,7 +15,6 @@ function ItemTypePage({action}) {
   const [selectedTestApps, setSelectedTestApps] = useState([]);
   //const [currentSelection, setCurrentSelection] = useState('');
   //const [allItemTypes, setAllItemTypes] = useState([]); 
-  //const { action } = useParams(); // "create" or "edit" or "getAllItemTypes"
   const [testAppComponents, setTestAppComponents] = useState([]);
   const navigate = useNavigate();
   const deleteTriggered = useRef(false);
@@ -170,8 +170,10 @@ function ItemTypePage({action}) {
     }
 
     handleAddItemTypeOnServer(name, description, SNPrefix, parameterDefaults);
-    //return to previous screen
-    navigate(-1);
+
+    //TODO: add new item type to the list of item types
+    //TODO: select the new item type in the list of item types
+    //TODO: selected item type's data is shown at the  right as usual 
     console.log("after handleAddItemTypeOnServer, new item type name = " + name);
 
   };
@@ -221,15 +223,15 @@ function ItemTypePage({action}) {
   <h2 className="mb-4">{action === 'create' ? 'Create Item Type' : 'Edit Item Type'}</h2>
 
   <div className="mb-4">
-    <ItemTypeForm name={name} onNameChange={setName} label={'Item Type Name'}/>
+    <TextComponent name={name} onChange={setName} label={'Item Type Name'}/>
   </div>
 
   <div className="mb-4">
-    <ItemTypeForm name={description} onNameChange={setDescription} label={'Item Type Description'}/>
+    <TextComponent name={description} onChange={setDescription} label={'Item Type Description'}/>
   </div>
 
   <div className="mb-4">
-    <ItemTypeForm name={SNPrefix} onNameChange={setSNPrefix} label={'Item Serial Number Prefix'}/>
+    <TextComponent name={SNPrefix} onChange={setSNPrefix} label={'Item Serial Number Prefix'}/>
   </div>
 
   <hr style={{ borderTop: '3px solid green' }} />
@@ -286,21 +288,6 @@ function ItemTypePage({action}) {
 
 </div>
 
-  );
-}
-
-function ItemTypeForm({ name, onNameChange, label }) {
-  return (
-    <div className="mb-3">
-      <label htmlFor="itemTypeName" className="form-label">{label}</label>
-      <input
-        type="text"
-        className="form-control"
-        id="itemTypeName"
-        value={name}
-        onChange={(e) => onNameChange(e.target.value)}
-      />
-    </div>
   );
 }
 

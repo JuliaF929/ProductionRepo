@@ -5,6 +5,7 @@ import VerticalMenu from '../components/VerticalMenu';
 import ItemTypesPage from './ItemTypesPage';
 import ItemTypePage from './ItemTypePage';
 import TestApplicationsPage from './TestApplicationsPage';
+import TestApplicationPage from './TestApplicationPage';
 
 function HomePage() {
   const [leftPanelSelected, setLeftPanelSelected] = useState('item-types-page');//the default first page to load (user sees first)
@@ -16,7 +17,10 @@ function HomePage() {
                                                       onCreateNewItemType={() => setRightPanelContent(<ItemTypePage action="create"/>)}
                                                       onEditItemType={() => setRightPanelContent(<ItemTypePage action="edit"/>)}
                                                       />;
-  else if (leftPanelSelected === 'test-applications-page') content = <TestApplicationsPage />;
+  else if (leftPanelSelected === 'test-applications-page') content = 
+                                                      <TestApplicationsPage 
+                                                      onCreateNewTestApplication={() => setRightPanelContent(<TestApplicationPage action="create"/>)}
+                                                      />;
   else if (leftPanelSelected === 'about-page') content = <div style={{ padding: 20 }}><h2>About</h2><p>This is the About section.</p></div>;
 
   return (
