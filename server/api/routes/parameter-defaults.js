@@ -112,7 +112,7 @@ router.delete('/:uuid', async (req, res) => {
   
   try {
 
-    const deleteResult = await itemTypeRepository.deleteItemTypeByUUID(req.params.uuid);
+    const deleteResult = await parameterDefaultRepository.deleteParameterDefaultByUUID(req.params.uuid);
 
     if (deleteResult === false  ) {
       return res.status(404).json({ message: 'Parameter default not found' });

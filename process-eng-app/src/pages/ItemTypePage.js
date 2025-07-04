@@ -1,9 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TextComponent from '../components/TextComponent';
-
-const DESCRIPTION_MAX_CHARS = 60;
-const GENERAL_STRING_MAX_CHARS = 5;
+import constants from '../constants';
 
 const availableParametersTypes = ['string', 'double', 'integer'];
 
@@ -16,12 +14,20 @@ function ItemTypePage({action}) {
   //const [currentSelection, setCurrentSelection] = useState('');
   //const [allItemTypes, setAllItemTypes] = useState([]); 
   const [testAppComponents, setTestAppComponents] = useState([]);
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const deleteTriggered = useRef(false);
   const getAllTriggered = useRef(false);
   const addTriggered = useRef(false);
 
   console.log(`action is ${action}`);
+
+  const clearFields = () => {
+    setName('');
+    setDescription('');
+    setSNPrefix('');
+    setParameterDefaults([]);      // <-- This removes all parameterDefaults
+    setTestAppComponents([]);      // <-- This removes all testAppComponents
+  };
 
   const handleDeleteItemTypeOnServer = async (uuid) => {
     try {
@@ -130,15 +136,15 @@ function ItemTypePage({action}) {
       return { isValid: false, message: 'Item Type Name is required.' };
     }
 
-    if (name.length > GENERAL_STRING_MAX_CHARS )  {
-      return { isValid: false, message: 'Item Type name has to be shorter than ' + GENERAL_STRING_MAX_CHARS + ' characters.' };
+    if (name.length > constants.GENERAL_STRING_MAX_CHARS )  {
+      return { isValid: false, message: 'Item Type name has to be shorter than ' + constants.GENERAL_STRING_MAX_CHARS + ' characters.' };
     }
 
-    if (description.length > DESCRIPTION_MAX_CHARS)  {
-     return { isValid: false, message: 'Item Type Description has to be shorter than ' + DESCRIPTION_MAX_CHARS + ' characters.' };
+    if (description.length > constants.DESCRIPTION_MAX_CHARS)  {
+     return { isValid: false, message: 'Item Type Description has to be shorter than ' + constants.DESCRIPTION_MAX_CHARS + ' characters.' };
    }
-   if (SNPrefix.length > GENERAL_STRING_MAX_CHARS )  {
-    return { isValid: false, message: 'Item Type SN Prefix has to be shorter than ' + GENERAL_STRING_MAX_CHARS + ' characters.'};
+   if (SNPrefix.length > constants.SN_PREFIX_MAX_CHARS )  {
+    return { isValid: false, message: 'Item Type SN Prefix has to be shorter than ' + constants.SN_PREFIX_MAX_CHARS + ' characters.'};
   }
 
   //TODO: Validation of all paramters
@@ -158,7 +164,7 @@ function ItemTypePage({action}) {
     ];
   };
 
-  // Create/Edit item type and return to prev. screen
+  // Create/Edit item type 
   const handleAddItemType = () => {
 
     console.log("before handleAddItemTypeOnServer, new item type name = " + name + ' ' + description + ' ' + SNPrefix);
@@ -170,6 +176,10 @@ function ItemTypePage({action}) {
     }
 
     handleAddItemTypeOnServer(name, description, SNPrefix, parameterDefaults);
+
+    addTriggered.current = false;
+
+    clearFields();
 
     //TODO: add new item type to the list of item types
     //TODO: select the new item type in the list of item types
@@ -223,15 +233,15 @@ function ItemTypePage({action}) {
   <h2 className="mb-4">{action === 'create' ? 'Create Item Type' : 'Edit Item Type'}</h2>
 
   <div className="mb-4">
-    <TextComponent name={name} onChange={setName} label={'Item Type Name'}/>
+    <TextComponent text={name} onChange={setName} label={'Item Type Name'}/>
   </div>
 
   <div className="mb-4">
-    <TextComponent name={description} onChange={setDescription} label={'Item Type Description'}/>
+    <TextComponent text={description} onChange={setDescription} label={'Item Type Description'}/>
   </div>
 
   <div className="mb-4">
-    <TextComponent name={SNPrefix} onChange={setSNPrefix} label={'Item Serial Number Prefix'}/>
+    <TextComponent text={SNPrefix} onChange={setSNPrefix} label={'Item Serial Number Prefix'}/>
   </div>
 
   <hr style={{ borderTop: '3px solid green' }} />

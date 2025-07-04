@@ -14,12 +14,13 @@ function HomePage() {
   let content;
   if (leftPanelSelected === 'item-types-page') content = 
                                                       <ItemTypesPage 
-                                                      onCreateNewItemType={() => setRightPanelContent(<ItemTypePage action="create"/>)}
-                                                      onEditItemType={() => setRightPanelContent(<ItemTypePage action="edit"/>)}
+                                                      onCreateNewItemType={() => setRightPanelContent(<ItemTypePage key={Date.now()} action="create"/>)}
+                                                      onEditItemType={() => setRightPanelContent(<ItemTypePage key={Date.now()} action="edit"/>)}
                                                       />;
   else if (leftPanelSelected === 'test-applications-page') content = 
                                                       <TestApplicationsPage 
-                                                      onCreateNewTestApplication={() => setRightPanelContent(<TestApplicationPage action="create"/>)}
+                                                      onCreateNewTestApplication={() => setRightPanelContent(<TestApplicationPage key={Date.now()} action="create"/>)}
+                                                      onEditTestApplication={() => setRightPanelContent(<TestApplicationPage key={Date.now()} action="edit"/>)}
                                                       />;
   else if (leftPanelSelected === 'about-page') content = <div style={{ padding: 20 }}><h2>About</h2><p>This is the About section.</p></div>;
 

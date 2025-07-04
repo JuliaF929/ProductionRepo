@@ -43,7 +43,7 @@ module.exports = {
     }));
   },
 
-  deleteParameterDefault: async (uuid) => {
+  deleteParameterDefaultByUUID: async (uuid) => {
     const sheetId = await sheets.getSheetIdByName(sheetsConstants.ITEM_TYPES_SPREADSHEET_ID, sheetsConstants.PARAMETER_DEFAULTS_SHEET_NAME);
     if (sheetId === null)
     {
