@@ -68,6 +68,7 @@ async function getAllRows(spreadsheetId, sheetName, lastColumnName) {
 
   const rows = response.data.values || []; //If response.data.values exists, use it. Otherwise, use an empty array [].
   logger.debug(`Fetched ${rows.length} rows from range ${range}.`);
+  logger.debug(`Rows: ${JSON.stringify(rows, null, 2)}`);
 
   return rows;
 }

@@ -55,14 +55,7 @@ router.post('/', async (req, res, next) => {
 router.get('/', async (req, res) => {
   try {
 
-    const rows = await itemTypeRepository.getAllItemTypes();
-    const itemTypes = rows.map(row => ({
-      uuid: row[0],
-      name: row[1],
-      description: row[2],
-      SNPrefix: row[3],
-    }));
-
+    const itemTypes = await itemTypeRepository.getAllItemTypes();
     res.status(200).json(itemTypes);
 
     logger.debug(`Returned 200 response with all existing item types (count: ${itemTypes.length}).`);

@@ -56,16 +56,7 @@ router.post('/', async (req, res, next) => {
 router.get('/', async (req, res) => {
   try {
 
-    const rows = await parameterDefaultRepository.getAllParameterDefaults();
-    const parameterDefaults = rows.map(row => ({
-      uuid: row[0],
-      name: row[1],
-      description: row[2],
-      type: row[3],
-      defaultValue: row[4],
-      itemType: row[5]
-    }));
-
+    const parameterDefaults = await parameterDefaultRepository.getAllParameterDefaults();
     res.status(200).json(parameterDefaults);
 
     logger.debug(`Returned 200 response with all existing parameter defaults (count: ${parameterDefaults.length}).`);

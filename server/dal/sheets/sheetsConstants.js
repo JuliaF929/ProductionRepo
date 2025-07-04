@@ -6,7 +6,7 @@ const TEST_APPLICATIONS_SHEET_NAME     = 'TestApplications';
 const ItemTypesLastColumnName = 'D';
 const ParameterDefaultsLastColumnName = 'F';
 const ParameterDefaultsItemTypeIDColumnName = 'F';
-const TestApplicationsLastColumnName = 'H';
+const TestApplicationsLastColumnName = 'I';
 
 module.exports = {ITEM_TYPES_SPREADSHEET_ID,
                   ITEM_TYPES_SHEET_NAME,

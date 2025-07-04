@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TextComponent from '../components/TextComponent';
 import constants from '../constants';
@@ -14,12 +14,20 @@ function ItemTypePage({action}) {
   //const [currentSelection, setCurrentSelection] = useState('');
   //const [allItemTypes, setAllItemTypes] = useState([]); 
   const [testAppComponents, setTestAppComponents] = useState([]);
+  const [allExistingTestApplications, setAllExistingTestApplications] = useState([]);
   //const navigate = useNavigate();
   const deleteTriggered = useRef(false);
   const getAllTriggered = useRef(false);
   const addTriggered = useRef(false);
 
-  console.log(`action is ${action}`);
+
+  useEffect(() => {
+    async function fetchTestApps() {
+      const data = await GetAllExistingTestApplicationsFromServer();
+      setAllExistingTestApplications(data);
+    }
+    fetchTestApps();
+  }, []);
 
   const clearFields = () => {
     setName('');
@@ -89,12 +97,15 @@ function ItemTypePage({action}) {
     return;
   }
 
-  const handleAddItemTypeOnServer = async (name, description, SNPrefix, parameterDefaults) => {
+  const handleAddItemTypeOnServer = async (name, description, SNPrefix, parameterDefaults, testApplications) => {
     try {
       
       if (addTriggered.current) return; // Prevent second call  
 
       addTriggered.current = true;
+
+      console.log('parameterDefaults: ' + JSON.stringify(parameterDefaults, null, 2));
+      console.log('testApplications: ' + JSON.stringify(testApplications, null, 2));
   
       const response = await fetch('http://localhost:5000/item-types', {
         method: 'POST',
@@ -105,7 +116,8 @@ function ItemTypePage({action}) {
           name: name,
           description: description,
           SNPrefix: SNPrefix,
-          parameterDefaults: parameterDefaults //Sending full parameter array
+          parameterDefaults: parameterDefaults, //Sending full parameter array,
+          testApplications: testApplications //Sending full test application array
         }),
       });
   
@@ -155,13 +167,36 @@ function ItemTypePage({action}) {
   
   //currently mocked function, shall be replaced by 
   //getting real test application names and versions from the server
-  const GetAllTestApplicationsForItemTypeFromServer = (itemTypeName) => {
-    return [
-      { "appName": "Analyzer", "version": "1.0.0" },
-      { "appName": "Analyzer", "version": "1.0.1" },
-      { "appName": "Runner", "version": "2.3.0" },
-      { "appName": "Analyzer", "version": "1.2.0" }
-    ];
+  const GetAllExistingTestApplicationsFromServer = async () => {
+    try {
+
+      const response = await fetch('http://localhost:5000/test-applications', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get test applications');
+      }
+  
+      const testApplications = await response.json();
+      console.log(JSON.stringify(testApplications, null, 2));
+  
+      const testAppsToShow = testApplications.map(app => ({
+        appName: app.name,
+        version: app.versionNumber
+      }));
+      console.log(JSON.stringify(testAppsToShow, null, 2));
+      return testAppsToShow;
+
+  }
+   catch (error) 
+  {
+    console.error('Error:', error);
+    return [];
+  }
   };
 
   // Create/Edit item type 
@@ -175,7 +210,7 @@ function ItemTypePage({action}) {
         return;
     }
 
-    handleAddItemTypeOnServer(name, description, SNPrefix, parameterDefaults);
+    handleAddItemTypeOnServer(name, description, SNPrefix, parameterDefaults, testAppComponents);
 
     addTriggered.current = false;
 
@@ -187,8 +222,6 @@ function ItemTypePage({action}) {
     console.log("after handleAddItemTypeOnServer, new item type name = " + name);
 
   };
-
-  const allTestApplicationsForItemType = GetAllTestApplicationsForItemTypeFromServer(action);
 
   const onAddAnotherTestApp = () => {
     setTestAppComponents(prev => [
@@ -249,7 +282,7 @@ function ItemTypePage({action}) {
   {testAppComponents.map((app, index) => (
   <TestApplicationComponent
     key={app.id}
-    testAppsFromServer={allTestApplicationsForItemType}
+    testAppsFromServer={allExistingTestApplications}
     selectedAppName={app.selectedAppName}
     selectedAppVersion={app.selectedAppVersion}
     onSelectAppName={(newName) => {
@@ -307,7 +340,8 @@ function TestApplicationComponent({
   selectedAppVersion,
   onSelectAppName,
   onSelectAppVersion,
-  onRemoveTestApplication
+  onRemoveTestApplication,
+  onChange
 }) {
   const appNames = [...new Set(testAppsFromServer.map(app => app.appName))];
   const versionsForSelectedApp = testAppsFromServer

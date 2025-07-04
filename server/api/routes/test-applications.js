@@ -63,19 +63,7 @@ router.post('/', async (req, res, next) => {
 router.get('/', async (req, res) => {
   try {
 
-    const rows = await testApplicationRepository.getAllTestApplications();
-    const testApplications = rows.map(row => ({
-      uuid: row[0],
-      name: row[1],
-      versionNumber: row[2],
-      description: row[3],
-      ECONumber: row[4],
-      UploadDate: row[5],
-      EffectiveDate: row[6],
-      UploadUser: row[7],
-      Path: row[8]
-    }));
-
+    const testApplications = await testApplicationRepository.getAllTestApplications();
     res.status(200).json(testApplications);
 
     logger.debug(`Returned 200 response with all existing test applications (count: ${testApplications.length}).`);
