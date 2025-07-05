@@ -17,7 +17,7 @@ module.exports = {
   getAllItemTypes: async () => {
     const rows = await sheets.getAllRows(sheetsConstants.ITEM_TYPES_SPREADSHEET_ID, sheetsConstants.ITEM_TYPES_SHEET_NAME, sheetsConstants.ItemTypesLastColumnName);
     return rows.map(row => ({
-      uuid: row[0],
+      _id: row[0],
       name: row[1],
       description: row[2],
       SNPrefix: row[3],

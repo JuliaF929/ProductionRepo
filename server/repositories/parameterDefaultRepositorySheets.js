@@ -18,7 +18,7 @@ module.exports = {
   getAllParameterDefaults: async () => {
     const rows = await sheets.getAllRows(sheetsConstants.ITEM_TYPES_SPREADSHEET_ID, sheetsConstants.PARAMETER_DEFAULTS_SHEET_NAME, sheetsConstants.ParameterDefaultsLastColumnName);
     return rows.map(row => ({
-      uuid: row[0],
+      _id: row[0],
       name: row[1],
       description: row[2],
       type: row[3],
@@ -34,7 +34,7 @@ module.exports = {
                                              itemTypeID, 
                                              sheetsConstants.ParameterDefaultsLastColumnName);
     return rows.map(row => ({
-      uuid: row[0],
+      _id: row[0],
       name: row[1],
       description: row[2],
       type: row[3],

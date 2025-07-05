@@ -21,7 +21,7 @@ module.exports = {
   getAllTestApplications: async () => {
     const rows = await sheets.getAllRows(sheetsConstants.ITEM_TYPES_SPREADSHEET_ID, sheetsConstants.TEST_APPLICATIONS_SHEET_NAME, sheetsConstants.TestApplicationsLastColumnName);
     return rows.map(row => ({
-      uuid: row[0],
+      _id: row[0],
       name: row[1],
       versionNumber: row[2],
       description: row[3],

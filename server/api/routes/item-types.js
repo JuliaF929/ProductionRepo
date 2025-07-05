@@ -7,6 +7,7 @@ const ItemType = require('../models/item-types');
 // Later can swap this line to use a MongoDB or another repository
 const itemTypeRepository = require('../../repositories/itemTypeRepositorySheets');
 const itemTypeAtomicTransaction = require('../../repositories/itemTypeAtomicTransactionsSheets');
+const testApplicationRepository = require('../../repositories/testApplicationRepositorySheets');
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -29,11 +30,22 @@ router.post('/', async (req, res, next) => {
     }));
 
     logger.debug(`Received parameters: ${JSON.stringify(parameterDefaultsWithUUID, null, 2)}`); 
+    logger.debug(`Received test applications: ${JSON.stringify(req.body.testApplications, null, 2)}`);
+
+    //translate testApplications to testApplicationsWithUUID
+    const allExistingTestApplications = await testApplicationRepository.getAllTestApplications();
+    const testApplicationsForItemTypeUUIDs = (req.body.testApplications || []).map(app => {
+      const matchingApp = allExistingTestApplications.find(existingApp => existingApp.name === app.selectedAppName && existingApp.versionNumber === app.selectedAppVersion);
+      logger.debug(`Matching app: ${JSON.stringify(matchingApp, null, 2)}`);
+      return matchingApp ? matchingApp._id : null;
+    });
+
+    logger.debug(`Received test applications UUIDs: ${JSON.stringify(testApplicationsForItemTypeUUIDs, null, 2)}`);
 
     try
      {
         
-        await itemTypeAtomicTransaction.addAtomicItemType(itemType, parameterDefaultsWithUUID);
+        await itemTypeAtomicTransaction.addAtomicItemType(itemType, parameterDefaultsWithUUID, testApplicationsForItemTypeUUIDs);
 
         res.status(201).json({
           message: 'Row added successfully',
