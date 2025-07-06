@@ -6,7 +6,7 @@ function ItemTypesPage({onCreateNewItemType, onEditItemType}) {
   const navigate = useNavigate();
 
   return (
-    <div className="p-4">
+    <div className="container mt-4">
       <h2>Item Types</h2>
       <button className="btn btn-primary mb-3" onClick={onCreateNewItemType}>
         Create new Item Type

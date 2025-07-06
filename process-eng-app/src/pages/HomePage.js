@@ -25,7 +25,7 @@ function HomePage() {
   else if (leftPanelSelected === 'about-page') content = <div style={{ padding: 20 }}><h2>About</h2><p>This is the About section.</p></div>;
 
   return (
-    <div style={{ display: 'flex', height: '100vh' }}>
+    <div className="container-fluid" style={{ display: 'flex', height: '100vh' }}>
       {/* Left: Vertical Menu */}
       <VerticalMenu selected={leftPanelSelected} onSelect={setLeftPanelSelected} />
 
