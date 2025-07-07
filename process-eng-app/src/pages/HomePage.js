@@ -10,14 +10,14 @@ import TestApplicationPage from './TestApplicationPage';
 function HomePage() {
   const [leftPanelSelected, setLeftPanelSelected] = useState('item-types-page');//the default first page to load (user sees first)
   const [rightPanelContent, setRightPanelContent] = useState(null);
-  const [selectedTestApp, setSelectedTestApp] = useState(null);
-
+  const [selectedTestApp, setSelectedTestApp] = useState(null); 
+  const [selectedItemType, setSelectedItemType] = useState(null); 
   let content;
   if (leftPanelSelected === 'item-types-page') content = 
                                                       <ItemTypesPage 
                                                       onCreateNewItemType={() => setRightPanelContent(<ItemTypePage key={Date.now()} action="create"/>)}
-                                                      onEditItemType={() => setRightPanelContent(<ItemTypePage key={Date.now()} action="edit"/>)}
-                                                      
+                                                      onEditItemType={(itemType) => {setSelectedItemType(itemType); setRightPanelContent(<ItemTypePage key={Date.now()} action="view" itemTypeData={itemType}/>);}}//TODO julia: edit item type
+                                                      onSelectItemType={(itemType) => { setSelectedTestApp(itemType); setRightPanelContent(<ItemTypePage key={Date.now()} action="view" itemTypeData={itemType}/>); }}
                                                       />;
   else if (leftPanelSelected === 'test-applications-page') content = 
                                                       <TestApplicationsPage 

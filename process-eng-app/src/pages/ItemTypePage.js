@@ -5,7 +5,7 @@ import constants from '../constants';
 
 const availableParametersTypes = ['string', 'double', 'integer'];
 
-function ItemTypePage({action}) {
+function ItemTypePage({action, itemTypeData}) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [SNPrefix, setSNPrefix] = useState('');
@@ -28,6 +28,16 @@ function ItemTypePage({action}) {
     }
     fetchTestApps();
   }, []);
+
+  useEffect(() => {
+    if (itemTypeData) {
+      setName(itemTypeData.name);
+      setDescription(itemTypeData.description);
+      setSNPrefix(itemTypeData.SNPrefix);
+      setParameterDefaults(itemTypeData.parameterDefaults); 
+      setTestAppComponents(itemTypeData.testApplications);
+    }
+  }, [itemTypeData]);
 
   const clearFields = () => {
     setName('');
@@ -184,7 +194,7 @@ function ItemTypePage({action}) {
       const testApplications = await response.json();
       console.log(JSON.stringify(testApplications, null, 2));
   
-      const testAppsToShow = testApplications.map(app => ({
+      const testAppsToShow = (testApplications || []).map(app => ({
         appName: app.name,
         version: app.versionNumber
       }));
@@ -253,7 +263,7 @@ function ItemTypePage({action}) {
   };
 
   const handleParameterDefaultChange = (id, field, value) => {
-    const updated = parameterDefaults.map(param =>
+    const updated = (parameterDefaults || []).map(param =>
       param.id === id
         ? { ...param, [field]: value }
         : param
@@ -263,23 +273,25 @@ function ItemTypePage({action}) {
 
   return (
     <div className="container mt-4">
-  <h2 className="mb-4">{action === 'create' ? 'Create Item Type' : 'Edit Item Type'}</h2>
+  <h2 className="mb-4">{action === 'create' ? 'Create Item Type' : action === 'edit' ? 'Edit Item Type' : 'View Item Type'}</h2>
 
   <div className="mb-4">
-    <TextComponent text={name} onChange={setName} label={'Item Type Name'}/>
+    <TextComponent text={name} onChange={setName} label={'Item Type Name'} isDisabled={action === 'view'}/>
   </div>
 
   <div className="mb-4">
-    <TextComponent text={description} onChange={setDescription} label={'Item Type Description'}/>
+    <TextComponent text={description} onChange={setDescription} label={'Item Type Description'} isDisabled={action === 'view'}/>
   </div>
 
   <div className="mb-4">
-    <TextComponent text={SNPrefix} onChange={setSNPrefix} label={'Item Serial Number Prefix'}/>
+    <TextComponent text={SNPrefix} onChange={setSNPrefix} label={'Item Serial Number Prefix'} isDisabled={action === 'view'}/>
   </div>
-
+  
+  {action !== 'view' && (
+  <div className="mb-5">
   <hr style={{ borderTop: '3px solid green' }} />
 
-  {testAppComponents.map((app, index) => (
+  {(testAppComponents || []).map((app, index) => (
   <TestApplicationComponent
     key={app.id}
     testAppsFromServer={allExistingTestApplications}
@@ -305,7 +317,7 @@ function ItemTypePage({action}) {
 
 <hr style={{ borderTop: '3px solid magenta' }} />
 
-{parameterDefaults.map((param) => (
+{(parameterDefaults || []).map((param) => (
   <ParameterComponent
     key={param.id}
     id={param.id}
@@ -317,17 +329,18 @@ function ItemTypePage({action}) {
   />
 ))}
 
+
 <button className="btn btn-secondary" onClick={onAddAnotherParameterDefault}>Add Another Parameter</button>
 
 <hr style={{ borderTop: '3px solid blue' }} />
 
-
-  <div className="mb-5">
     <button
       className="btn btn-success"
       onClick={handleAddItemType}>{action === 'create' ? 'Create Item Type' : 'Edit Item Type'}
     </button>
   </div>
+)}
+
 
 </div>
 
@@ -343,7 +356,7 @@ function TestApplicationComponent({
   onRemoveTestApplication,
   onChange
 }) {
-  const appNames = [...new Set(testAppsFromServer.map(app => app.appName))];
+  const appNames = [...new Set((testAppsFromServer || []).map(app => app.appName))];
   const versionsForSelectedApp = testAppsFromServer
     .filter(app => app.appName === selectedAppName)
     .map(app => app.version);
@@ -357,7 +370,7 @@ function TestApplicationComponent({
         onChange={(e) => onSelectAppName(e.target.value)}
       >
         <option value="">-- Select Test Application --</option>
-        {appNames.map(name => (
+        {(appNames || []).map(name => (
           <option key={name} value={name}>{name}</option>
         ))}
       </select>
@@ -370,7 +383,7 @@ function TestApplicationComponent({
         disabled={!selectedAppName}
       >
         <option value="">-- Select Test Application Version# --</option>
-        {versionsForSelectedApp.map(ver => (
+        {(versionsForSelectedApp || []).map(ver => (
           <option key={ver} value={ver}>{ver}</option>
         ))}
       </select>
@@ -412,7 +425,7 @@ function ParameterComponent({
         onChange={(e) => onChange(id, 'type', e.target.value)}
         >
         <option value="">-- Select Parameter Type --</option>
-        {availableParametersTypes.map(type => (
+        {(availableParametersTypes || []).map(type => (
           <option key={type} value={type}>{type}</option>
         ))}
       </select>

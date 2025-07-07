@@ -1,9 +1,36 @@
 // pages/ItemTypesPage.js
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function ItemTypesPage({onCreateNewItemType, onEditItemType}) {
+function ItemTypesPage({onCreateNewItemType, onEditItemType, onSelectItemType}) {
   const navigate = useNavigate();
+  const [itemTypes, setItemTypes] = useState([]); 
+  const [selectedId, setSelectedId] = useState(null);
+
+  useEffect(() => {
+    // Fetch item types from server
+    async function fetchItemTypes() {
+      const response = await fetch('http://localhost:5000/item-types');
+      const data = await response.json();
+      setItemTypes(data);
+    }
+    fetchItemTypes();
+  }, []);
+
+  const handleEdit = (itemType) => {
+    setSelectedId(itemType._id);
+    onEditItemType(itemType);
+    alert('Edit is not implemented yet, You can only view selected item type contents:\n ' + itemType.name);
+  };  
+
+  const handleDelete = (itemType) => {
+    alert('Delete is not implemented yet, sorry. Item type name selected: ' + itemType.name);
+  };
+
+  const handleRowClick = (itemType) => {
+    setSelectedId(itemType._id); 
+    if (onSelectItemType) onSelectItemType(itemType);
+  };
 
   return (
     <div className="container mt-4">
@@ -11,31 +38,48 @@ function ItemTypesPage({onCreateNewItemType, onEditItemType}) {
       <button className="btn btn-primary mb-3" onClick={onCreateNewItemType}>
         Create new Item Type
       </button>
-      <button className="btn btn-primary mb-3" onClick={onEditItemType}>
-        Edit Item Type
-      </button>
-      <button className="btn btn-primary mb-3" onClick={() => navigate('/item-types/getAllItemTypes')}>
-        Get All Item Types
-      </button>
-      <button className="btn btn-primary mb-3" onClick={() => navigate('/item-types/deleteItemType')}>
-        Delete Item Type
-      </button>
 
-      <table className="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Item Type Name</th>
-          </tr>
-        </thead>
-        <tbody>
-          {/* Replace with real data */}
-          <tr>
-            <td>1</td>
-            <td>Example Type</td>
-          </tr>
-        </tbody>
-      </table>
+      <div className="table-responsive">
+        <table className="table table-hover">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Edit</th>
+              <th>Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            {itemTypes.map(itemType => (
+              <tr
+                key={itemType._id}
+                className={selectedId === itemType._id ? 'table-primary' : ''}
+                onClick={() => handleRowClick(itemType)}
+                style={{ cursor: 'pointer' }}
+              >
+                <td>{itemType.name}</td>
+                <td>{itemType.description}</td>
+                <td>
+                  <button
+                    className="btn btn-sm btn-warning"
+                    onClick={e => { e.stopPropagation(); handleEdit(itemType); }}
+                  >
+                    Edit
+                  </button>
+                </td>
+                <td>
+                  <button
+                    className="btn btn-sm btn-danger"
+                    onClick={e => { e.stopPropagation(); handleDelete(itemType); }}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
