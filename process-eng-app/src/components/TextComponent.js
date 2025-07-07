@@ -1,7 +1,7 @@
 // src/components/BasicForm.js
 import React from 'react';
 
-function TextComponent({ text, onChange, label }) {
+function TextComponent({ text, onChange, label, isDisabled }) {
     return (
       <div className="mb-3">
         <label htmlFor="testAppText" className="form-label">{label}</label>
@@ -11,6 +11,7 @@ function TextComponent({ text, onChange, label }) {
           id="testAppText"
           value={text}
           onChange={(e) => onChange(e.target.value)}
+          disabled={isDisabled}
         />
       </div>
     );

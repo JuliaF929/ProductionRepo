@@ -10,17 +10,20 @@ import TestApplicationPage from './TestApplicationPage';
 function HomePage() {
   const [leftPanelSelected, setLeftPanelSelected] = useState('item-types-page');//the default first page to load (user sees first)
   const [rightPanelContent, setRightPanelContent] = useState(null);
+  const [selectedTestApp, setSelectedTestApp] = useState(null);
 
   let content;
   if (leftPanelSelected === 'item-types-page') content = 
                                                       <ItemTypesPage 
                                                       onCreateNewItemType={() => setRightPanelContent(<ItemTypePage key={Date.now()} action="create"/>)}
                                                       onEditItemType={() => setRightPanelContent(<ItemTypePage key={Date.now()} action="edit"/>)}
+                                                      
                                                       />;
   else if (leftPanelSelected === 'test-applications-page') content = 
                                                       <TestApplicationsPage 
                                                       onCreateNewTestApplication={() => setRightPanelContent(<TestApplicationPage key={Date.now()} action="create"/>)}
-                                                      onEditTestApplication={() => setRightPanelContent(<TestApplicationPage key={Date.now()} action="edit"/>)}
+                                                      onEditTestApplication={(testApp) => {setSelectedTestApp(testApp); setRightPanelContent(<TestApplicationPage key={Date.now()} action="view" testAppData={testApp}/>);}} //TODO julia: edit test application
+                                                      onSelectTestApp={(testApp) => { setSelectedTestApp(testApp); setRightPanelContent(<TestApplicationPage key={Date.now()} action="view" testAppData={testApp}/>); }}
                                                       />;
   else if (leftPanelSelected === 'about-page') content = <div style={{ padding: 20 }}><h2>About</h2><p>This is the About section.</p></div>;
 

@@ -1,9 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import TextComponent from '../components/TextComponent';
 import constants from '../constants';
 
-function TestApplicationPage({action}) {
+function TestApplicationPage({action, testAppData}) {
   const [name, setName] = useState('');
   const [versionNumber, setVersionNumber] = useState('');
   const [description, setDescription] = useState('');
@@ -12,6 +12,17 @@ function TestApplicationPage({action}) {
 
   // Create a ref to programmatically click the hidden input
   const fileInputRef = useRef(null);
+
+    // Update the fields when a new testAppData is passed in:
+    useEffect(() => {
+      console.log('testAppData: ' + JSON.stringify(testAppData, null, 2));
+      if (testAppData) {
+        setName(testAppData.name || '');
+        setVersionNumber(testAppData.versionNumber || '');
+        setDescription(testAppData.description || '');
+        setECONumber(testAppData.ECONumber || '');
+      }
+    }, [testAppData]);
 
   const clearFields = () => {
     setName('');
@@ -138,24 +149,28 @@ function TestApplicationPage({action}) {
   };
   return (
     <div className="container mt-4">
-      <h2 className="mb-4">{action === 'create' ? 'Create Test Application' : 'Edit Test Application'}</h2>
+      <h2 className="mb-4">
+        {action === 'create' ? 'Create Test Application' : action === 'edit' ? 'Edit Test Application' : 'View Test Application'}
+      </h2>
 
   <div className="mb-4">
-    <TextComponent text={name} onChange={setName} label={'Test Application Name'}/>
+    <TextComponent text={name} onChange={setName} label={'Test Application Name'} isDisabled={action === 'view'}/>
   </div>
 
   <div className="mb-4">
-    <TextComponent text={versionNumber} onChange={setVersionNumber} label={'Test Application Version Number'}/>
+    <TextComponent text={versionNumber} onChange={setVersionNumber} label={'Test Application Version Number'} isDisabled={action === 'view'}/>
   </div>
 
   <div className="mb-4">
-    <TextComponent text={description} onChange={setDescription} label={'Test Application Description'}/>
+    <TextComponent text={description} onChange={setDescription} label={'Test Application Description'} isDisabled={action === 'view'}/>
   </div>
 
   <div className="mb-4">
-    <TextComponent text={ECONumber} onChange={setECONumber} label={'ECO#'}/>
+    <TextComponent text={ECONumber} onChange={setECONumber} label={'ECO#'} isDisabled={action === 'view'}/>
   </div>
 
+  {action !== 'view' && (
+<div className="mb-4">
       {/* Custom link (or replace with a button if you prefer) */}
       <a href="#" onClick={handleOpenFolderPicker}>📂 Upload Test Application</a>
 
@@ -169,14 +184,17 @@ function TestApplicationPage({action}) {
         multiple
         onChange={handleFolderSelect}
       />
+</div>
+)}
 
+{action !== 'view' && (
   <div className="mb-5">
     <button
       className="btn btn-success"
       onClick={handleAddTestApplication}>{action === 'create' ? 'Create Test Application' : 'Edit Test Application'}
     </button>
   </div>
-
+)}
   </div>
   );
 }
