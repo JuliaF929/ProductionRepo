@@ -28,6 +28,9 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
+        //TODO: After connecting DB get from BE the company name here
+        OperatorAppWindow.Title = "Julia - Manufactoring Operator Application";
+
         AllocConsole();
         Console.WriteLine("DesktopHost started...");
 

@@ -1,0 +1,139 @@
+/* Container layout: left + right split */
+.container {
+    display: flex;
+    height: 100vh;
+  }
+  
+  /* Left Panel */
+  .left-panel {
+    width: 40%;
+    border-right: 1px solid #ccc;
+    padding: 1rem;
+    overflow-y: auto;
+  }
+  
+  /* Right Panel */
+  .right-panel {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+  }
+  
+  /* Top Section in Right Panel */
+  .top-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .top-section label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+  
+  .form-buttons {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+  
+  /* Divider between top/bottom sections */
+  .divider {
+    height: 1px;
+    background-color: #ccc;
+    margin: 0.5rem 0;
+  }
+  
+  /* Bottom Section in Right Panel */
+  .bottom-section {
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  /* Table in Bottom Section */
+  .actions-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #333; /* Full table border */
+  }
+  
+  .actions-table th, 
+  .actions-table td {
+    border: 1px solid #333; /* Cell borders */
+    padding: 0.5rem;
+    text-align: center;
+  }
+  
+  .actions-table th {
+    background-color: #f0f0f0;
+  }
+  
+  .actions-table button {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.6rem;
+  }
+  
+  .actions-table a {
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  
+  /* Status Indicators */
+  span.pass {
+    color: green;
+  }
+  
+  span.fail {
+    color: red;
+  }
+  
+  span.not-started {
+    color: gray;
+  }
+  
+  /* Table in Left Panel */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+  }
+  
+  tr.selected {
+    background-color: #e0f7fa;
+  }
+  
+  /* General Button Styling */
+  button {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+  }
+  .pdf-viewer {
+    margin-top: 1rem;
+    border: 1px solid #333;
+    padding: 0.5rem;
+    background-color: #fafafa;
+  }
+  
+  .pdf-viewer iframe {
+    border: none;
+  }
+  
+  .close-btn {
+    margin-top: 0.5rem;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+    
