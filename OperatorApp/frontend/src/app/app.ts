@@ -22,7 +22,26 @@ export class App {
     { sn: '003', type: 'Type C' },
   ];
 
+  filteredItems = [...this.items];
+
+  filters = {
+    sn: '',
+    type: ''
+  };
+
   selectedItem: any = null;
+
+  addItem() {
+    console.log('Add new item');
+  }
+
+  applyFilters() {
+    this.filteredItems = this.items.filter(item =>
+      item.sn.toLowerCase().includes(this.filters.sn.toLowerCase()) &&
+      item.type.toLowerCase().includes(this.filters.type.toLowerCase())
+    );
+  }
+
   formItem = { type: '', sn: '' };
 
   dynamicActions: {

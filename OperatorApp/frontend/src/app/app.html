@@ -8,22 +8,27 @@
     <div class="left-panel">
       <button (click)="addNewItem()">Add New Item</button>
   
-      <table>
-        <thead>
-          <tr>
-            <th>Item SN</th>
-            <th>Item Type</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of items" 
-              (click)="selectItem(item)" 
-              [class.selected]="item === selectedItem">
-            <td>{{ item.sn }}</td>
-            <td>{{ item.type }}</td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- Filter Row -->
+    <div class="filter-row">
+      <input type="text" placeholder="Filter by SN" [(ngModel)]="filters.sn" (input)="applyFilters()" />
+      <input type="text" placeholder="Filter by Type" [(ngModel)]="filters.type" (input)="applyFilters()" />
+    </div>
+
+    <!-- Table -->
+    <table>
+      <thead>
+        <tr>
+          <th>Item SN</th>
+          <th>Item Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of filteredItems" (click)="selectItem(item)" [class.selected]="item === selectedItem">
+          <td>{{ item.sn }}</td>
+          <td>{{ item.type }}</td>
+        </tr>
+      </tbody>
+    </table>
     </div>
   
     <!-- Right Section -->
