@@ -20,10 +20,13 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": [
+            "assets": [          
+                "src/favicon.ico",
+                "src/assets",
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "src/assets/pdfjs",
+                "output": "/assets/pdfjs"
               }
             ],
             "styles": [

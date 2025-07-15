@@ -106,8 +106,14 @@
       <!-- PDF Viewer Panel -->
       <div *ngIf="selectedPdf" class="pdf-viewer">
         <h4>Report Viewer</h4>
-        <iframe [src]="sanitizeUrl(selectedPdf)" width="100%" height="500px"></iframe>
-        <button class="close-btn" (click)="closePdf()">Close</button>
+        <iframe
+              *ngIf="selectedPdf"
+              [src]="getSafePdfUrl()"
+              width="100%"
+              height="600px"
+              frameborder="0">
+        </iframe>
+      <button *ngIf="selectedPdf" (click)="closePdf()">Close PDF</button>
       </div>
     </div>
   </div>

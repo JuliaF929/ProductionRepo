@@ -11,7 +11,10 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
   imports: [CommonModule, NgForOf, NgIf, FormsModule]
 })
 export class App {
-  constructor(private sanitizer: DomSanitizer) {}
+  constructor(public sanitizer: DomSanitizer) {}
+
+  pdfViewerUrl = '/assets/pdfjs/web/viewer.html?file=/assets/pdfjs/reports/testPDF.pdf';
+  selectedPdf: string | null = null; // PDF URL to display
 
   items = [
     { sn: '001', type: 'Type A' },
@@ -21,8 +24,6 @@ export class App {
 
   selectedItem: any = null;
   formItem = { type: '', sn: '' };
-
-  selectedPdf: string | null = null; // ✅ PDF URL to display
 
   dynamicActions: {
     label: string;
@@ -95,10 +96,13 @@ export class App {
     console.log(`Performed: ${actionName} on item ${this.selectedItem.sn}`);
   }
 
-  openPdf(pdfUrl: string) {
-    this.selectedPdf = pdfUrl;
+  openPdf(reportUrl?: string) {
+    if (reportUrl) {
+      this.selectedPdf = reportUrl;
+    } else {
+      console.warn('PDF URL not defined');
+    }
   }
-
   closePdf() {
     this.selectedPdf = null;
   }
@@ -126,5 +130,13 @@ export class App {
       this.formItem = { type: '', sn: '' };
     }
     console.log('Cancelled edit, restored form:', this.formItem);
+  }
+
+  getSafePdfUrl(): SafeResourceUrl {
+    if (!this.selectedPdf) return '';
+    const encodedUrl = encodeURIComponent(this.selectedPdf);
+    return this.sanitizer.bypassSecurityTrustResourceUrl(
+      `${this.pdfViewerUrl}?file=${encodedUrl}`
+    );
   }
 }
