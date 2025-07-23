@@ -3,6 +3,11 @@ server/node_modules/
 process-eng-app/node_modules/
 OperatorApp/frontend/node_modules/
 OperatorApp/frontend/dist/
+OperatorApp/DesktopHost/bin/
+OperatorApp/DesktopHost/obj/
+OperatorApp/Backend/bin/
+OperatorApp/Backend/obj/
+OperatorApp/frontend/dist/
 
 # Optional npm cache directory
 .npm/
