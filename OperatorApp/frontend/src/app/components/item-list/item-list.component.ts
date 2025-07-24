@@ -61,20 +61,14 @@ export class ItemListComponent implements OnInit {
     });
   }
 
-  onCreateNewItem(newItem: Item) {
-    if (newItem) {
-      this.itemService.createNewItem(newItem).subscribe({
-        next: (createdItem: Item) => {
-          console.log('Item created successfully on backend:', createdItem);
-          this.items.push(createdItem);       
+  onNewItemCreated(newItem: Item) {
+    if (newItem) 
+    {
+      console.log('ItemListComponent: onNewItemCreated, updating the list of items.', newItem);
+      this.items.push(newItem);       
                   
-          this.applyFilters();
-          this.createNewItemEvent.emit(createdItem);// Notify parent
-        },
-        error: (err: HttpErrorResponse) => {
-          console.error('Failed to create item on backend', err);
-        }
-      });
+      this.applyFilters();
+      this.createNewItemEvent.emit(newItem);// Notify parent
     }
   }
   

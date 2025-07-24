@@ -1,0 +1,16 @@
+<main>
+    <div class="item-details-container">
+        <label>
+            Item Type:
+            <input [(ngModel)]="item.Type" />
+          </label>
+          <label>
+            Item SN:
+            <input [(ngModel)]="item.SerialNumber" />
+          </label>
+          <div class="item-details-buttons">
+            <button (click)="cancel()">Cancel</button>
+            <button (click)="saveNewItem()">Save</button>
+          </div>
+    </div>
+</main>

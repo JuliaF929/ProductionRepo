@@ -24,20 +24,9 @@
     <!-- Right Section -->
     <div class="right-panel">
       <!-- Top Section -->
-      <div class="top-section">
-        <label>
-          Item Type:
-          <input [(ngModel)]="formItem.Type" />
-        </label>
-        <label>
-          Item SN:
-          <input [(ngModel)]="formItem.SerialNumber" />
-        </label>
-        <div class="form-buttons">
-          <button (click)="cancel()">Cancel</button>
-          <button (click)="save()">Save</button>
-        </div>
-      </div>
+      <item-details
+        (newItemSaved)="onNewItemSaved($event)">
+      </item-details>
   
       <!-- Divider -->
       <div class="divider"></div>

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Item } from './models/item.model';
 import { ItemListComponent } from './components/item-list/item-list.component';
+import { ItemDetailsComponent } from './components/item-details/item-details.component';
 import { HttpClientModule } from '@angular/common/http';
 
 @Component({
@@ -11,7 +12,7 @@ import { HttpClientModule } from '@angular/common/http';
   standalone: true,
   templateUrl: './app.html',
   styleUrls: ['./app.css'],
-  imports: [CommonModule, NgForOf, NgIf, FormsModule, HttpClientModule, ItemListComponent]
+  imports: [CommonModule, NgForOf, NgIf, FormsModule, HttpClientModule, ItemListComponent, ItemDetailsComponent]
 })
 export class App {
   constructor(public sanitizer: DomSanitizer) {}
@@ -20,6 +21,7 @@ export class App {
   selectedPdf: string | null = null; // PDF URL to display
 
   @ViewChild(ItemListComponent) itemListComponent!: ItemListComponent;
+  @ViewChild(ItemDetailsComponent) itemDetailsComponent!: ItemDetailsComponent;
 
   selectedItem: Item | null = null;
 
@@ -28,7 +30,9 @@ export class App {
     console.log('Parent received selected item:', item);
   }
 
-  formItem = { SerialNumber: '', Type: '' };
+  onNewItemSaved(newItem: Item) {
+    this.itemListComponent.onNewItemCreated(newItem);
+  }
 
   dynamicActions: {
     label: string;
@@ -40,16 +44,17 @@ export class App {
   }[] = [];
 
   addNewItem() {
-    console.log('addNewItem');
-    this.formItem = { SerialNumber: '', Type: '' };
+    console.log('app: addNewItem');
+    this.itemDetailsComponent.addNewItem();
     this.selectedItem = null;
     this.dynamicActions = [];
     this.selectedPdf = null;
   }
 
   selectItem(item: any) {
+    console.log('app: selectItem');
     this.selectedItem = item;
-    this.formItem = { ...item };
+    this.itemDetailsComponent.setItemDetails(item);
     this.selectedPdf = null; 
 
     if (item.sn === '001') {
@@ -117,36 +122,10 @@ export class App {
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
-  save() {
-    console.log('Save called');
-    // if (this.selectedItem) {
-    //   this.selectedItem.Type = this.formItem.Type;
-    //   this.selectedItem.SerialNumber = this.formItem.SerialNumber;
-    // } else {
-      //this.items.push({ ...this.formItem });
-      //this.itemListComponent.onCreateNewItem(this.formItem);
-      //this.itemCreated.emit(this.formItem); 
-
-      this.itemListComponent.onCreateNewItem(this.formItem);
-    //}
-    console.log('Saved kuku item:', this.formItem);
-  }
-
   onItemAddedToTable(newItem: Item) {
      // Just a placeholder for the future
      console.log('Parent notified of new item creation:', newItem);
    }
-
-  cancel() {
-    if (this.selectedItem) {
-      // Restore original values if editing existing item
-      this.formItem = { ...this.selectedItem };
-    } else {
-      // Clear form if adding new item
-      this.formItem = { SerialNumber: '', Type: '' };
-    }
-    console.log('Cancelled edit, restored form:', this.formItem);
-  }
 
   getSafePdfUrl(): SafeResourceUrl {
     if (!this.selectedPdf) return '';

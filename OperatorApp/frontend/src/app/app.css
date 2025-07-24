@@ -34,13 +34,7 @@
     margin-bottom: 0.5rem;
   }
   
-  .form-buttons {
-    margin-top: 1rem;
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem;
-  }
-  
+ 
   /* Divider between top/bottom sections */
   .divider {
     height: 1px;
