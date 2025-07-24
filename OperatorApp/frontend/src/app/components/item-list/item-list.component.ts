@@ -44,6 +44,7 @@ export class ItemListComponent implements OnInit {
   }
 
   onSelectItem(item: Item) {
+    this.itemSelectedByParent = item; // persistently sets selected
     this.itemSelectedByUser.emit(item); //Emit selected item
   }
 
