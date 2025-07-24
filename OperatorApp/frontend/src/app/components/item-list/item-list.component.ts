@@ -3,7 +3,7 @@ import { CommonModule, NgForOf, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Item } from '../../models/item.model';
 import { ItemService } from '../../services/item.service';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'item-list',
@@ -30,6 +30,10 @@ export class ItemListComponent implements OnInit {
   constructor(private itemService: ItemService, private cdr: ChangeDetectorRef) 
   {
     console.log('ItemListComponent constructor called!');
+  }
+
+  trackBySerialNumber(index: number, item: Item): string {
+    return item.SerialNumber;
   }
 
   applyFilters() {
@@ -59,10 +63,19 @@ export class ItemListComponent implements OnInit {
 
   onCreateNewItem(newItem: Item) {
     if (newItem) {
-      this.itemService.createNewItem(newItem).subscribe((newItem: Item ) => {
-        this.items.push(newItem);
+      this.itemService.createNewItem(newItem).subscribe({
+        next: (createdItem: Item) => {
+          console.log('Item created successfully on backend:', createdItem);
+          this.items.push(createdItem);       
+                  
+          this.applyFilters();
+          this.createNewItemEvent.emit(createdItem);// Notify parent
+        },
+        error: (err: HttpErrorResponse) => {
+          console.error('Failed to create item on backend', err);
+        }
       });
-      this.createNewItemEvent.emit(newItem); // Notify parent
     }
   }
+  
 }

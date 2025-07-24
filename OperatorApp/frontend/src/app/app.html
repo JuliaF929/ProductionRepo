@@ -10,7 +10,7 @@
   
     <!-- Table and its filter row -->
     <item-list
-       (itemSelectedByUser)="onItemSelected($event)" (createNewItemEvent)="onCreateNewItem($event)">
+       (itemSelectedByUser)="onItemSelected($event)" (createNewItemEvent)="onItemAddedToTable($event)">
     </item-list>
 
     <div *ngIf="selectedItem">

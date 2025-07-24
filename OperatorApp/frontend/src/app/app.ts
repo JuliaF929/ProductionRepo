@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { CommonModule, NgForOf, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -19,14 +19,7 @@ export class App {
   pdfViewerUrl = '/assets/pdfjs/web/viewer.html?file=/assets/pdfjs/reports/testPDF.pdf';
   selectedPdf: string | null = null; // PDF URL to display
 
-  //@Output() itemCreated = new EventEmitter<Item>();
-
-  // items = [
-  //   { sn: '001', type: 'Type A' },
-  //   { sn: '002', type: 'Type B' },
-  //   { sn: '003', type: 'Type C' },
-  // ];
-
+  @ViewChild(ItemListComponent) itemListComponent!: ItemListComponent;
 
   selectedItem: Item | null = null;
 
@@ -126,21 +119,23 @@ export class App {
 
   save() {
     console.log('Save called');
-    if (this.selectedItem) {
-      this.selectedItem.Type = this.formItem.Type;
-      this.selectedItem.SerialNumber = this.formItem.SerialNumber;
-    } else {
+    // if (this.selectedItem) {
+    //   this.selectedItem.Type = this.formItem.Type;
+    //   this.selectedItem.SerialNumber = this.formItem.SerialNumber;
+    // } else {
       //this.items.push({ ...this.formItem });
       //this.itemListComponent.onCreateNewItem(this.formItem);
       //this.itemCreated.emit(this.formItem); 
-    }
+
+      this.itemListComponent.onCreateNewItem(this.formItem);
+    //}
     console.log('Saved kuku item:', this.formItem);
   }
 
-  onCreateNewItem(newItem: Item) {
-    // Let child handle adding the item
-    console.log('Parent notified of new item:', newItem);
-  }
+  onItemAddedToTable(newItem: Item) {
+     // Just a placeholder for the future
+     console.log('Parent notified of new item creation:', newItem);
+   }
 
   cancel() {
     if (this.selectedItem) {
