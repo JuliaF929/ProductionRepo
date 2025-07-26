@@ -1,25 +1,31 @@
 <main>
-<div class="item-list-container">
+  <div class="item-list-container">
     <!-- Filter Row -->
-    <div class="filter-row">
-        <input type="text" placeholder="Filter by SN" [(ngModel)]="filters.SerialNumber" (input)="applyFilters()" />
-        <input type="text" placeholder="Filter by Type" [(ngModel)]="filters.Type" (input)="applyFilters()" />
+    <div class="row">
+      <div class="col-sm mb-3">
+        <input type="text" class="form-control" placeholder="Filter by SN" [(ngModel)]="filters.SerialNumber"
+          (input)="applyFilters()">
+      </div>
+      <div class="col-sm mb-3">
+        <input type="text" class="form-control" placeholder="Filter by Type" [(ngModel)]="filters.Type"
+          (input)="applyFilters()">
+      </div>
     </div>
+
     <table>
-    <thead>
-      <tr>
-        <th>Item SN</th>
-        <th>Item Type</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let item of filteredItems; trackBy: trackBySerialNumber"
-          (click)="onSelectItem(item)"
+      <thead>
+        <tr>
+          <th>Item SN</th>
+          <th>Item Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of filteredItems; trackBy: trackBySerialNumber" (click)="onSelectItem(item)"
           [class.selected]="item === itemSelectedByParent">
-        <td>{{ item.SerialNumber }}</td>
-        <td>{{ item.Type }}</td>
-      </tr>
-    </tbody>
+          <td>{{ item.SerialNumber }}</td>
+          <td>{{ item.Type }}</td>
+        </tr>
+      </tbody>
     </table>
-</div>
+  </div>
 </main>

@@ -1,107 +1,101 @@
-<header>
-  <h1>🚀 Calibrate for All </h1>
-</header>
 <main>
 
-  <div class="container">
-    <!-- Left Section -->
-    <div class="left-panel">
-      <button (click)="addNewItem()">Add New Item</button>
-  
-    <!-- Table and its filter row -->
-    <item-list
-       (itemSelectedByUser)="onItemSelected($event)" (createNewItemEvent)="onItemAddedToTable($event)">
-    </item-list>
+  <div class="container-fluid">
+    <h1>🚀 Calibrate for All </h1>
 
-    <div *ngIf="selectedItem">
-      <h2>Selected Item</h2>
-      <p>Serial Number: {{ selectedItem.SerialNumber }}</p>
-      <p>Type: {{ selectedItem.Type }}</p>
-    </div>
+    <div class="row">
+      <div class="col">
+        <!-- Left Section -->
+        <div class="row">
+          <div class="col mb-3">
+            <button type="button" class="btn btn-primary" (click)="addNewItem()">Add New Item</button>
+          </div>
+        </div>
+        <!-- Table and its filter row -->
+        <item-list (itemSelectedByUser)="onItemSelected($event)" (createNewItemEvent)="onItemAddedToTable($event)">
+        </item-list>
 
-    </div>
-  
-    <!-- Right Section -->
-    <div class="right-panel">
-      <!-- Top Section -->
-      <item-details
-        (newItemSaved)="onNewItemSaved($event)">
-      </item-details>
-  
-      <!-- Divider -->
-      <div class="divider"></div>
-  
-      <!-- Bottom Section -->
-      <div class="bottom-section">
-        <table class="actions-table">
-          <thead>
-            <tr>
-              <th>Action</th>
-              <th>Status</th>
-              <th>Report</th>
-              <th>Date</th>
-              <th>Executed By</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let action of dynamicActions">
-              <!-- Action Button -->
-              <td>
-                <button (click)="action.handler()">
-                  {{ action.label }}
-                </button>
-              </td>
-  
-              <!-- Status Icon -->
-              <td>
-                <span [class.pass]="action.status === 'pass'"
-                      [class.fail]="action.status === 'fail'"
-                      [class.not-started]="action.status === 'not-started'">
-                  ●
-                </span>
-              </td>
-  
-              <!-- PDF Report Link -->
-              <td>
-                <ng-container *ngIf="action.status !== 'not-started'; else noData">
-                  <a href="#" (click)="openPdf(action.reportUrl ?? ''); $event.preventDefault()">Open Report</a>
-                </ng-container>
-                <ng-template #noData>-</ng-template>
-              </td>
-  
-              <!-- Execution Date -->
-              <td>
-                <ng-container *ngIf="action.status !== 'not-started'; else noData">
-                  {{ action.date | date: 'short' }}
-                </ng-container>
-              </td>
-  
-              <!-- Executed By -->
-              <td>
-                <ng-container *ngIf="action.status !== 'not-started'; else noData">
-                  {{ action.executedBy }}
-                </ng-container>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div *ngIf="selectedItem">
+          <h2>Selected Item</h2>
+          <p>Serial Number: {{ selectedItem.SerialNumber }}</p>
+          <p>Type: {{ selectedItem.Type }}</p>
+        </div>
       </div>
-  
-      <!-- PDF Viewer Panel -->
-      <div *ngIf="selectedPdf" class="pdf-viewer">
-        <h4>Report Viewer</h4>
-        <iframe
-              *ngIf="selectedPdf"
-              [src]="getSafePdfUrl()"
-              width="100%"
-              height="600px"
-              frameborder="0">
-        </iframe>
-      <button *ngIf="selectedPdf" (click)="closePdf()">Close PDF</button>
+      <div class="col">
+        <!-- Right Section -->
+        <!-- Top Section -->
+        <item-details (newItemSaved)="onNewItemSaved($event)">
+        </item-details>
+
+        <!-- Divider -->
+        <div class="divider"></div>
+
+        <!-- Bottom Section -->
+        <div class="bottom-section">
+          <table class="actions-table">
+            <thead>
+              <tr>
+                <th>Action</th>
+                <th>Status</th>
+                <th>Report</th>
+                <th>Date</th>
+                <th>Executed By</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let action of dynamicActions">
+                <!-- Action Button -->
+                <td>
+                  <button type="button" class="btn btn-primary" (click)="action.handler()">
+                    {{ action.label }}
+                  </button>
+                </td>
+
+                <!-- Status Icon -->
+                <td>
+                  <span [class.pass]="action.status === 'pass'" [class.fail]="action.status === 'fail'"
+                    [class.not-started]="action.status === 'not-started'">
+                    ●
+                  </span>
+                </td>
+
+                <!-- PDF Report Link -->
+                <td>
+                  <ng-container *ngIf="action.status !== 'not-started'; else noData">
+                    <a href="#" (click)="openPdf(action.reportUrl ?? ''); $event.preventDefault()">Open Report</a>
+                  </ng-container>
+                  <ng-template #noData>-</ng-template>
+                </td>
+
+                <!-- Execution Date -->
+                <td>
+                  <ng-container *ngIf="action.status !== 'not-started'; else noData">
+                    {{ action.date | date: 'short' }}
+                  </ng-container>
+                </td>
+
+                <!-- Executed By -->
+                <td>
+                  <ng-container *ngIf="action.status !== 'not-started'; else noData">
+                    {{ action.executedBy }}
+                  </ng-container>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- PDF Viewer Panel -->
+        <div *ngIf="selectedPdf" class="pdf-viewer">
+          <h4>Report Viewer</h4>
+          <iframe *ngIf="selectedPdf" [src]="getSafePdfUrl()" width="100%" height="600px" frameborder="0">
+          </iframe>
+          <button *ngIf="selectedPdf" (click)="closePdf()">Close PDF</button>
+        </div>
       </div>
     </div>
+
   </div>
-  
-  
+
 
 </main>

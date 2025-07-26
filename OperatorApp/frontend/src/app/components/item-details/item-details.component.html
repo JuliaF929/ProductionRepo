@@ -1,16 +1,22 @@
 <main>
-    <div class="item-details-container">
-        <label>
-            Item Type:
-            <input [(ngModel)]="item.Type" />
-          </label>
-          <label>
-            Item SN:
-            <input [(ngModel)]="item.SerialNumber" />
-          </label>
-          <div class="item-details-buttons">
-            <button (click)="cancel()">Cancel</button>
-            <button (click)="saveNewItem()">Save</button>
-          </div>
+  <div class="row">
+    <div class="col-sm mb-3">
+      <label for="itemFormControlInput1" class="form-label">Item Type:</label>
+      <input type="text" class="form-control" id="itemFormControlInput1" placeholder="xxxxxxxxx"
+        [(ngModel)]="item.Type">
     </div>
+    <div class="col-sm mb-3">
+      <label for="itemFormControlInput2" class="form-label">Item SN:</label>
+      <input type="text" class="form-control" id="itemFormControlInput2" placeholder="xxxxxxxxx"
+        [(ngModel)]="item.SerialNumber">
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm d-flex justify-content-end gap-2 mb-3">
+      <button type="button" class="btn btn-outline-primary" (click)="cancel()">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="saveNewItem()">Save</button>
+    </div>
+  </div>
+
 </main>

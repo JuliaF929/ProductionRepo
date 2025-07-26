@@ -1,64 +1,64 @@
 /* Container layout: left + right split */
-.container {
+/* .container {
     display: flex;
     height: 100vh;
-  }
+  } */
   
   /* Left Panel */
-  .left-panel {
+  /* .left-panel {
     width: 40%;
     border-right: 1px solid #ccc;
     padding: 1rem;
     overflow-y: auto;
   }
-  
+   */
   /* Right Panel */
-  .right-panel {
+  /* .right-panel {
     width: 60%;
     display: flex;
     flex-direction: column;
     padding: 1rem;
-  }
+  } */
   
   /* Top Section in Right Panel */
-  .top-section {
+  /* .top-section {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     margin-bottom: 0.5rem;
   }
-  
-  .top-section label {
+   */
+  /* .top-section label {
     display: flex;
     justify-content: space-between;
     margin-bottom: 0.5rem;
-  }
+  } */
   
  
   /* Divider between top/bottom sections */
-  .divider {
+  /* .divider {
     height: 1px;
     background-color: #ccc;
     margin: 0.5rem 0;
-  }
+  } */
   
   /* Bottom Section in Right Panel */
-  .bottom-section {
+  /* .bottom-section {
     flex: 1;
     overflow-y: auto;
-  }
+  } */
   
   /* Table in Bottom Section */
-  .actions-table {
+  /* .actions-table {
     width: 100%;
     border-collapse: collapse;
     border: 1px solid #333; /* Full table border */
-  }
+ /* } */
   
-  .actions-table th, 
+  /* .actions-table th, 
   .actions-table td {
     border: 1px solid #333; /* Cell borders */
-    padding: 0.5rem;
+    /*padding: 0.5rem;
     text-align: center;
   }
   
@@ -75,10 +75,10 @@
     color: #007bff;
     text-decoration: underline;
     cursor: pointer;
-  }
+  } */
   
   /* Status Indicators */
-  span.pass {
+  /* span.pass {
     color: green;
   }
   
@@ -88,10 +88,10 @@
   
   span.not-started {
     color: gray;
-  }
+  } */
   
   /* General Button Styling */
-  button {
+  /* button {
     padding: 0.5rem 1rem;
     cursor: pointer;
   }
@@ -114,4 +114,4 @@
     padding: 0.3rem 0.6rem;
     border-radius: 4px;
     cursor: pointer;
-  }
+  } */
