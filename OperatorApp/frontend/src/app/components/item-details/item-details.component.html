@@ -1,16 +1,28 @@
 <main>
   <div class="row">
-    <div class="col-sm mb-3">
-      <label for="itemFormControlInput1" class="form-label">Item Type:</label>
-      <input type="text" class="form-control" id="itemFormControlInput1" placeholder="xxxxxxxxx"
-        [(ngModel)]="item.Type">
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="itemType" class="form-label">Item Type:</label>
+        <select [(ngModel)]="item.Type" class="form-select" id="itemType">
+          <option value="" disabled>Select a type</option>
+          <option *ngFor="let t of availableTypes" [ngValue]="t">{{ t.Name }}</option>
+        </select>
+      </div>
+    
+      <div class="col-md-6">
+        <label for="itemSN" class="form-label">Item SN:</label>
+        <input
+          type="text"
+          [(ngModel)]="item.SerialNumber"
+          class="form-control"
+          id="itemSN"
+          placeholder="xxxxxxxxx"
+        />
+      </div>
     </div>
-    <div class="col-sm mb-3">
-      <label for="itemFormControlInput2" class="form-label">Item SN:</label>
-      <input type="text" class="form-control" id="itemFormControlInput2" placeholder="xxxxxxxxx"
-        [(ngModel)]="item.SerialNumber">
-    </div>
+
   </div>
+    
 
   <div class="row">
     <div class="col-sm d-flex justify-content-end gap-2 mb-3">

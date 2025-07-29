@@ -1,4 +1,6 @@
+import { ItemType } from "./item-type.model";
+
 export interface Item {
     SerialNumber: string;
-    Type: string;
+    Type: ItemType;
   }

@@ -22,9 +22,9 @@ public class ItemsController : ControllerBase
         _items.Clear(); // remove old items
         _items.AddRange(new[]
         {
-            new Item { SerialNumber = "001", Type = "Type A" },
-            new Item { SerialNumber = "002", Type = "Type B" },
-            new Item { SerialNumber = "003", Type = "Type C" }
+            new Item { SerialNumber = "001", Type = new ItemType {Name = "Type A"} },
+            new Item { SerialNumber = "002", Type = new ItemType {Name = "Type B"} },
+            new Item { SerialNumber = "003", Type = new ItemType {Name = "Type C"} }
         });
 
         _logger.LogInformation("kuku");

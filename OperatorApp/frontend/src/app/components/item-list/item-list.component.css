@@ -33,6 +33,11 @@ table tr.selected {
   font-weight: bold;
 } */
 
+table tr.selected {
+  --bs-table-color-state: var(--bs-table-active-color);
+  --bs-table-bg-state: var(--bs-table-active-bg);
+}
+
 /* When selected row is hovered, keep it selected */
 /* table tr.selected:hover {
   background-color: #007bff;

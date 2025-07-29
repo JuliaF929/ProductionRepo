@@ -2,6 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef } fro
 import { CommonModule, NgForOf, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Item } from '../../models/item.model';
+import { ItemType } from '../../models/item-type.model';
 import { ItemService } from '../../services/item.service';
 import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
 
@@ -39,7 +40,7 @@ export class ItemListComponent implements OnInit {
   applyFilters() {
     this.filteredItems = this.items.filter(item =>
       item.SerialNumber.toLowerCase().includes(this.filters.SerialNumber.toLowerCase()) &&
-      item.Type.toLowerCase().includes(this.filters.Type.toLowerCase())
+      item.Type?.Name.toLowerCase().includes(this.filters.Type.toLowerCase())
     );
   }
 
