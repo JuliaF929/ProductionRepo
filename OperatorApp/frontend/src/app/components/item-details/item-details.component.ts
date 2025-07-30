@@ -18,6 +18,7 @@ import { ItemService } from '../../services/item.service';
   export class ItemDetailsComponent implements OnInit{
 
     @Output() newItemSaved = new EventEmitter<Item>();
+    @Output() newItemSavingCanceled = new EventEmitter<void>();
 
     @Input() public item: Item | null = { SerialNumber: '', Type: {Name:''} };
     
@@ -83,7 +84,6 @@ import { ItemService } from '../../services/item.service';
               next: (createdItem: Item) => {
                 if (this.item) {
                     console.log('Item created successfully on backend:', createdItem);
-                    //this.newItemSaved.emit(this.item);// Notify parent
                     this.newItemSaved.emit(structuredClone(this.item)); // emits a deep copy
                     this.item = { SerialNumber: '', Type: { Name: '' } };
                 }
@@ -97,14 +97,8 @@ import { ItemService } from '../../services/item.service';
     }
 
     cancel() {
-        // if (this.selectedItem) {
-        //   // Restore original values if editing existing item
-        //   this.formItem = { ...this.selectedItem };
-        // } else {
-        //   // Clear form if adding new item
-        //   this.formItem = { SerialNumber: '', Type: '' };
-        // }
-        console.log('Cancelled saving new item, restored form:');
+        console.log('Cancelled saving new item by the user.');
+        this.newItemSavingCanceled.emit();
       }
 
   }

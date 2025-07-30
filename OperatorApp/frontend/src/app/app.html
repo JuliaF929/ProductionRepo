@@ -27,7 +27,8 @@
         <item-details 
             [item]="selectedItem"
             [readonly]="!isNewItemMode && selectedItem !== null"
-            (newItemSaved)="onNewItemSaved($event)">
+            (newItemSaved)="onNewItemSaved($event)"
+            (newItemSavingCanceled)="onNewItemSavingCanceled()">
         </item-details>
 
         <!-- Divider -->

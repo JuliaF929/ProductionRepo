@@ -38,6 +38,12 @@ export class App {
     this.itemListComponent.onNewItemCreated(newItem);
   }
 
+  onNewItemSavingCanceled() {
+    this.selectedItem = null;
+    this.isNewItemMode = false;
+  }
+
+
   dynamicActions: {
     label: string;
     status: 'pass' | 'fail' | 'not-started';
