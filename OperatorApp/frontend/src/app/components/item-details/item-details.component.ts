@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, OnInit, ChangeDetectorRef  } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectorRef, SimpleChanges } from '@angular/core';
 import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -19,12 +19,27 @@ import { ItemService } from '../../services/item.service';
 
     @Output() newItemSaved = new EventEmitter<Item>();
 
-    public item = { SerialNumber: '', Type: {Name:''} };
-    public availableTypes: ItemType[] = [];//['Type A', 'Type B', 'Type C'];
+    @Input() public item: Item | null = { SerialNumber: '', Type: {Name:''} };
+    
+    public availableTypes: ItemType[] = [];
+
+    @Input() public readonly: boolean = false;
      
     constructor(private itemService: ItemService, private cdr: ChangeDetectorRef) 
     {
         console.log('ItemDetailsComponent constructor called!');
+    }
+
+    ngOnChanges(changes: SimpleChanges) 
+    {
+        if (changes['item'] && this.item) {
+            this.item = structuredClone(this.item); // make local copy to avoid binding issues
+            // Match item.Type by name with one from availableTypes
+            const match = this.availableTypes.find(t => t.Name === this.item!.Type?.Name);
+            if (match) {
+              this.item.Type = match;
+            }
+          }
     }
 
     ngOnInit() {
@@ -45,12 +60,16 @@ import { ItemService } from '../../services/item.service';
 
     addNewItem()
     {
+        if (this.item === null)
+            console.log("The item is null and this fails...");
+
         this.item = { SerialNumber: '', Type: {Name: ''} };
+        this.cdr.detectChanges();
     }
 
     setItemDetails(item: Item)
     {
-        this.item = { SerialNumber: item.SerialNumber, Type: { Name: item.Type?.Name } };
+        this.item = { SerialNumber: item.SerialNumber, Type: { Name: item?.Type?.Name } };
     }
 
     saveNewItem()
@@ -62,10 +81,12 @@ import { ItemService } from '../../services/item.service';
         if (this.item) {
             this.itemService.createNewItem(this.item).subscribe({
               next: (createdItem: Item) => {
-                console.log('Item created successfully on backend:', createdItem);
-                //this.newItemSaved.emit(this.item);// Notify parent
-                this.newItemSaved.emit(structuredClone(this.item)); // ✅ emits a deep copy
-                this.item = { SerialNumber: '', Type: { Name: '' } };
+                if (this.item) {
+                    console.log('Item created successfully on backend:', createdItem);
+                    //this.newItemSaved.emit(this.item);// Notify parent
+                    this.newItemSaved.emit(structuredClone(this.item)); // emits a deep copy
+                    this.item = { SerialNumber: '', Type: { Name: '' } };
+                }
               },
               error: (err: HttpErrorResponse) => {
                 console.error('Failed to create item on backend', err);

@@ -8,11 +8,11 @@
         <!-- Left Section -->
         <div class="row">
           <div class="col mb-3">
-            <button type="button" class="btn btn-primary" (click)="addNewItem()">Add New Item</button>
+            <button type="button" class="btn btn-primary" (click)="appAddNewItem()">Add New Item</button>
           </div>
         </div>
         <!-- Table and its filter row -->
-        <item-list (itemSelectedByUser)="onItemSelected($event)" (createNewItemEvent)="onItemAddedToTable($event)">
+        <item-list [itemSelectedByParent]="selectedItem" (itemSelectedByUser)="onItemSelected($event)" (createNewItemEvent)="onItemAddedToTable($event)">
         </item-list>
 
         <div *ngIf="selectedItem">
@@ -24,7 +24,10 @@
       <div class="col">
         <!-- Right Section -->
         <!-- Top Section -->
-        <item-details (newItemSaved)="onNewItemSaved($event)">
+        <item-details 
+            [item]="selectedItem"
+            [readonly]="!isNewItemMode && selectedItem !== null"
+            (newItemSaved)="onNewItemSaved($event)">
         </item-details>
 
         <!-- Divider -->

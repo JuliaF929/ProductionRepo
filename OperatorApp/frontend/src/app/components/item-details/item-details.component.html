@@ -1,9 +1,10 @@
 <main>
+
   <div class="row">
     <div class="row mb-3">
       <div class="col-md-6">
         <label for="itemType" class="form-label">Item Type:</label>
-        <select [(ngModel)]="item.Type" class="form-select" id="itemType">
+        <select *ngIf="item" [(ngModel)]="item.Type" [disabled]="readonly" class="form-select" id="itemType">
           <option value="" disabled>Select a type</option>
           <option *ngFor="let t of availableTypes" [ngValue]="t">{{ t.Name }}</option>
         </select>
@@ -13,9 +14,11 @@
         <label for="itemSN" class="form-label">Item SN:</label>
         <input
           type="text"
+          *ngIf="item"
           [(ngModel)]="item.SerialNumber"
           class="form-control"
           id="itemSN"
+          [disabled]="readonly"
           placeholder="xxxxxxxxx"
         />
       </div>
@@ -26,8 +29,8 @@
 
   <div class="row">
     <div class="col-sm d-flex justify-content-end gap-2 mb-3">
-      <button type="button" class="btn btn-outline-primary" (click)="cancel()">Cancel</button>
-      <button type="button" class="btn btn-primary" (click)="saveNewItem()">Save</button>
+      <button type="button" class="btn btn-outline-primary" (click)="cancel()" *ngIf="!readonly">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="saveNewItem()" *ngIf="!readonly">Save</button>
     </div>
   </div>
 

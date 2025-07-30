@@ -23,14 +23,18 @@ export class App {
   @ViewChild(ItemListComponent) itemListComponent!: ItemListComponent;
   @ViewChild(ItemDetailsComponent) itemDetailsComponent!: ItemDetailsComponent;
 
-  selectedItem: Item | null = null;
+  public selectedItem: Item | null = null;
+  public isNewItemMode = false;
 
   onItemSelected(item: Item) {
     this.selectedItem = item;
+    this.isNewItemMode = false;
     console.log('Parent received selected item:', item);
   }
 
   onNewItemSaved(newItem: Item) {
+    this.selectedItem = null;
+    this.isNewItemMode = false;
     this.itemListComponent.onNewItemCreated(newItem);
   }
 
@@ -43,12 +47,14 @@ export class App {
     handler: () => void;
   }[] = [];
 
-  addNewItem() {
-    console.log('app: addNewItem');
-    this.itemDetailsComponent.addNewItem();
-    this.selectedItem = null;
+  appAddNewItem() {
+    console.log(`appAddNewItem, selectedItem is ${this.selectedItem}`);
+    this.selectedItem = { SerialNumber: '', Type: { Name: '' } };
+    this.isNewItemMode = true;
+
     this.dynamicActions = [];
     this.selectedPdf = null;
+    this.itemDetailsComponent.addNewItem();
   }
 
   selectItem(item: any) {
@@ -123,8 +129,11 @@ export class App {
   }
 
   onItemAddedToTable(newItem: Item) {
-     // Just a placeholder for the future
+
      console.log('Parent notified of new item creation:', newItem);
+
+     this.selectedItem = newItem;
+     this.isNewItemMode = false;
    }
 
   getSafePdfUrl(): SafeResourceUrl {
