@@ -1,0 +1,62 @@
+<main>
+    <div style="max-height: 500px; overflow-y: auto;">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Report</th>
+          <th>Date</th>
+          <th>Executed By</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let action of itemActions">
+          <td>
+            <button type="button" class="btn btn-primary" (click)="executeAction()">
+              {{ action.Name }}
+            </button>
+          </td>
+
+          <!-- Status Icon -->
+          <td>
+            <span [class.pass]="action.LatestRunStatus === 'Pass'" [class.fail]="action.LatestRunStatus === 'Fail'"
+              [class.not-started]="action.LatestRunStatus === 'not-started'">
+              ●
+            </span>
+          </td>
+
+          <!-- PDF Report Link -->
+          <td>
+            <ng-container *ngIf="action.LatestRunStatus !== 'not-started'; else noData">
+              <a href="#" (click)="openPdf(); $event.preventDefault()">Open Report</a>
+            </ng-container>
+            <ng-template #noData>-</ng-template>
+          </td>
+
+          <!-- Execution Date -->
+          <td>
+            <ng-container *ngIf="action.LatestRunStatus !== 'not-started'; else noData">
+              {{ action.LatestRunDateTime | date: 'short' }}
+            </ng-container>
+          </td>
+
+          <!-- Executed By -->
+          <td>
+            <ng-container *ngIf="action.LatestRunStatus !== 'not-started'; else noData">
+              {{ action.LatestExecuter }}
+            </ng-container>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+          <!-- PDF Viewer Panel -->
+          <div *ngIf="selectedPdf" class="pdf-viewer">
+            <h4>Report Viewer</h4>
+            <iframe *ngIf="selectedPdf" [src]="getSafePdfUrl()" width="100%" height="600px" frameborder="0">
+            </iframe>
+            <button *ngIf="selectedPdf" (click)="closePdf()">Close PDF</button>
+          </div>
+</main>
