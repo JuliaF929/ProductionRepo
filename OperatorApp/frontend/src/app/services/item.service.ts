@@ -12,6 +12,7 @@ export class ItemService {
   private apiItemsUrl = '/api/items';
   private apiItemTypesUrl = '/api/itemtype';
   private apiItemActionsUrl = '/api/itemactions';
+  private apiActionUrl = '/api/action';
 
   constructor(private http: HttpClient) {}
 
@@ -31,5 +32,12 @@ export class ItemService {
     const params = new HttpParams().set('itemSN', item.SerialNumber);
     return this.http.get<ItemAction[]>(this.apiItemActionsUrl, { params });
 
+  }
+
+  executeAction(actionName: string, itemSN: string) : Observable<void> {
+    const params = new HttpParams()
+                                  .set('actionName', actionName)
+                                  .set('itemSN', itemSN);
+    return this.http.get<void>(this.apiActionUrl + "/execute", {params});
   }
 }

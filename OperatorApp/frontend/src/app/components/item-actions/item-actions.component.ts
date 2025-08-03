@@ -21,6 +21,7 @@ import { ItemAction } from '../../models/item-action.model';
   {
 
     public itemActions: ItemAction[] = [];
+    item: Item | null = {SerialNumber: "", Type: {Name: ""}};
 
     selectedPdf: string | null = null; // PDF URL to display
 
@@ -69,15 +70,28 @@ import { ItemAction } from '../../models/item-action.model';
       );
     }
 
-    executeAction()
+    executeAction(action: ItemAction)
     {
-        console.log(`Going to run action `);//${selectedAction.Name} for itemSN ${selectedAction.SerialNumber}.`)
+        
+        
+        if (this.item === null)
+        {
+          console.log("Item is null, cant run action.");
+          return;
+        }
+
+        console.log(`Going to run action ${action.Name} for item ${this.item!.SerialNumber}`);
+
+        //TODO: do not allow any UI user interaction when the action is executed
+
+        this.itemService.executeAction(action.Name, this.item!.SerialNumber).subscribe(() => {});
     }
 
     clear()
     {
       console.log(`ItemActionsComponent - clearing table of actions.`);
       this.itemActions.length = 0;
+      this.item = null;
       this.cdr.detectChanges(); //Force Angular to refresh the view
     }
 
@@ -89,54 +103,9 @@ import { ItemAction } from '../../models/item-action.model';
         this.itemService.getItemActions(item).subscribe((itemActionsListFromBE: ItemAction[]) => {
           console.log('Those are all item actions:', itemActionsListFromBE);
           this.itemActions = itemActionsListFromBE;
+          this.item = item;
           this.cdr.detectChanges(); //Force Angular to refresh the view
         });
 
-        /*
-        if (item.sn === '001') {
-      this.dynamicActions = [
-        {
-          label: 'Check A',
-          status: 'pass',
-          reportUrl: '/assets/reports/checkA.pdf',
-          date: new Date(),
-          executedBy: 'John Doe',
-          handler: () => this.startAction('Check A')
-        },
-        {
-          label: 'Check B',
-          status: 'not-started',
-          handler: () => this.startAction('Check B')
-        }
-      ];
-    } else if (item.sn === '002') {
-      this.dynamicActions = [
-        {
-          label: 'Inspection X',
-          status: 'fail',
-          reportUrl: '/assets/reports/inspectionX.pdf',
-          date: new Date(),
-          executedBy: 'Jane Smith',
-          handler: () => this.startAction('Inspection X')
-        }
-      ];
-    } else {
-      this.dynamicActions = [
-        {
-          label: 'Validation Y',
-          status: 'not-started',
-          handler: () => this.startAction('Validation Y')
-        },
-        {
-          label: 'Validation Z',
-          status: 'pass',
-          reportUrl: '/assets/reports/validationZ.pdf',
-          date: new Date(),
-          executedBy: 'Alice Johnson',
-          handler: () => this.startAction('Validation Z')
-        }
-      ];
-    }
-        */
     }
 }

@@ -13,7 +13,7 @@
       <tbody>
         <tr *ngFor="let action of itemActions">
           <td>
-            <button type="button" class="btn btn-primary" (click)="executeAction()">
+            <button type="button" class="btn btn-primary" (click)="executeAction(action)">
               {{ action.Name }}
             </button>
           </td>
