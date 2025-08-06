@@ -3,6 +3,8 @@ using Backend.Models;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using System.Diagnostics;
+using PdfSharpCore.Drawing;
+using PdfSharpCore.Pdf;
 
 namespace Backend.Controllers;
 
@@ -11,10 +13,105 @@ namespace Backend.Controllers;
 public class ActionController : ControllerBase
 {
     private readonly ILogger<ActionController> _logger;
+    private const string ACTIONS_RELATIVE_PATH = "CalibrationApplications";
+    private const string INPUT_FOLDER_NAME     = "Input";
+    private const string OUTPUT_FOLDER_NAME    = "Output";
+    private const string REPORT_FOLDER_NAME    = "Reports";
+
 
     public ActionController(ILogger<ActionController> logger)
     {
         _logger = logger;
+    }
+
+    private Dictionary<string, string> GetOutputJsonData(string targetPath)
+    {
+        //output.json name shall be called as:
+        //"output_" + whatever the action application wants + ".json"
+        string[] matchingFiles = Directory.GetFiles(Path.Combine(targetPath, OUTPUT_FOLDER_NAME), "output*.json");
+
+        if (matchingFiles.Length == 0)
+        {
+            _logger.LogInformation($"No matching JSON files found at {targetPath}.");
+            return null;
+        }
+
+        string jsonFilePath = matchingFiles[0]; // Use the first matching file
+        string jsonContent = System.IO.File.ReadAllText(jsonFilePath);
+
+        _logger.LogInformation($"Json data will be read from {jsonFilePath}");
+
+        // Deserialize into dictionary
+        return JsonSerializer.Deserialize<Dictionary<string, string>>(jsonContent);
+    }
+
+    private string CreatePdf(string targetPath, string actionName, string actionVersionNumber, string itemSN, Dictionary<string, string> jsonData)
+    {
+        string pathForReport = Path.Combine(targetPath, REPORT_FOLDER_NAME);
+
+        //ensure folder exists
+        if (!Directory.Exists(pathForReport))
+            Directory.CreateDirectory(pathForReport);
+
+        string reportPdfName = itemSN + "_" + actionName + "_" + DateTime.Now.ToString("yyyyMMMdd_HHmmss") + "_" + "Report.pdf";  
+        string outputPath = Path.Combine(pathForReport, reportPdfName);
+
+        var document = new PdfDocument();
+        var page = document.AddPage();
+        var gfx = XGraphics.FromPdfPage(page);
+
+        int y = 40;
+        gfx.DrawString("Report", new XFont("Arial", 18, XFontStyle.Bold), XBrushes.Black, new XRect(0, y, page.Width, 20), XStringFormats.TopCenter);
+        y += 40;
+
+        // write each key-value from JSON
+        foreach (var pair in jsonData)
+        {
+            gfx.DrawString($"{pair.Key}: {pair.Value}", new XFont("Arial", 12), XBrushes.Black, new XRect(40, y, page.Width - 80, 20), XStringFormats.TopLeft);
+            y += 20;
+        }
+
+        document.Save(outputPath);
+
+        return pathForReport;
+    }
+
+    [HttpGet("create-report")]
+    public IActionResult CreateReport([FromQuery] string actionName,
+                                      [FromQuery] string actionVersionNumber, 
+                                      [FromQuery] string itemSN)
+    {
+        try
+        {
+            //the output json is located at the OUTPUT_FOLDER_NAME folder
+            // relative to the backend's current directory
+            string basePath = AppContext.BaseDirectory;
+            string targetPath = Path.Combine(basePath, ACTIONS_RELATIVE_PATH);
+
+            _logger.LogInformation($"CreateReport - going to create report for item {itemSN}, action {actionName}, actionVersionNumber {actionVersionNumber}");
+
+            // parse as Dictionary or dynamic if structure is not predefined
+            var outputJsonData = GetOutputJsonData(targetPath);
+            if (outputJsonData == null)
+            {
+                return BadRequest("Output json is invalid.");
+            }
+            
+            _logger.LogInformation($"Output Json data read, {outputJsonData}.");
+
+
+            //put all metadata from json to report
+            //put report at "Reports" folder
+            string pathForReport = CreatePdf(targetPath, actionName, actionVersionNumber, itemSN, outputJsonData);
+
+            //TODO: error handling
+            return Ok(new { path = pathForReport });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogInformation($"Exception in CreateReport, Ex. {ex.Message}.");
+            return BadRequest("Exception in CreateReport");
+        }
     }
 
     [HttpGet("execute")]
@@ -31,8 +128,8 @@ public class ActionController : ControllerBase
             if (string.IsNullOrWhiteSpace(actionFolderPath))
                 return BadRequest("Invalid action folder name");
 
-            string inputFolderPath = ClearFolder("Input");
-            string outputFolderPath = ClearFolder("Output");
+            string inputFolderPath = ClearFolder(INPUT_FOLDER_NAME);
+            string outputFolderPath = ClearFolder(OUTPUT_FOLDER_NAME);
 
             //TODO: get item metadata from server
             var data = new Dictionary<string, string>
@@ -51,9 +148,11 @@ public class ActionController : ControllerBase
                
             RunExecutable(actionFolderPath);
 
-            //TODO: handle action output
+            //TODO: send to the server execution details and the output
+            //so all these can be written to DB
 
-            return Ok();
+            _logger.LogInformation($"Finished executing {actionName}, returning {actionLatestVer}.");
+            return Ok(new { version = actionLatestVer });
         }
         catch (Exception ex)
         {
@@ -106,7 +205,7 @@ public class ActionController : ControllerBase
 
         // relative to the backend's current directory
         string basePath = AppContext.BaseDirectory;
-        string targetPath = Path.Combine(basePath, "CalibrationApplications", actionName + "_" + actionVersion);
+        string targetPath = Path.Combine(basePath, ACTIONS_RELATIVE_PATH, actionName + "_" + actionVersion);
 
         if (!Directory.Exists(targetPath))
         {
@@ -130,7 +229,7 @@ public class ActionController : ControllerBase
     {
         // relative to the backend's current directory
         string basePath = AppContext.BaseDirectory;
-        string targetPath = Path.Combine(basePath, "CalibrationApplications", folderName);
+        string targetPath = Path.Combine(basePath, ACTIONS_RELATIVE_PATH, folderName);
 
         if (!Directory.Exists(targetPath))
         {

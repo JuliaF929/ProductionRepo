@@ -1,6 +1,6 @@
 
 import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectorRef, SimpleChanges } from '@angular/core';
-import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpClientModule  } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -13,7 +13,7 @@ import { ItemAction } from '../../models/item-action.model';
     standalone: true,
     templateUrl: './item-actions.component.html',
     styleUrls: ['./item-actions.component.css'],
-    imports: [FormsModule, HttpClientModule, CommonModule],
+    imports: [FormsModule, CommonModule, HttpClientModule ],
     providers: [ItemService],
   })
 
@@ -84,7 +84,26 @@ import { ItemAction } from '../../models/item-action.model';
 
         //TODO: do not allow any UI user interaction when the action is executed
 
-        this.itemService.executeAction(action.Name, this.item!.SerialNumber).subscribe(() => {});
+        this.itemService.executeAction(action.Name, this.item!.SerialNumber).subscribe({
+          next: (res: { version: string }) => {
+            const actionVersionNumber = res.version;
+            console.log(`Finished running ${action.Name} for item ${this.item!.SerialNumber}, version ${actionVersionNumber}`);
+        
+            this.itemService.createReportForAction(action.Name, actionVersionNumber, this.item!.SerialNumber).subscribe({
+              next: (res: { path: string }) => {
+                const kuku = res.path;
+                // Use reportPdfPath
+              },
+              error: (error: HttpErrorResponse) => {
+                console.error('Create report failed:', error);
+              }
+            });
+          },
+          error: (error: HttpErrorResponse) => {
+            console.error('Execution failed:', error);
+          }
+        });
+        
     }
 
     clear()

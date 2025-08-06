@@ -3,11 +3,15 @@ import { Injectable } from '@angular/core';
 import { Item } from '../models/item.model';
 import { ItemType } from '../models/item-type.model';
 import { ItemAction } from '../models/item-action.model';
+import { ExecuteActionResponse } from '../models/execute-action-response.model';
+import { ActionReportResponse } from '../models/action-report.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
+
+
 export class ItemService {
   private apiItemsUrl = '/api/items';
   private apiItemTypesUrl = '/api/itemtype';
@@ -34,10 +38,26 @@ export class ItemService {
 
   }
 
-  executeAction(actionName: string, itemSN: string) : Observable<void> {
+  executeAction(actionName: string, itemSN: string) : Observable<ExecuteActionResponse> {
     const params = new HttpParams()
                                   .set('actionName', actionName)
                                   .set('itemSN', itemSN);
-    return this.http.get<void>(this.apiActionUrl + "/execute", {params});
+
+    console.log("Calling:", this.apiActionUrl + "/execute");
+    console.log("With params:", params.toString());
+
+    return this.http.get<ExecuteActionResponse>(this.apiActionUrl + "/execute", {params});
+  }
+
+  createReportForAction(actionName: string, actionVersionNumber: string, itemSN: string) : Observable<ActionReportResponse> {
+    const params = new HttpParams()
+                                  .set('actionName', actionName)
+                                  .set('actionVersionNumber', actionVersionNumber)
+                                  .set('itemSN', itemSN);
+
+    console.log("Calling:", this.apiActionUrl + "/create-report");
+    console.log("With params:", params.toString());
+                              
+    return this.http.get<ActionReportResponse>(this.apiActionUrl + "/create-report", {params});
   }
 }
