@@ -45,7 +45,12 @@ public class ActionController : ControllerBase
         return JsonSerializer.Deserialize<Dictionary<string, string>>(jsonContent);
     }
 
-    private string CreatePdf(string targetPath, string actionName, string actionVersionNumber, string itemSN, Dictionary<string, string> jsonData)
+    private string CreatePdf(string targetPath, 
+                             string actionName, 
+                             string actionVersionNumber, 
+                             string itemSN, 
+                             string itemType, 
+                             Dictionary<string, string> jsonData)
     {
         string pathForReport = Path.Combine(targetPath, REPORT_FOLDER_NAME);
 
@@ -53,33 +58,123 @@ public class ActionController : ControllerBase
         if (!Directory.Exists(pathForReport))
             Directory.CreateDirectory(pathForReport);
 
-        string reportPdfName = itemSN + "_" + actionName + "_" + DateTime.Now.ToString("yyyyMMMdd_HHmmss") + "_" + "Report.pdf";  
+        string reportCreationDateTime = DateTime.Now.ToString("yyyyMMMdd_HHmmss");
+        string reportPdfName = itemSN + "_" + actionName + "_" + reportCreationDateTime + "_" + "Report.pdf";  
         string outputPath = Path.Combine(pathForReport, reportPdfName);
 
         var document = new PdfDocument();
         var page = document.AddPage();
         var gfx = XGraphics.FromPdfPage(page);
 
+        var fontHeader = new XFont("Arial", 18, XFontStyle.Bold);
+        var font       = new XFont("Arial", 12);
+
+        //header
         int y = 40;
-        gfx.DrawString("Report", new XFont("Arial", 18, XFontStyle.Bold), XBrushes.Black, new XRect(0, y, page.Width, 20), XStringFormats.TopCenter);
+        gfx.DrawString(actionName + " Report", 
+                       fontHeader, 
+                       XBrushes.Black, 
+                       new XRect(0, y, page.Width, 20), 
+                       XStringFormats.TopCenter);
         y += 40;
 
-        // write each key-value from JSON
-        foreach (var pair in jsonData)
+
+        //report meta data
+        Dictionary<string, string> reportMetaData = new Dictionary<string, string>();
+        reportMetaData.Add("Item Serial Number", itemSN);
+        reportMetaData.Add("Item Type", itemType);
+        reportMetaData.Add(actionName + " Version#:", actionVersionNumber);
+        reportMetaData.Add("JuliaSW " + "Version#:", "6.6.6.6"); //TODO: set the ver# of this application
+        reportMetaData.Add("Site", "Rio de Janeiro;-)"); //TODO: fill real site name
+        reportMetaData.Add("Operator Name", "Julia"); //TODO: fill real operator name
+        reportMetaData.Add("Report Creation Date and Time", reportCreationDateTime);
+
+        foreach (var key in reportMetaData.Keys)
         {
-            gfx.DrawString($"{pair.Key}: {pair.Value}", new XFont("Arial", 12), XBrushes.Black, new XRect(40, y, page.Width - 80, 20), XStringFormats.TopLeft);
+            gfx.DrawString($"{key}: {reportMetaData[key]}", 
+                            font, 
+                            XBrushes.Black, 
+                            new XRect(40, y, page.Width - 80, 20), 
+                            XStringFormats.TopLeft);
+
             y += 20;
         }
+
+        y += 60;
+
+        // output json data written by the action application
+        foreach (var pair in jsonData)
+        {
+            gfx.DrawString($"{pair.Key}: {pair.Value}", 
+                           font, 
+                           XBrushes.Black, 
+                           new XRect(40, y, page.Width - 80, 20), 
+                           XStringFormats.TopLeft);
+            y += 20;
+        }
+
+        y += 60;
+
+        //table for operator sign
+        int startX = 15;
+        int startY = y;
+        int rowHeight = 30;
+        int colWidth = 115;
+
+        string[] headers = { "", "Name", "Role", "Date", "Sign" };
+        string[] rows_col_0 = { "Performed by", "Approved by" };
+        string[] rows_col_1 = { "Julia", "" };
+        string[] rows_col_3 = { reportCreationDateTime, "" };
+
+        // Draw header row
+        for (int col = 0; col < headers.Length; col++)
+        {
+            DrawCell(gfx, font, headers[col], startX + col * colWidth, startY, colWidth, rowHeight);
+        }
+
+        // Draw data rows
+        string text = string.Empty;
+        for (int row = 0; row < 2; row++)
+        {
+            for (int col = 0; col < headers.Length; col++)
+            {
+                if (col == 0)
+                    text = rows_col_0[row];
+                if (col == 1)
+                    text = rows_col_1[row];
+                if (col == 2)
+                    text = "";
+                if (col == 3)
+                    text = rows_col_3[row];
+                if (col == 4)
+                    text = "";
+
+                DrawCell(gfx, font, text, startX + col * colWidth, startY + (row + 1) * rowHeight, colWidth, rowHeight);
+            }
+        }
+
 
         document.Save(outputPath);
 
         return pathForReport;
     }
 
+    private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int width, int height)
+    {
+        // Draw border
+        gfx.DrawRectangle(XPens.Black, x, y, width, height);
+
+        // Draw text centered
+        gfx.DrawString(text, font, XBrushes.Black,
+            new XRect(x, y, width, height),
+            XStringFormats.Center);
+    }
+
     [HttpGet("create-report")]
     public IActionResult CreateReport([FromQuery] string actionName,
                                       [FromQuery] string actionVersionNumber, 
-                                      [FromQuery] string itemSN)
+                                      [FromQuery] string itemSN,
+                                      [FromQuery] string itemType)
     {
         try
         {
@@ -102,7 +197,7 @@ public class ActionController : ControllerBase
 
             //put all metadata from json to report
             //put report at "Reports" folder
-            string pathForReport = CreatePdf(targetPath, actionName, actionVersionNumber, itemSN, outputJsonData);
+            string pathForReport = CreatePdf(targetPath, actionName, actionVersionNumber, itemSN, itemType, outputJsonData);
 
             //TODO: error handling
             return Ok(new { path = pathForReport });

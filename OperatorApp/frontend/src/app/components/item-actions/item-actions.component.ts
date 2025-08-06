@@ -89,7 +89,7 @@ import { ItemAction } from '../../models/item-action.model';
             const actionVersionNumber = res.version;
             console.log(`Finished running ${action.Name} for item ${this.item!.SerialNumber}, version ${actionVersionNumber}`);
         
-            this.itemService.createReportForAction(action.Name, actionVersionNumber, this.item!.SerialNumber).subscribe({
+            this.itemService.createReportForAction(action.Name, actionVersionNumber, this.item!.SerialNumber, this.item!.Type!.Name).subscribe({
               next: (res: { path: string }) => {
                 const kuku = res.path;
                 // Use reportPdfPath
