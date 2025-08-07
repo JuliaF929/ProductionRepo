@@ -9,6 +9,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Diagnostics;
+using Microsoft.Extensions.Configuration;
 
 namespace DesktopHost;
 
@@ -30,9 +31,16 @@ public partial class MainWindow : Window
 
         //TODO: After connecting DB get from BE the company name here
         OperatorAppWindow.Title = "Julia - Manufacturing Operator Application";
+        OperatorAppWindow.WindowState = WindowState.Maximized;
 
         AllocConsole();
         Console.WriteLine("DesktopHost started...");
+
+        var config = new ConfigurationBuilder()
+                                                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                                                .AddJsonFile("appsettings.json")
+                                                .Build();
+        var backendUrl = config["AppConfig:BackendUrl"];
 
         // Start Backend silently
         //string backendDir;
@@ -80,7 +88,7 @@ public partial class MainWindow : Window
         Thread.Sleep(2000);
 
         // Load Angular UI from Backend
-        webView.Source = new Uri("http://localhost:5005");
+        webView.Source = new Uri(backendUrl);
     }
 
     protected override void OnClosed(EventArgs e)

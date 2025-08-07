@@ -7,6 +7,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Item } from '../../models/item.model';
 import { ItemService } from '../../services/item.service';
 import { ItemAction } from '../../models/item-action.model';
+import { ExecuteActionResponse } from '../../models/execute-action-response.model';
 
 @Component({
     selector: 'item-actions',
@@ -25,7 +26,8 @@ import { ItemAction } from '../../models/item-action.model';
 
     selectedPdf: string | null = null; // PDF URL to display
 
-    pdfViewerUrl = '/assets/pdfjs/web/viewer.html?file=/assets/pdfjs/reports/testPDF.pdf';
+    staticDummyPdf = '/assets/pdfjs/web/viewer.html?file=/assets/pdfjs/reports/testPDF.pdf';
+    pdfViewerUrl = this.staticDummyPdf;
 
     constructor(private itemService: ItemService, private cdr: ChangeDetectorRef, public sanitizer: DomSanitizer) 
     {
@@ -36,12 +38,16 @@ import { ItemAction } from '../../models/item-action.model';
         console.log(`ItemActionsComponent - ngOnInit called!`);
     }
 
-    openPdf() {//reportUrl?: string) {
-      if (this.pdfViewerUrl) {
-        this.selectedPdf = this.pdfViewerUrl;
+    openPdf (reportUrl?: string) {
+      console.log(`openPdf - reportUrl is ${reportUrl}.`);
+      if (reportUrl !== null) {
+        this.pdfViewerUrl = reportUrl!;
+        this.selectedPdf = reportUrl!;     
       } else {
-        console.warn('PDF URL not defined');
+        this.pdfViewerUrl = this.staticDummyPdf;
+        this.selectedPdf = this.staticDummyPdf;
       }
+      this.cdr.detectChanges();
     }
 
     closePdf() {
@@ -85,14 +91,30 @@ import { ItemAction } from '../../models/item-action.model';
         //TODO: do not allow any UI user interaction when the action is executed
 
         this.itemService.executeAction(action.Name, this.item!.SerialNumber).subscribe({
-          next: (res: { version: string }) => {
-            const actionVersionNumber = res.version;
-            console.log(`Finished running ${action.Name} for item ${this.item!.SerialNumber}, version ${actionVersionNumber}`);
+          next: (actionResponse: ExecuteActionResponse) => {
+            const actionVersionNumber = actionResponse.version;
+            const actionResult = actionResponse.executionResult;
         
-            this.itemService.createReportForAction(action.Name, actionVersionNumber, this.item!.SerialNumber, this.item!.Type!.Name).subscribe({
+            console.log(`Finished running ${action.Name} for item ${this.item!.SerialNumber}, version ${actionVersionNumber}, result ${actionResult}`);
+        
+            this.itemService.createReportForAction(
+              action.Name,
+              actionVersionNumber,
+              this.item!.SerialNumber,
+              this.item!.Type!.Name
+            ).subscribe({
               next: (res: { path: string }) => {
-                const kuku = res.path;
-                // Use reportPdfPath
+                const reportPdfPath = res.path;
+                console.log(`Received report pdf path to show: ${reportPdfPath}.`);
+                
+                this.cdr.detectChanges();
+
+                const reportPdfPathForAngular = "/assets/pdfjs/web/viewer.html?file=" + reportPdfPath;
+                console.log(`Report pdf path to show in angular: ${reportPdfPathForAngular}.`);
+                console.log(`Going to open report.`);
+                this.openPdf(reportPdfPathForAngular);
+                console.log(`Report opened.`);
+                // show the report pdf
               },
               error: (error: HttpErrorResponse) => {
                 console.error('Create report failed:', error);
@@ -103,6 +125,7 @@ import { ItemAction } from '../../models/item-action.model';
             console.error('Execution failed:', error);
           }
         });
+        
         
     }
 

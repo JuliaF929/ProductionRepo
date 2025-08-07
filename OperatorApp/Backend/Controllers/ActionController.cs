@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Diagnostics;
 using PdfSharpCore.Drawing;
 using PdfSharpCore.Pdf;
+using Microsoft.Extensions.Options;
 
 namespace Backend.Controllers;
 
@@ -13,15 +14,19 @@ namespace Backend.Controllers;
 public class ActionController : ControllerBase
 {
     private readonly ILogger<ActionController> _logger;
+    private readonly AppConfig _config;
+
     private const string ACTIONS_RELATIVE_PATH = "CalibrationApplications";
     private const string INPUT_FOLDER_NAME     = "Input";
     private const string OUTPUT_FOLDER_NAME    = "Output";
     private const string REPORT_FOLDER_NAME    = "Reports";
+    private const string ANGULAR_FOLDER_NAME   = "wwwroot"; 
 
-
-    public ActionController(ILogger<ActionController> logger)
+    
+    public ActionController(ILogger<ActionController> logger, IOptions<AppConfig> config)
     {
         _logger = logger;
+        _config = config.Value;
     }
 
     private Dictionary<string, string> GetOutputJsonData(string targetPath)
@@ -45,14 +50,14 @@ public class ActionController : ControllerBase
         return JsonSerializer.Deserialize<Dictionary<string, string>>(jsonContent);
     }
 
-    private string CreatePdf(string targetPath, 
+    private string CreatePdf(string basePath, 
                              string actionName, 
                              string actionVersionNumber, 
                              string itemSN, 
                              string itemType, 
                              Dictionary<string, string> jsonData)
     {
-        string pathForReport = Path.Combine(targetPath, REPORT_FOLDER_NAME);
+        string pathForReport = Path.Combine(basePath, ANGULAR_FOLDER_NAME, REPORT_FOLDER_NAME);
 
         //ensure folder exists
         if (!Directory.Exists(pathForReport))
@@ -60,7 +65,7 @@ public class ActionController : ControllerBase
 
         string reportCreationDateTime = DateTime.Now.ToString("yyyyMMMdd_HHmmss");
         string reportPdfName = itemSN + "_" + actionName + "_" + reportCreationDateTime + "_" + "Report.pdf";  
-        string outputPath = Path.Combine(pathForReport, reportPdfName);
+        string reportPdfPathAndName = Path.Combine(pathForReport, reportPdfName);
 
         var document = new PdfDocument();
         var page = document.AddPage();
@@ -154,9 +159,9 @@ public class ActionController : ControllerBase
         }
 
 
-        document.Save(outputPath);
+        document.Save(reportPdfPathAndName);
 
-        return pathForReport;
+        return reportPdfPathAndName;
     }
 
     private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int width, int height)
@@ -197,10 +202,15 @@ public class ActionController : ControllerBase
 
             //put all metadata from json to report
             //put report at "Reports" folder
-            string pathForReport = CreatePdf(targetPath, actionName, actionVersionNumber, itemSN, itemType, outputJsonData);
+            string pathForReport = CreatePdf(basePath, actionName, actionVersionNumber, itemSN, itemType, outputJsonData);
+            //in order to pass the pdf path to angular, ir shall be interpreted as a relative path as '/Reports/kuku.pdf'
+            int basePathLength = basePath.Length;
+            string pathForReportForAngularUse = pathForReport.Substring(basePathLength);
+            pathForReportForAngularUse = pathForReportForAngularUse.Replace(ANGULAR_FOLDER_NAME, "").Replace("\\", "/");
+            pathForReportForAngularUse = _config.BackendUrl + pathForReportForAngularUse;
 
             //TODO: error handling
-            return Ok(new { path = pathForReport });
+            return Ok(new { path = pathForReportForAngularUse });
         }
         catch (Exception ex)
         {
@@ -214,6 +224,8 @@ public class ActionController : ControllerBase
     {
         try
         {
+            ExecuteActionResponse actionResponse = new ExecuteActionResponse();
+
             _logger.LogInformation($"Starting ExecuteAction for action {actionName}, itemSN {itemSN}");
 
             string actionLatestVer = "1.2.3.4"; //TODO: get latest version from server
@@ -240,14 +252,37 @@ public class ActionController : ControllerBase
             string inputFilePath = Path.Combine(inputFolderPath, "input_" + itemSN + ".json");
             System.IO.File.WriteAllText(inputFilePath, json);
 
+            string startExecutionDateTime = DateTime.Now.ToString("yyyyMMMdd_HHmmss");
                
             RunExecutable(actionFolderPath);
 
-            //TODO: send to the server execution details and the output
+            string endExecutionDateTime = DateTime.Now.ToString("yyyyMMMdd_HHmmss");
+
+            //TODO: send to the server execution details, startExecutionDateTime, endExecutionDateTime and the output
             //so all these can be written to DB
 
             _logger.LogInformation($"Finished executing {actionName}, returning {actionLatestVer}.");
-            return Ok(new { version = actionLatestVer });
+
+            // parse output*.json to find the Result  entry (mandatory entry)
+            var outputJsonData = GetOutputJsonData(Path.Combine(AppContext.BaseDirectory, ACTIONS_RELATIVE_PATH));
+            if (outputJsonData == null)
+            {
+                _logger.LogInformation("Output json is invalid.");
+                return BadRequest("Output json is invalid.");
+            }
+            var resultEntry = outputJsonData.FirstOrDefault(kvp => kvp.Key == "Result");
+            if (string.IsNullOrEmpty(resultEntry.Value))
+            {
+                _logger.LogInformation("Output json does not contain 'Result' mandatory key.");
+                return BadRequest("Output json does not contain 'Result' mandatory key.");
+            }
+
+            actionResponse.version = actionLatestVer;
+            actionResponse.startExecutionDateTime = startExecutionDateTime;
+            actionResponse.endExecutionDateTime = endExecutionDateTime;
+            actionResponse.executionResult = resultEntry.Value;
+
+            return Ok(actionResponse);
         }
         catch (Exception ex)
         {
