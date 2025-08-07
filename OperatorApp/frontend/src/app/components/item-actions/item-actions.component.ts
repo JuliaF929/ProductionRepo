@@ -95,16 +95,19 @@ import { ExecuteActionResponse } from '../../models/execute-action-response.mode
 
         this.itemService.executeAction(action.Name, this.item!.SerialNumber).subscribe({
           next: (actionResponse: ExecuteActionResponse) => {
-            const actionVersionNumber = actionResponse.version;
-            const actionResult = actionResponse.executionResult;
+
+            action.LatestRunResult = actionResponse.executionResult;
+            action.LatestRunDateTime = actionResponse.endExecutionDateTime;
+            action.LatestActionVersionNumber = actionResponse.version;
+            action.LatestRunResult = actionResponse.executionResult;
         
-            console.log(`Finished running ${action.Name} for item ${this.item!.SerialNumber}, version ${actionVersionNumber}, result ${actionResult}`);
+            console.log(`Finished running ${action.Name} for item ${this.item!.SerialNumber}, version ${actionResponse.version}, result ${actionResponse.executionResult}`);
         
             this.uiBlocked = false;
 
             this.itemService.createReportForAction(
               action.Name,
-              actionVersionNumber,
+              actionResponse.version,
               this.item!.SerialNumber,
               this.item!.Type!.Name
             ).subscribe({
@@ -119,6 +122,8 @@ import { ExecuteActionResponse } from '../../models/execute-action-response.mode
                 console.log(`Going to open report.`);
                 this.openPdf(reportPdfPathForAngular);
                 console.log(`Report opened.`);
+
+                action.LatestReportUrl = reportPdfPathForAngular;
               },
               error: (error: HttpErrorResponse) => {
                 console.error('Create report failed:', error);

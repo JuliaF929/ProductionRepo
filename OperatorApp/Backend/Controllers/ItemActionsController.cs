@@ -30,10 +30,10 @@ public class ItemActionsController : ControllerBase
         _itemActions.Clear(); // remove old items
         _itemActions.AddRange(new[]
         {
-            new ItemAction { Index = 1, Name = "Action_1", LatestRunStatus = "Pass", LatestReportUrl = "/assets/reports/checkA.pdf", LatestRunDateTime = new DateTime(), LatestExecuter = "Julia_1"},
-            new ItemAction { Index = 2, Name = "Action_2", LatestRunStatus = "Fail", LatestReportUrl = "/assets/reports/checkA.pdf", LatestRunDateTime = new DateTime(), LatestExecuter = "Julia_2"},
-            new ItemAction { Index = 3, Name = "Action_3", LatestRunStatus = "Pass", LatestReportUrl = "/assets/reports/checkA.pdf", LatestRunDateTime = new DateTime(), LatestExecuter = "Julia_3"},
-            new ItemAction { Index = 4, Name = "Action_4", LatestRunStatus = "Fail", LatestReportUrl = "/assets/reports/checkA.pdf", LatestRunDateTime = new DateTime(), LatestExecuter = "Julia_4"}
+            new ItemAction { Index = 1, Name = "Action_1", LatestActionVersionNumber = "", LatestRunResult = "NotStarted", LatestReportUrl = "/assets/reports/checkA.pdf", LatestRunDateTime = "", LatestExecuter = "Julia_1"},
+            new ItemAction { Index = 2, Name = "Action_2", LatestActionVersionNumber = "", LatestRunResult = "NotStarted", LatestReportUrl = "/assets/reports/checkA.pdf", LatestRunDateTime = "", LatestExecuter = "Julia_2"},
+            new ItemAction { Index = 3, Name = "Action_3", LatestActionVersionNumber = "", LatestRunResult = "NotStarted", LatestReportUrl = "/assets/reports/checkA.pdf", LatestRunDateTime = "", LatestExecuter = "Julia_3"},
+            new ItemAction { Index = 4, Name = "Action_4", LatestActionVersionNumber = "", LatestRunResult = "NotStarted", LatestReportUrl = "/assets/reports/checkA.pdf", LatestRunDateTime = "", LatestExecuter = "Julia_4"}
         });
 
         _logger.LogInformation("ItemActions filled in BE.");

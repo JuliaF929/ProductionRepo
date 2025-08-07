@@ -17,9 +17,10 @@
       <thead>
         <tr>
           <th>Name</th>
-          <th>Status</th>
+          <th>Version#</th>
+          <th>Result</th>
           <th>Report</th>
-          <th>Date</th>
+          <th>End Date & Time</th>
           <th>Executed By</th>
         </tr>
       </thead>
@@ -31,17 +32,23 @@
             </button>
           </td>
 
-          <!-- Status Icon -->
+          <!-- Action version number executed -->
           <td>
-            <span [class.pass]="action.LatestRunStatus === 'Pass'" [class.fail]="action.LatestRunStatus === 'Fail'"
-              [class.not-started]="action.LatestRunStatus === 'not-started'">
-              ●
-            </span>
+            <ng-container *ngIf="action.LatestRunResult !== 'NotStarted'; else noData">
+                {{ action.LatestActionVersionNumber }}
+            </ng-container>
+          </td>
+
+          <!-- Execution Result -->
+          <td>
+            <ng-container *ngIf="action.LatestRunResult !== 'NotStarted'; else noData">
+                {{ action.LatestRunResult }}
+            </ng-container>
           </td>
 
           <!-- PDF Report Link -->
           <td>
-            <ng-container *ngIf="action.LatestRunStatus !== 'not-started'; else noData">
+            <ng-container *ngIf="action.LatestRunResult !== 'NotStarted'; else noData">
               <a href="#" (click)="openPdf(); $event.preventDefault()">Open Report</a>
             </ng-container>
             <ng-template #noData>-</ng-template>
@@ -49,14 +56,14 @@
 
           <!-- Execution Date -->
           <td>
-            <ng-container *ngIf="action.LatestRunStatus !== 'not-started'; else noData">
-              {{ action.LatestRunDateTime | date: 'short' }}
+            <ng-container *ngIf="action.LatestRunResult !== 'NotStarted'; else noData">
+              {{ action.LatestRunDateTime }}
             </ng-container>
           </td>
 
           <!-- Executed By -->
           <td>
-            <ng-container *ngIf="action.LatestRunStatus !== 'not-started'; else noData">
+            <ng-container *ngIf="action.LatestRunResult !== 'NotStarted'; else noData">
               {{ action.LatestExecuter }}
             </ng-container>
           </td>

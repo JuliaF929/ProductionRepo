@@ -1,9 +1,10 @@
 export interface ItemAction {
     Index: number;
     Name: string;
-    LatestRunStatus: string;
+    LatestActionVersionNumber: string;
+    LatestRunResult: string;
     LatestReportUrl: string;
-    LatestRunDateTime: Date;
+    LatestRunDateTime: string;
     LatestExecuter: string;
   }
 
