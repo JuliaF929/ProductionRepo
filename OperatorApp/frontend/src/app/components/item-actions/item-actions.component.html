@@ -49,7 +49,7 @@
           <!-- PDF Report Link -->
           <td>
             <ng-container *ngIf="action.LatestRunResult !== 'NotStarted'; else noData">
-              <a href="#" (click)="openPdf(); $event.preventDefault()">Open Report</a>
+              <a href="#" (click)="openPdf(action); $event.preventDefault()">Open Report</a>
             </ng-container>
             <ng-template #noData>-</ng-template>
           </td>

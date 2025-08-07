@@ -38,13 +38,13 @@ import { ExecuteActionResponse } from '../../models/execute-action-response.mode
     ngOnInit() 
     {
         console.log(`ItemActionsComponent - ngOnInit called!`);
+
     }
 
-    openPdf (reportUrl?: string) {
-      console.log(`openPdf - reportUrl is ${reportUrl}.`);
-      if (reportUrl !== null) {
-        this.pdfViewerUrl = reportUrl!;
-        this.selectedPdf = reportUrl!;     
+    openPdf (action: ItemAction) {
+      if (action.LatestReportUrl !== null) {
+        this.pdfViewerUrl = action.LatestReportUrl!;
+        this.selectedPdf = action.LatestReportUrl!;     
       } else {
         this.pdfViewerUrl = this.staticDummyPdf;
         this.selectedPdf = this.staticDummyPdf;
@@ -63,12 +63,6 @@ import { ExecuteActionResponse } from '../../models/execute-action-response.mode
     sanitizeUrl(url: string): SafeResourceUrl {
       return this.sanitizer.bypassSecurityTrustResourceUrl(url);
     }
-    //on add new item
-    //   this.dynamicActions = [];
-    //this.selectedPdf = null;
-
-    //on select item
-    //    this.selectedPdf = null; 
 
     getSafePdfUrl(): SafeResourceUrl {
       if (!this.selectedPdf) return '';
@@ -80,8 +74,6 @@ import { ExecuteActionResponse } from '../../models/execute-action-response.mode
 
     executeAction(action: ItemAction)
     {
-        
-        
         if (this.item === null)
         {
           console.log("Item is null, cant run action.");
@@ -89,6 +81,8 @@ import { ExecuteActionResponse } from '../../models/execute-action-response.mode
         }
 
         console.log(`Going to run action ${action.Name} for item ${this.item!.SerialNumber}`);
+
+        this.closePdf();
 
         //do not allow any UI user interaction when the action is executed
         this.uiBlocked = true;
@@ -120,10 +114,12 @@ import { ExecuteActionResponse } from '../../models/execute-action-response.mode
                 const reportPdfPathForAngular = "/assets/pdfjs/web/viewer.html?file=" + reportPdfPath;
                 console.log(`Report pdf path to show in angular: ${reportPdfPathForAngular}.`);
                 console.log(`Going to open report.`);
-                this.openPdf(reportPdfPathForAngular);
-                console.log(`Report opened.`);
 
                 action.LatestReportUrl = reportPdfPathForAngular;
+                this.openPdf(action);
+
+                console.log(`Report opened.`);
+
               },
               error: (error: HttpErrorResponse) => {
                 console.error('Create report failed:', error);
@@ -144,6 +140,9 @@ import { ExecuteActionResponse } from '../../models/execute-action-response.mode
     clear()
     {
       console.log(`ItemActionsComponent - clearing table of actions.`);
+
+      this.closePdf();
+      
       this.itemActions.length = 0;
       this.item = null;
       this.cdr.detectChanges(); //Force Angular to refresh the view
@@ -152,6 +151,8 @@ import { ExecuteActionResponse } from '../../models/execute-action-response.mode
     setItemActions(item: Item)
     {
         console.log(`ItemActionsComponent - setItemActions called, item is ${JSON.stringify(item, null, 2)}`);
+
+        this.closePdf();
 
         //get list of item actions from be
         this.itemService.getItemActions(item).subscribe((itemActionsListFromBE: ItemAction[]) => {
