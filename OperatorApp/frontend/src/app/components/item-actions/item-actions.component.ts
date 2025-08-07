@@ -29,6 +29,8 @@ import { ExecuteActionResponse } from '../../models/execute-action-response.mode
     staticDummyPdf = '/assets/pdfjs/web/viewer.html?file=/assets/pdfjs/reports/testPDF.pdf';
     pdfViewerUrl = this.staticDummyPdf;
 
+    uiBlocked = false;
+
     constructor(private itemService: ItemService, private cdr: ChangeDetectorRef, public sanitizer: DomSanitizer) 
     {
         console.log('ItemActionsComponent constructor called!');
@@ -88,7 +90,8 @@ import { ExecuteActionResponse } from '../../models/execute-action-response.mode
 
         console.log(`Going to run action ${action.Name} for item ${this.item!.SerialNumber}`);
 
-        //TODO: do not allow any UI user interaction when the action is executed
+        //do not allow any UI user interaction when the action is executed
+        this.uiBlocked = true;
 
         this.itemService.executeAction(action.Name, this.item!.SerialNumber).subscribe({
           next: (actionResponse: ExecuteActionResponse) => {
@@ -97,6 +100,8 @@ import { ExecuteActionResponse } from '../../models/execute-action-response.mode
         
             console.log(`Finished running ${action.Name} for item ${this.item!.SerialNumber}, version ${actionVersionNumber}, result ${actionResult}`);
         
+            this.uiBlocked = false;
+
             this.itemService.createReportForAction(
               action.Name,
               actionVersionNumber,
@@ -114,18 +119,20 @@ import { ExecuteActionResponse } from '../../models/execute-action-response.mode
                 console.log(`Going to open report.`);
                 this.openPdf(reportPdfPathForAngular);
                 console.log(`Report opened.`);
-                // show the report pdf
               },
               error: (error: HttpErrorResponse) => {
                 console.error('Create report failed:', error);
+                this.uiBlocked = false;
+                this.cdr.detectChanges();
               }
             });
           },
           error: (error: HttpErrorResponse) => {
             console.error('Execution failed:', error);
+            this.uiBlocked = false;
+            this.cdr.detectChanges();
           }
         });
-        
         
     }
 
