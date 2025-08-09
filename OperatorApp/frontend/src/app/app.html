@@ -1,29 +1,32 @@
 <main>
-
-  <div class="container-fluid">
+  <!-- Main Content -->
+  <div class="container-fluid" [class.sidebar-open]="isSidebarOpen">
     <h1>🚀 Calibrate for All </h1>
 
     <div class="row">
       <div class="col">
-        <!-- Left Section -->
-        <div class="row">
-          <div class="col mb-3">
-            <button type="button" class="btn btn-primary" (click)="appAddNewItem()">Add New Item</button>
+
+        <div class="card">
+          <div class="card-body">
+            <!-- Left Section -->
+            <div class="row">
+              <div class="col mb-3">
+                <button type="button" class="btn btn-primary" (click)="appAddNewItem()">Add New Item</button>
+              </div>
+            </div>
+            <!-- Table and its filter row -->
+            <item-list [itemSelectedByParent]="selectedItem" (itemSelectedByUser)="onItemSelected($event)"
+              (createNewItemEvent)="onItemAddedToTable($event)">
+            </item-list>
           </div>
         </div>
-        <!-- Table and its filter row -->
-        <item-list [itemSelectedByParent]="selectedItem" (itemSelectedByUser)="onItemSelected($event)" (createNewItemEvent)="onItemAddedToTable($event)">
-        </item-list>
       </div>
 
       <div class="col">
         <!-- Right Section -->
         <!-- Top Section -->
-        <item-details 
-            [item]="selectedItem"
-            [readonly]="!isNewItemMode && selectedItem !== null"
-            (newItemSaved)="onNewItemSaved($event)"
-            (newItemSavingCanceled)="onNewItemSavingCanceled()">
+        <item-details [item]="selectedItem" [readonly]="!isNewItemMode && selectedItem !== null"
+          (newItemSaved)="onNewItemSaved($event)" (newItemSavingCanceled)="onNewItemSavingCanceled()">
         </item-details>
 
         <!-- Divider -->
@@ -31,7 +34,6 @@
 
         <!-- Bottom Section -->
         <item-actions>
-
         </item-actions>
 
       </div>
@@ -39,5 +41,29 @@
 
   </div>
 
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" [class.open]="isSidebarOpen" (click)="closeSidebar()"></div>
+  
+  <!-- Sidebar -->
+  <div class="sidebar" [class.open]="isSidebarOpen">
+    <div class="sidebar-header">
+      <h3>Add New Item</h3>
+      <button class="close-btn" (click)="closeSidebar()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="sidebar-content">
+      <item-details 
+        *ngIf="isSidebarOpen && isNewItemMode" 
+        [item]="selectedItem" 
+        [readonly]="false"
+        (newItemSaved)="onNewItemSaved($event)" 
+        (newItemSavingCanceled)="onNewItemSavingCanceled()">
+      </item-details>
+    </div>
+  </div>
 
 </main>

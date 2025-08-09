@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { CommonModule, NgForOf, NgIf } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Item } from './models/item.model';
 import { ItemListComponent } from './components/item-list/item-list.component';
@@ -12,7 +12,7 @@ import { ItemActionsComponent } from './components/item-actions/item-actions.com
   standalone: true,
   templateUrl: './app.html',
   styleUrls: ['./app.css'],
-  imports: [CommonModule, NgForOf, NgIf, FormsModule, HttpClientModule, ItemListComponent, ItemDetailsComponent, ItemActionsComponent]
+  imports: [CommonModule, FormsModule, HttpClientModule, ItemListComponent, ItemDetailsComponent, ItemActionsComponent]
 })
 export class App {
   constructor() {}
@@ -23,6 +23,7 @@ export class App {
 
   public selectedItem: Item | null = null;
   public isNewItemMode = false;
+  public isSidebarOpen = false;
 
   onItemSelected(item: Item) {
     this.selectedItem = item;
@@ -34,6 +35,7 @@ export class App {
   onNewItemSaved(newItem: Item) {
     this.selectedItem = null;
     this.isNewItemMode = false;
+    this.isSidebarOpen = false;
     this.itemListComponent.onNewItemCreated(newItem);
     this.itemActionsComponent.clear();
   }
@@ -41,6 +43,7 @@ export class App {
   onNewItemSavingCanceled() {
     this.selectedItem = null;
     this.isNewItemMode = false;
+    this.isSidebarOpen = false;
     this.itemActionsComponent.clear();
   }
 
@@ -49,8 +52,16 @@ export class App {
     console.log(`appAddNewItem, selectedItem is ${this.selectedItem}`);
     this.selectedItem = { SerialNumber: '', Type: { Name: '' } };
     this.isNewItemMode = true;
+    this.isSidebarOpen = true;
 
     this.itemDetailsComponent.addNewItem();
+    this.itemActionsComponent.clear();
+  }
+
+  closeSidebar() {
+    this.isSidebarOpen = false;
+    this.isNewItemMode = false;
+    this.selectedItem = null;
     this.itemActionsComponent.clear();
   }
 
