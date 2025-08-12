@@ -294,7 +294,7 @@ public class ActionController : ControllerBase
     private void RunExecutable(string exePath)
     {
         //TODO: get the executable name for the action from server
-        string exeName = "Tzabad_1.exe"; 
+        string exeName = "WinCalib_1.exe"; 
         _logger.LogInformation($"Going to start {exeName} action from {exePath}.");
 
         string exeFullPath = Path.Combine(exePath, exeName);

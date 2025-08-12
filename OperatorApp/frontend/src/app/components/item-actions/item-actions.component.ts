@@ -148,8 +148,15 @@ import { ExecuteActionResponse } from '../../models/execute-action-response.mode
       this.cdr.detectChanges(); //Force Angular to refresh the view
     }
 
-    setItemActions(item: Item)
+    setItemActions(item: Item | null)
     {
+        if (item == null)
+        {
+          console.log(`ItemActionsComponent - setItemActions called, item is null. Clearing actions list.`);
+          this.clear();
+          return;
+        }
+        
         console.log(`ItemActionsComponent - setItemActions called, item is ${JSON.stringify(item, null, 2)}`);
 
         this.closePdf();

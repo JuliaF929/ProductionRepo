@@ -25,7 +25,7 @@ export class App {
   public isNewItemMode = false;
   public isSidebarOpen = false;
 
-  onItemSelected(item: Item) {
+  onItemSelected(item: Item | null) {
     this.selectedItem = item;
     this.isNewItemMode = false;
     this.itemActionsComponent.setItemActions(item);
@@ -71,7 +71,7 @@ export class App {
     this.itemDetailsComponent.setItemDetails(item);
   }
 
-  onItemAddedToTable(newItem: Item) {
+  onItemAddedToTable(newItem: Item | null) {
 
      console.log('Parent notified of new item creation:', newItem);
 

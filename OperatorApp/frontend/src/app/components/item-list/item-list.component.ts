@@ -16,10 +16,10 @@ import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
 })
 export class ItemListComponent implements OnInit {
     public items: Item[] = []; 
-    @Output() itemSelectedByUser = new EventEmitter<Item>(); // Child selection -> Notify parent
+    @Output() itemSelectedByUser = new EventEmitter<Item | null>(); // Child selection -> Notify parent
 
     @Input() itemSelectedByParent: Item | null = null; // Parent selection -> Notify Child
-    @Output() createNewItemEvent = new EventEmitter<Item>();
+    @Output() createNewItemEvent = new EventEmitter<Item | null>();
 
   public filteredItems = [...this.items];
 
@@ -42,9 +42,15 @@ export class ItemListComponent implements OnInit {
       item.SerialNumber.toLowerCase().includes(this.filters.SerialNumber.toLowerCase()) &&
       item.Type?.Name.toLowerCase().includes(this.filters.Type.toLowerCase())
     );
+
+     // Clear selection if filtered list no longer contains the selected item
+     if ((this.itemSelectedByParent) && (!this.filteredItems.some(it => it.SerialNumber === this.itemSelectedByParent!.SerialNumber)))
+     {
+        this.onSelectItem(null);
+     }
   }
 
-  onSelectItem(item: Item) {
+  onSelectItem(item: Item | null) {
     this.itemSelectedByParent = item; // persistently sets selected
     this.itemSelectedByUser.emit(item); //Emit selected item
   }
