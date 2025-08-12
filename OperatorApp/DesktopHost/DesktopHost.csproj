@@ -11,13 +11,11 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.8" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3351.48" />
+      <!-- Link the backend appsettings.json into DesktopHost as appsettings.json -->
+    <None Include="..\Backend\appsettings.json" Link="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
   </ItemGroup>
-
-  <Target Name="CopyBackendAppSettings" AfterTargets="Build">
-    <Copy
-      SourceFiles="..\Backend\appsettings.json"
-      DestinationFolder="$(OutputPath)"
-      SkipUnchangedFiles="true" />
-  </Target>
 
 </Project>

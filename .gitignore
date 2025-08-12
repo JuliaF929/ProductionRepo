@@ -8,6 +8,8 @@ OperatorApp/DesktopHost/obj/
 OperatorApp/Backend/bin/
 OperatorApp/Backend/obj/
 OperatorApp/frontend/dist/
+OperatorApp/Backend/wwwroot
+OperatorApp/Publish
 
 # Optional npm cache directory
 .npm/
