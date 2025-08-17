@@ -1,5 +1,6 @@
 // pages/TestApplicationsPage.js
 import React, { useState, useEffect } from 'react';
+import constants from '../constants';
 
 function TestApplicationsPage({onCreateNewTestApplication, onEditTestApplication, onSelectTestApp}) {
   const [testApps, setTestApps] = useState([]);
@@ -8,7 +9,7 @@ function TestApplicationsPage({onCreateNewTestApplication, onEditTestApplication
   useEffect(() => {
     // Fetch test applications from server
     async function fetchTestApps() {
-      const response = await fetch('http://localhost:5000/test-applications');
+      const response = await fetch(`${constants.API_BASE}/test-applications`);
       const data = await response.json();
       setTestApps(data);
     }

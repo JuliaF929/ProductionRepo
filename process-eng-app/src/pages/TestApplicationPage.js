@@ -90,8 +90,8 @@ function TestApplicationPage({action, testAppData}) {
         }
 
       addTriggered.current = true;
-  
-      const response = await fetch('http://localhost:5000/test-applications', {
+
+      const response = await fetch(`${constants.API_BASE}/test-applications`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

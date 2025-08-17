@@ -17,6 +17,8 @@ OperatorApp/Publish
 # dotenv environment variables file
 server/.env
 server/dal/sheets/productionapp-463314-77556795ce19.json
+process-eng-app/.env.production
+process-eng-app/.env.development
 
 # Logs
 server/logs/

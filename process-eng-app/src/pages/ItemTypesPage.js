@@ -1,16 +1,19 @@
 // pages/ItemTypesPage.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import constants from '../constants';
 
 function ItemTypesPage({onCreateNewItemType, onEditItemType, onSelectItemType}) {
   const navigate = useNavigate();
   const [itemTypes, setItemTypes] = useState([]); 
   const [selectedId, setSelectedId] = useState(null);
+  
 
   useEffect(() => {
     // Fetch item types from server
     async function fetchItemTypes() {
-      const response = await fetch('http://localhost:5000/item-types');
+      console.log(`The API_BASE is ${constants.API_BASE}`);
+      const response = await fetch(`${constants.API_BASE}/item-types`);
       const data = await response.json();
       setItemTypes(data);
     }

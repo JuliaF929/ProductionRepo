@@ -54,7 +54,8 @@ function ItemTypePage({action, itemTypeData}) {
       deleteTriggered.current = true;
 
       console.log(`Got ${uuid} for deletion in handleDeleteItemTypeOnServer`);
-      const response = await fetch(`http://localhost:5000/item-types/${uuid}`, {
+      console.log(`The API_BASE is {constants.API_BASE}`);
+      const response = await fetch(`${constants.API_BASE}/item-types/${uuid}`, {
         method: 'DELETE',
       });
   
@@ -82,7 +83,7 @@ function ItemTypePage({action, itemTypeData}) {
         
       getAllTriggered.current = true;
 
-      const response = await fetch('http://localhost:5000/item-types', {
+      const response = await fetch(`${constants.API_BASE}/item-types`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -117,7 +118,7 @@ function ItemTypePage({action, itemTypeData}) {
       console.log('parameterDefaults: ' + JSON.stringify(parameterDefaults, null, 2));
       console.log('testApplications: ' + JSON.stringify(testApplications, null, 2));
   
-      const response = await fetch('http://localhost:5000/item-types', {
+      const response = await fetch(`${constants.API_BASE}/item-types`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -180,7 +181,7 @@ function ItemTypePage({action, itemTypeData}) {
   const GetAllExistingTestApplicationsFromServer = async () => {
     try {
 
-      const response = await fetch('http://localhost:5000/test-applications', {
+      const response = await fetch(`${constants.API_BASE}/test-applications`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
