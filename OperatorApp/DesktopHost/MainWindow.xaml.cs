@@ -42,19 +42,24 @@ public partial class MainWindow : Window
                                                 .Build();
         var backendUrl = config["AppConfig:BackendUrl"];
 
+        //get the cmd line parameter with the server IP definition (localhost vs ElasticIP of the AWS)
+        string _serverIP = "localhost";
+
+        // args[0] = exe path, args[1] = first user arg
+        var args = Environment.GetCommandLineArgs();
+        if (args.Length > 1 && !string.IsNullOrWhiteSpace(args[1]))
+        {
+           _serverIP = args[1];
+        }
+        else
+        {
+            Console.WriteLine("ServerIP shall be a cmd line argument. Now it is missing. Exiting....");
+            Console.ReadLine();
+            Environment.Exit(0);
+        }
+
+
         // Start Backend silently
-        //string backendDir;
-  
-
-        // #if DEBUG
-        // backendDir = System.IO.Path.Combine("C:\\JuliaF\\Julia\\ProductionClean22\\OperatorApp\\", "Backend", "bin", "Debug", "net8.0");
-        // #else
-        // backendDir = System.IO.Path.Combine("C:\\JuliaF\\Julia\\ProductionClean22\\OperatorApp\\", "Backend", "bin", "Release", "net8.0", "win-x64", "publish");
-        // #endif
-
-        // backendProcess.StartInfo.FileName = System.IO.Path.Combine(backendDir, "Backend.exe");
-        // backendProcess.StartInfo.WorkingDirectory = backendDir;
-
 
         string baseDir = AppContext.BaseDirectory;
 
@@ -73,6 +78,7 @@ public partial class MainWindow : Window
 
         backendProcess.StartInfo.CreateNoWindow = true;
         backendProcess.StartInfo.UseShellExecute = false;
+        backendProcess.StartInfo.Arguments = _serverIP;
 
         backendProcess.StartInfo.RedirectStandardOutput = true;
         backendProcess.StartInfo.RedirectStandardError = true;

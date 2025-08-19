@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +37,29 @@ builder.Services.Configure<AppConfig>(
 var appConfig = builder.Configuration.GetSection("AppConfig").Get<AppConfig>();
 
 builder.WebHost.UseUrls(appConfig.BackendUrl);
+
+//TODO: add here logging of the OpeartorApp running (inside the Backend log)
+//get the cmd line argument passed from the DesktopHost and containing serverIP
+string serverIP = "localhost";
+if (args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]))
+{
+    serverIP = args[0];
+}
+string version = "1.1.1.1";
+Log.Information($"----------- Started Backend of OperatorApp --- ver. {version} ---------------");
+Log.Information($"1. Server IP is {serverIP}");
+
+string serverUrl = "http://" + serverIP + ":" + appConfig.ServerPort + "/";
+Log.Information($"2. Rest requests will be sent to {serverUrl}");
+
+// Bind options and HttpClient
+builder.Services.Configure<GlobalOptions>(o => o.ServerURL = serverUrl);
+builder.Services.AddHttpClient("ServerApi", (sp, http) =>
+{
+     var opt = sp.GetRequiredService<IOptions<GlobalOptions>>().Value;
+     http.BaseAddress = new Uri(opt.ServerURL);
+});
+
 
 var app = builder.Build();
 
