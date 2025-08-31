@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Running after 
+# Running after build by
+#OperatorApp>./MacHostApp/bin/Debug/net8.0/MacHostApp
 
 # Prevent Angular CLI from prompting
 export NG_CLI_ANALYTICS=ci

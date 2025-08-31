@@ -33,20 +33,11 @@ public partial class MainWindow : Window
 
     void StartBackend()
 	{
-		//from windows
-		// string baseDir = AppContext.BaseDirectory;
-
-        // // Figure out Debug vs Release
-        // #if DEBUG
-        // string backendDir = System.IO.Path.Combine(baseDir, "..", "..", "..", "..", "Backend", "bin", "Debug", "net8.0");
-        // #else
-        // string backendDir = System.IO.Path.Combine(baseDir, "Backend");
-        // #endif
-
-        // backendDir = System.IO.Path.GetFullPath(backendDir);
-		//from windows
-
+#if DEBUG
 		string backendPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Backend", "bin", "Debug", "net8.0", "Backend");
+#else
+        string backendPath = Path.Combine(AppContext.BaseDirectory, "Backend", "Backend");
+#endif        
 		
 		Console.WriteLine("This is a backendPath: " + backendPath);
 		Console.WriteLine("This is a working directory: " + Path.GetDirectoryName(backendPath));
