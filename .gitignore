@@ -7,9 +7,12 @@ OperatorApp/DesktopHost/bin/
 OperatorApp/DesktopHost/obj/
 OperatorApp/Backend/bin/
 OperatorApp/Backend/obj/
+OperatorApp/Backend/Logs/
 OperatorApp/frontend/dist/
-OperatorApp/Backend/wwwroot
-OperatorApp/Publish
+OperatorApp/Backend/wwwroot/
+OperatorApp/Publish/
+OperatorApp/MacHostApp/bin/
+OperatorApp/MacHostApp/obj/
 
 # Optional npm cache directory
 .npm/
