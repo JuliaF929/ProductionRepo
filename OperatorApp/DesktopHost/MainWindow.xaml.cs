@@ -53,7 +53,7 @@ public partial class MainWindow : Window
         }
         else
         {
-            Console.WriteLine("ServerIP shall be a cmd line argument. Now it is missing. Exiting....");
+            Console.WriteLine("ServerIP shall be a cmd line argument. Now it is missing. Press any key to exit ...");
             Console.ReadLine();
             Environment.Exit(0);
         }

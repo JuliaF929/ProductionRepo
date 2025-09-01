@@ -8,6 +8,8 @@ using Avalonia.Controls;
 using MsBox.Avalonia;
 using ReactiveUI;
 using AvaloniaWebView;
+using Microsoft.Extensions.Configuration;
+
 
 namespace MacHostApp.Views;
 
@@ -21,6 +23,19 @@ public partial class MainWindow : Window
 
         this.Closing += OnWindowClosing;
 
+        OperatorAppWindow.Title = "Operator Application ver#1.1.1.1 for Mac";
+        OperatorAppWindow.WindowState = WindowState.Maximized;
+
+        Console.WriteLine("MacHostApp started...");
+
+        var config = new ConfigurationBuilder()
+                                                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                                                .AddJsonFile("appsettings.json")
+                                                .Build();
+        var backendUrl = config["AppConfig:BackendUrl"];
+
+        Console.WriteLine("Backend URL is: " + backendUrl);
+
         StartBackend();
 
         //Give backend a second to start up
@@ -28,11 +43,27 @@ public partial class MainWindow : Window
 
         //Load Angular UI from Backend
         var vw = this.FindControl<WebView>("webView");
-        vw.Url = new Uri("http://localhost:5005");
+        vw.Url = new Uri(backendUrl);
     }
 
     void StartBackend()
 	{
+        //get the cmd line parameter with the server IP definition (localhost vs ElasticIP of the AWS)
+        string _serverIP = "localhost";
+
+        // args[0] = exe path, args[1] = first user arg
+        var args = Environment.GetCommandLineArgs();
+        if (args.Length > 1 && !string.IsNullOrWhiteSpace(args[1]))
+        {
+           _serverIP = args[1];
+        }
+        else
+        {
+            Console.WriteLine("ServerIP shall be a cmd line argument. Now it is missing. Press any key to exit ...");
+            Console.ReadLine();
+            Environment.Exit(0);
+        }
+
 #if DEBUG
 		string backendPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Backend", "bin", "Debug", "net8.0", "Backend");
 #else
@@ -42,22 +73,19 @@ public partial class MainWindow : Window
 		Console.WriteLine("This is a backendPath: " + backendPath);
 		Console.WriteLine("This is a working directory: " + Path.GetDirectoryName(backendPath));
 		Console.WriteLine("File exists? " + File.Exists(backendPath));
-		Console.WriteLine("These are arguments: " + $"\"{backendPath}\" localhost");
+		Console.WriteLine("These are arguments: " + $"\"{backendPath}\"" + _serverIP);
 
 		backendProcess = new Process
 		{
 			StartInfo = new ProcessStartInfo
 			{
-				FileName = backendPath,//"dotnet",
-				Arguments = "localhost",//$"\"{backendPath}\" localhost", //TODO
+				FileName = backendPath,
+				Arguments = _serverIP,
 				WorkingDirectory = Path.GetDirectoryName(backendPath),
-			//FileName = "open",
-    		//Arguments = $"-a Terminal \"{backendPath}\"",
-    		//UseShellExecute = true
-			CreateNoWindow = true,
-			UseShellExecute = false,
-			RedirectStandardOutput = true,
-		    RedirectStandardError = true,
+			    CreateNoWindow = true,
+			    UseShellExecute = false,
+			    RedirectStandardOutput = true,
+		        RedirectStandardError = true,
 			}
 		};
 
@@ -93,9 +121,6 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            // var box = MessageBoxManager.GetMessageBoxStandard("Error", $"Error closing Backend: {ex.Message}");
-            // await box.ShowWindowDialogAsync(this);
-
             Console.WriteLine($"Error closing Backend: {ex.Message}");
         }
 

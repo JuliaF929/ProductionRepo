@@ -1,7 +1,10 @@
 #!/bin/bash
 
 # Running after build by
-# OperatorApp> ./Publish/MacHostApp
+# OperatorApp> ./Publish/MacHostApp localhost
+
+# Prevent Angular CLI from prompting
+export NG_CLI_ANALYTICS=ci
 
 echo "[1/5] Building Angular (production)..."
 
@@ -30,5 +33,4 @@ echo "Cleaning up temporary Backend publish folder..."
 rm -rf TempPublish || exit 1
 
 echo "Publish complete! Ready to distribute:"
-echo "Publish\MacHostApp"
-pause
+echo "Publish/MacHostApp"

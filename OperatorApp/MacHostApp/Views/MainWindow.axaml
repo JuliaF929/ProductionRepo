@@ -8,7 +8,7 @@
         x:Class="MacHostApp.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Operator Application ver#1.1.1.1 for Mac"
+        Name="OperatorAppWindow"
         d:DesignWidth="800"
         d:DesignHeight="450">
 
