@@ -1,7 +1,10 @@
 #!/bin/bash
 
-# Running after build by
+# Running after build by while the server is running locally (not AWS) by
 # OperatorApp> ./Publish/MacHostApp localhost
+
+# Running after build while the server is running at AWS by
+# OperatorApp> ./Publish/MacHostApp <ElasticIP>
 
 # Prevent Angular CLI from prompting
 export NG_CLI_ANALYTICS=ci
