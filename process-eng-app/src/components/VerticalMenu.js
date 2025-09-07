@@ -4,6 +4,8 @@ import React from 'react';
 const menuItems = [
   { label: 'Item Types', key: 'item-types-page' },
   { label: 'Test Applications', key: 'test-applications-page' },
+  { label: 'Items Dashboard', key: 'items-dashboard'},
+  { label: 'Runs Dashboard', key: 'runs-dashboard'},
   { label: 'About', key: 'about-page' }
 ];
 

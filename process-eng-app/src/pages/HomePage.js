@@ -12,7 +12,7 @@ function HomePage() {
   const [rightPanelContent, setRightPanelContent] = useState(null);
   const [selectedTestApp, setSelectedTestApp] = useState(null); 
   const [selectedItemType, setSelectedItemType] = useState(null); 
-  let content;
+    let content;
   if (leftPanelSelected === 'item-types-page') content = 
                                                       <ItemTypesPage 
                                                       onCreateNewItemType={() => setRightPanelContent(<ItemTypePage key={Date.now()} action="create"/>)}
@@ -25,6 +25,9 @@ function HomePage() {
                                                       onEditTestApplication={(testApp) => {setSelectedTestApp(testApp); setRightPanelContent(<TestApplicationPage key={Date.now()} action="view" testAppData={testApp}/>);}} //TODO julia: edit test application
                                                       onSelectTestApp={(testApp) => { setSelectedTestApp(testApp); setRightPanelContent(<TestApplicationPage key={Date.now()} action="view" testAppData={testApp}/>); }}
                                                       />;
+                                                      
+  else if (leftPanelSelected === 'items-dashboard') content = <div style={{ padding: 20 }}><h2>Items Dashboard</h2><p>This is the items dashboard.</p></div>;
+  else if (leftPanelSelected === 'runs-dashboard') content = <div style={{ padding: 20 }}><h2>Runs dashboard</h2><p>This is the runs dashboard.</p></div>;
   else if (leftPanelSelected === 'about-page') content = <div style={{ padding: 20 }}><h2>About</h2><p>This is the About section.</p></div>;
 
   return (
