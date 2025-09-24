@@ -30,7 +30,7 @@
   <div class="row">
     <div class="col-sm d-flex justify-content-end gap-2 mb-3">
       <button type="button" class="btn btn-outline-primary" (click)="cancel()" *ngIf="!readonly && item">Cancel</button>
-      <button type="button" class="btn btn-primary" (click)="saveNewItem()" *ngIf="!readonly && item">Save</button>
+      <button type="button" class="btn btn-primary" (click)="saveNewItem()" *ngIf="!readonly && item">{{ isSaving ? 'Saving...' : 'Save' }}</button>
     </div>
   </div>
 

@@ -1,7 +1,7 @@
 // repositories/itemTypeRepositorySheets.js
 const sheets = require('../dal/sheets/sheets');
 const sheetsConstants = require('../dal/sheets/sheetsConstants');
-
+const logger = require('../logger');
 
 
 module.exports = {
@@ -32,5 +32,26 @@ module.exports = {
         return false;
     }
     return sheets.deleteRowByUUID(sheetsConstants.ITEM_TYPES_SPREADSHEET_ID, sheetsConstants.ITEM_TYPES_SHEET_NAME, sheetId, sheetsConstants.ItemTypesLastColumnName, uuid);
+  },
+
+  getFirstItemTypeIDForItemTypeName: async(itemTypeName) => {
+    try {
+      const rows = await sheets.getRowsByValue(sheetsConstants.ITEM_TYPES_SPREADSHEET_ID, 
+                                               sheetsConstants.ITEM_TYPES_SHEET_NAME, 
+                                               sheetsConstants.ItemTypesLastColumnName, 
+                                               itemTypeName, 
+                                               sheetsConstants.ItemTypeIDInItemTypesTableColumnName);
+
+      if (!rows || rows.length === 0) {
+        logger.debug(`No item type found for name: ${itemTypeName}`);
+        return null; 
+      }
+
+      return rows[0][0];      
+    }
+    catch (err) {
+      logger.error(err, 'getFirstItemTypeIDForItemTypeName failed');
+      return null;
+    }     
   },
 };

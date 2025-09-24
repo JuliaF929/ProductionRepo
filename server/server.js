@@ -2,6 +2,7 @@ const http = require('http');
 const os = require('os');
 const app = require('./app');
 const logger = require('./logger');
+const connectDB = require('./api/config/mongodb');
 const { version } = require('./package.json');
 
 const port = process.env.PORT || 5000;
@@ -17,6 +18,9 @@ server.listen(port, () => {
     logger.info(`Running on http://${ipAddress}:${port}`);
     logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
   });
+
+  // Connect to MongoDB
+connectDB();
    
   // Helper to get local IP
   function getLocalIpAddress() {

@@ -30,24 +30,55 @@ async function appendRow(spreadsheetId, sheetName, rowValues) {
   logger.debug(`Append response: ${response.data}`);
 }
 
+// "A" -> 0, "B" -> 1, ..., "Z" -> 25, "AA" -> 26, "AB" -> 27, ...
+function resolveColumnIndex(columnA1) {
+  if (typeof columnA1 !== 'string') return -1;
+  const s = columnA1.trim().toUpperCase();
+  if (!/^[A-Z]+$/.test(s)) return -1;
 
-async function getRowsByValue(spreadsheetId, sheetName, lastColumnName, valueToFilterBy, columnNumberToFilterBy) {
+  let n = 0;
+  for (let i = 0; i < s.length; i++) {
+    n = n * 26 + (s.charCodeAt(i) - 64); // 'A' = 65 -> 1
+  }
+  return n - 1; // zero-based
+}
 
-  logger.debug(`Going to get all rows where a specific column matches a given value from spreadsheetId: ${spreadsheetId}, sheetName: ${sheetName}, lastColumnName: ${lastColumnName}, columnNumberToFilterBy: ${columnNumberToFilterBy}, valueToFilterBy: ${valueToFilterBy}`);
 
-  const rows = getAllRows(spreadsheetId, sheetName, lastColumnName);
+async function getRowsByValue(spreadsheetId, sheetName, lastColumnName, valueToFilterBy, columnNameToFilterBy) {
+  try
+  {
+    logger.debug(`Going to get all rows where a specific column matches a given value from spreadsheetId: ${spreadsheetId}, sheetName: ${sheetName}, lastColumnName: ${lastColumnName}, columnNameToFilterBy: ${columnNameToFilterBy}, valueToFilterBy: ${valueToFilterBy}`);
 
-  logger.debug(`Got all rows by getAllRows, count: ${(await rows).length}`);
-  logger.debug(`Starting filterring by valueToFilterBy: ${valueToFilterBy} at columnNumberToFilterBy: ${columnNumberToFilterBy}`);
+    const rows = await getAllRows(spreadsheetId, sheetName, lastColumnName);
 
-  // Filter rows by column match 
-  const matchingRows = rows.filter((row, index) => {
-    return row[columnNumberToFilterBy - 1] === valueToFilterBy;
-  });
+    logger.debug(`Got all rows by getAllRows, count: ${(await rows).length}`);
+    if (!Array.isArray(rows) || rows.length === 0) {
+      logger.warn(`getRowsByValue: no rows returned`);
+      return [];
+    }
+    logger.debug(`Starting filterring by valueToFilterBy: ${valueToFilterBy} at columnNameToFilterBy: ${columnNameToFilterBy}`);
 
-  logger.debug(`In getRowsByValue got matchingRows count: ${matchingRows.length}`);
+    const colIdx = resolveColumnIndex(columnNameToFilterBy);
+    if (colIdx < 0) {
+      logger.warn(`getRowsByValue: column '${columnNameToFilterBy}' not found`);
+      return [];
+    }
 
-  return matchingRows;
+    // Filter rows by column match 
+    const matchingRows = rows.filter((row, index) => {
+     //return row[columnNumberToFilterBy - 1] === valueToFilterBy;
+     return row[colIdx] === valueToFilterBy;
+    });
+
+    logger.debug(`In getRowsByValue got matchingRows count: ${matchingRows.length}`);
+
+    return matchingRows;
+  }
+  catch (err) {
+    //Don’t crash the server—log and return a safe value
+    logger.error(err, `getRowsByValue failed for sheet ${sheetName}`);
+    return [];
+  }
 }
 
 

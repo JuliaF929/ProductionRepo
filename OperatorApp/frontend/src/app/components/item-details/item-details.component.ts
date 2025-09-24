@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, ChangeDetectorRef, Simp
 import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { finalize } from 'rxjs/operators';
 import { Item } from '../../models/item.model';
 import { ItemType } from '../../models/item-type.model';
 import { ItemService } from '../../services/item.service';
@@ -25,6 +26,8 @@ import { ItemService } from '../../services/item.service';
     public availableTypes: ItemType[] = [];
 
     @Input() public readonly: boolean = false;
+
+    isSaving = false;
      
     constructor(private itemService: ItemService, private cdr: ChangeDetectorRef) 
     {
@@ -75,25 +78,47 @@ import { ItemService } from '../../services/item.service';
 
     saveNewItem()
     {
-        console.log('Save new item called');
-
+        console.log(`Save new item called, this.item is ${this.item}`);
+        //after the addNewItem, this.item is just blank, not null, so we need to validate it is not blank.
         //validation of new item sn shall be on the server
         //since more than one operator will be able to create new items
-        if (this.item) {
-            this.itemService.createNewItem(this.item).subscribe({
-              next: (createdItem: Item) => {
+        if ((this.item !== null)      && (this.item.SerialNumber !== '') && 
+            (this.item.Type !== null) && (this.item.Type.Name !== '')) 
+        {
+            console.log(`Going to save item sn ${this.item.SerialNumber}, of type ${this.item.Type!.Name}`)
+            this.isSaving = true; // Set wait flag
+            document.body.style.cursor = 'wait'; // show wait cursor globally
+
+            this.itemService.createNewItem(this.item!).pipe(
+              finalize(() => {
+                this.isSaving = false;
+                document.body.style.cursor = 'default';
+                this.cdr.detectChanges(); // forces UI refresh
+              })
+            ).subscribe({
+              next: () => {
                 if (this.item) {
-                    console.log('Item created successfully on backend:', createdItem);
+                    console.log(`Item created successfully on server, sn ${this.item.SerialNumber}, type ${this.item.Type!.Name}`);
                     this.newItemSaved.emit(structuredClone(this.item)); // emits a deep copy
                     this.item = { SerialNumber: '', Type: { Name: '' } };
                 }
               },
               error: (err: HttpErrorResponse) => {
-                console.error('Failed to create item on backend', err);
-              }
+                /*
+                err.status → HTTP code (e.g. 400)
+                err.error → body returned by backend (your { "message": "..." })
+                err.error.message → the string "Item with this SerialNumber already exists"
+                */
+                console.error(`Failed to create item on server, err is ${err.error?.message}`);
+                alert(`Failed to save item. ${err.error?.message || 'Please try again.'}`);
+              },
             });
         }
-        console.log('Saved new item:', this.item);
+        else//this.item is blank for some reason...
+        {
+          console.log(`Tried to save item with blank fields. Failed.`);
+          alert(`You are trying to save item with some blank fields. Please try again.`);
+        }
     }
 
     cancel() {

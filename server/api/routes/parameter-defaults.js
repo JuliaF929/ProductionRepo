@@ -6,6 +6,7 @@ const ParameterDefault = require('../models/parameter-defaults');
 
 // Later can swap this line to use a MongoDB or another repository
 const parameterDefaultRepository = require('../../repositories/parameterDefaultRepositorySheets');
+const itemTypeRepository = require('../../repositories/itemTypeRepositorySheets');
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -68,34 +69,6 @@ router.get('/', async (req, res) => {
     res.status(500).json({ message: 'Failed to get all parameter defaults.' });
   }
 });
-
-router.get('/:itemTypeID', async (req, res) => {
-    try {
-
-      const itemTypeID = req.params.itemTypeID;
-  
-      const rows = await parameterDefaultRepository.getAllParameterDefaultsForItemType(itemTypeID);
-      const parameterDefaults = rows.map(row => ({
-        uuid: row[0],
-        name: row[1],
-        description: row[2],
-        type: row[3],
-        defaultValue: row[4],
-        itemType: row[5]
-      }));
-  
-      res.status(200).json(parameterDefaults);
-  
-      logger.debug(`Returned 200 response with all existing parameter defaults for itemTypeID: ${req.params.itemTypeID}, (count: ${parameterDefaults.length}).`);
-      return; 
-    }
-    catch (error)
-    {
-      logger.debug(`Failed to get all parameter defaults for itemTypeID:${itemTypeID}, error: ${error}`);
-      res.status(500).json({ message: 'Failed to get all parameter defaults for itemTypeID.' });
-    }
-  });
-
 
 router.delete('/:uuid', async (req, res) => {
 
