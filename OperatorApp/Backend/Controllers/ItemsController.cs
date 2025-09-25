@@ -65,7 +65,11 @@ public class ItemsController : ControllerBase
             _logger.LogInformation ($"CreateNewItem called - SN - {newItem.SerialNumber}, type - {newItem.Type}.");
          
             if (string.IsNullOrWhiteSpace(newItem.SerialNumber))
-                return BadRequest("Item Serial Number is required");
+            {
+                string errMsg = "Item Serial Number is required";
+                _logger.LogError(errMsg);
+                return BadRequest(errMsg);
+            }
 
             var newItemToServer = new BE2Server_CreateItemDto
             {
@@ -89,7 +93,7 @@ public class ItemsController : ControllerBase
             {
                 var error = await resp.Content.ReadAsStringAsync();
                 string errorStr = $"Error {resp.StatusCode}: {error}";
-                _logger.LogInformation (errorStr);
+                _logger.LogError (errorStr);
                 return BadRequest(new { message = error });
             }
 
@@ -99,7 +103,7 @@ public class ItemsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogInformation ($"CreateNewItem with item SN {newItem.SerialNumber} and type {newItem.Type!.Name} got exception. Ex. {ex.Message}");
+            _logger.LogError ($"CreateNewItem with item SN {newItem.SerialNumber} and type {newItem.Type!.Name} got exception. Ex. {ex.Message}");
             return BadRequest("Exception in CreateNewItem");
         }
     }

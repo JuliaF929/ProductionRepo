@@ -37,7 +37,7 @@ public class ActionController : ControllerBase
 
         if (matchingFiles.Length == 0)
         {
-            _logger.LogInformation($"No matching JSON files found at {targetPath}.");
+            _logger.LogError($"No matching JSON files found at {targetPath}.");
             return null;
         }
 
@@ -194,11 +194,12 @@ public class ActionController : ControllerBase
             var outputJsonData = GetOutputJsonData(targetPath);
             if (outputJsonData == null)
             {
-                _logger.LogInformation("CreateReport - Output json is invalid.");
-                return BadRequest("CreateReport - Output json is invalid.");
+                string errMsg = "CreateReport - Output json is invalid.";
+                _logger.LogError(errMsg);
+                return BadRequest(errMsg);
             }
             
-            _logger.LogInformation($"Output Json data read, {outputJsonData}.");
+            _logger.LogInformation($"Output Json data read, {JsonSerializer.Serialize(outputJsonData)}.");
 
 
             //put all metadata from json to report
@@ -215,8 +216,9 @@ public class ActionController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogInformation($"Exception in CreateReport, Ex. {ex.Message}.");
-            return BadRequest("Exception in CreateReport");
+            string errMsg = "Exception in CreateReport";
+            _logger.LogError($"{errMsg}, Ex. {ex.Message}.");
+            return BadRequest(errMsg);
         }
     }
 
@@ -234,7 +236,11 @@ public class ActionController : ControllerBase
 
             string actionFolderPath = PrepareActionFolder(actionName, actionLatestVer);
             if (string.IsNullOrWhiteSpace(actionFolderPath))
-                return BadRequest("Invalid action folder name");
+            {
+                string errMsg = "Invalid action folder name";
+                 _logger.LogError(errMsg);
+                return BadRequest(errMsg);
+            }
 
             string inputFolderPath = ClearFolder(INPUT_FOLDER_NAME);
             string outputFolderPath = ClearFolder(OUTPUT_FOLDER_NAME);
@@ -268,14 +274,16 @@ public class ActionController : ControllerBase
             var outputJsonData = GetOutputJsonData(Path.Combine(AppContext.BaseDirectory, ACTIONS_RELATIVE_PATH));
             if (outputJsonData == null)
             {
-                _logger.LogInformation("ExecuteAction - Output json is invalid.");
-                return BadRequest("ExecuteAction - Output json is invalid.");
+                string errMsg = "ExecuteAction - Output json is invalid.";
+                _logger.LogError(errMsg);
+                return BadRequest(errMsg);
             }
             var resultEntry = outputJsonData.FirstOrDefault(kvp => kvp.Key == "Result");
             if (string.IsNullOrEmpty(resultEntry.Value))
             {
-                _logger.LogInformation("Output json does not contain 'Result' mandatory key.");
-                return BadRequest("Output json does not contain 'Result' mandatory key.");
+                string errMsg = "Output json does not contain 'Result' mandatory key.";
+                _logger.LogError(errMsg);
+                return BadRequest(errMsg);
             }
 
             actionResponse.version = actionLatestVer;
@@ -287,8 +295,9 @@ public class ActionController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogInformation($"Exception in ExecuteAction, Ex. {ex.Message}.");
-            return BadRequest("Exception in ExecuteAction");
+            string errMsg = "Exception in ExecuteAction";
+            _logger.LogError($"{errMsg}, Ex. {ex.Message}.");
+            return BadRequest(errMsg);
         }
     }
 
@@ -324,13 +333,13 @@ public class ActionController : ControllerBase
         // Prevent path traversal
         if (string.IsNullOrWhiteSpace(actionName) || actionName.Contains("..") || Path.IsPathRooted(actionName))
         {
-            _logger.LogInformation("PrepareActionFolder - Invalid action name.");
+            _logger.LogError("PrepareActionFolder - Invalid action name.");
             return string.Empty;
         }
 
         if (string.IsNullOrWhiteSpace(actionVersion) || actionVersion.Contains("..") || Path.IsPathRooted(actionVersion))
         {
-            _logger.LogInformation("PrepareActionFolder - Invalid action version.");
+            _logger.LogError("PrepareActionFolder - Invalid action version.");
             return string.Empty;
         }
 
