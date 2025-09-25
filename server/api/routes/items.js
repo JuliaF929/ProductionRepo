@@ -1,28 +1,25 @@
 const express = require('express');
 const { HTTP_STATUS, STRING_CONSTANTS } = require('../../../shared/constants');
 const router = express.Router();
-const mongoose = require('mongoose');
 const logger = require('../../logger');
 
 const Item = require('../models/items');
 
 // Later can swap this line to use a MongoDB or another repository
-const itemTypeRepository = require('../../repositories/itemTypeRepositorySheets');
-const parameterDefaultRepository = require('../../repositories/parameterDefaultRepositorySheets');
+const itemTypeRepository = require('../../repositories/sheets/itemTypeRepositorySheets');
+const parameterDefaultRepository = require('../../repositories/sheets/parameterDefaultRepositorySheets');
+const itemRepository = require('../../repositories/mongodb/itemRepositoryMongo');
 
 router.get('/', async (req, res, next) => {
-    Item.find()
-    .exec()
-    .then (docs => {
-        logger.debug(docs);
+    try 
+    {
+        const docs = await itemRepository.getAllNarrowItems();
         res.status(HTTP_STATUS.OK).json(docs);
-    })
-    .catch(err => {
-        logger.debug(err);
-        res.status(HTTP_STATUS.BAD_REQUEST).json({
-            error: err
-        });
-    })
+    } 
+    catch (err) 
+    {
+        res.status(HTTP_STATUS.BAD_REQUEST).json({ error: err.message });
+    }
 });
 
 router.post('/', async (req, res, next) => {
@@ -30,7 +27,7 @@ router.post('/', async (req, res, next) => {
     logger.debug(`FULL BODY: ${JSON.stringify(req.body, null, 2)}`);
     logger.debug(`req.body.SerialNumber is ${req.body.SerialNumber}, req.body.Type is ${req.body.Type}`);
     //0. validate that item with the same serial number does not already exist
-    const existingItem = await Item.findOne({ serialNumber: req.body.SerialNumber });
+    const existingItem = await itemRepository.itemExists(req.body.SerialNumber);
 
     if (existingItem) {
       // Duplicate found, abort
@@ -81,7 +78,6 @@ router.post('/', async (req, res, next) => {
     //on new item creation there is still no calib applications passed, so calibApps array is empty
 
     const item = new Item({
-        _id: new mongoose.Types.ObjectId(),
         serialNumber: req.body.SerialNumber,
         type: req.body.Type,
         creationdate: new Date().toLocaleString(),
@@ -91,7 +87,7 @@ router.post('/', async (req, res, next) => {
 
     const start2 = Date.now();
     try {
-        const result = await item.save();
+        const result = await itemRepository.addItem(item);
         const saveActionMs = Date.now() - start2;
         logger.debug(`saveActionMs for mongo save: ${saveActionMs} ms`)
         logger.debug(`Item with SerialNumber ${req.body.SerialNumber} saved with result ${result}`);

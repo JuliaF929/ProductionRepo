@@ -5,9 +5,9 @@ const logger = require('../../logger');
 const ItemType = require('../models/item-types');
 
 // Later can swap this line to use a MongoDB or another repository
-const itemTypeRepository = require('../../repositories/itemTypeRepositorySheets');
-const itemTypeAtomicTransaction = require('../../repositories/itemTypeAtomicTransactionsSheets');
-const testApplicationRepository = require('../../repositories/testApplicationRepositorySheets');
+const itemTypeRepository = require('../../repositories/sheets/itemTypeRepositorySheets');
+const itemTypeAtomicTransaction = require('../../repositories/sheets/itemTypeAtomicTransactionsSheets');
+const testApplicationRepository = require('../../repositories/sheets/testApplicationRepositorySheets');
 
 const { v4: uuidv4 } = require('uuid');
 

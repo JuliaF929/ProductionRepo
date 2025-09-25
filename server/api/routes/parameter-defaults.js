@@ -5,8 +5,8 @@ const logger = require('../../logger');
 const ParameterDefault = require('../models/parameter-defaults');
 
 // Later can swap this line to use a MongoDB or another repository
-const parameterDefaultRepository = require('../../repositories/parameterDefaultRepositorySheets');
-const itemTypeRepository = require('../../repositories/itemTypeRepositorySheets');
+const parameterDefaultRepository = require('../../repositories/sheets/parameterDefaultRepositorySheets');
+const itemTypeRepository = require('../../repositories/sheets/itemTypeRepositorySheets');
 
 const { v4: uuidv4 } = require('uuid');
 

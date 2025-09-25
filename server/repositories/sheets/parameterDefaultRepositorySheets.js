@@ -1,7 +1,7 @@
-// repositories/parameterDefaultRepositorySheets.js
-const sheets = require('../dal/sheets/sheets');
-const logger = require('../logger');
-const sheetsConstants = require('../dal/sheets/sheetsConstants');
+// repositories/sheets/parameterDefaultRepositorySheets.js
+const sheets = require('../../dal/sheets/sheets');
+const logger = require('../../logger');
+const sheetsConstants = require('../../dal/sheets/sheetsConstants');
 
 module.exports = {
     addParameterDefault: async (parameterDefault) => {

@@ -73,7 +73,7 @@ export class ItemListComponent implements OnInit {
     if (newItem) 
     {
       console.log('ItemListComponent: onNewItemCreated, updating the list of items.', newItem);
-      this.items.push(newItem);       
+      this.loadItems();
                   
       this.applyFilters();
       this.createNewItemEvent.emit(newItem);// Notify parent

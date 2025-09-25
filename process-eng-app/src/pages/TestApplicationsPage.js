@@ -61,18 +61,22 @@ function TestApplicationsPage({onCreateNewTestApplication, onEditTestApplication
                 <td>{app.ECONumber}</td>
                 <td>
                   <button
-                    className="btn btn-sm btn-warning"
+                    className="btn btn-sm btn-outline-secondary"
                     onClick={e => { e.stopPropagation(); handleEdit(app); }}
                   >
-                    Edit
+                    <span class="material-symbols-outlined">
+                      edit
+                    </span>
                   </button>
                 </td>
                 <td>
                   <button
-                    className="btn btn-sm btn-danger"
+                    className="btn btn-sm btn-outline-danger"
                     onClick={e => { e.stopPropagation(); handleDelete(app); }}
                   >
-                    Delete
+                    <span class="material-symbols-outlined">
+                      delete
+                    </span>
                   </button>
                 </td>
               </tr>

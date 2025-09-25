@@ -1,7 +1,7 @@
-// repositories/itemTypeRepositorySheets.js
-const sheets = require('../dal/sheets/sheets');
-const sheetsConstants = require('../dal/sheets/sheetsConstants');
-const logger = require('../logger');
+// repositories/sheets/itemTypeRepositorySheets.js
+const sheets = require('../../dal/sheets/sheets');
+const sheetsConstants = require('../../dal/sheets/sheetsConstants');
+const logger = require('../../logger');
 
 
 module.exports = {

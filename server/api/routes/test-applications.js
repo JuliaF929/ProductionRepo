@@ -6,7 +6,7 @@ const { format } = require('date-fns');
 const TestApplication = require('../models/test-applications');
 
 // Later can swap this line to use a MongoDB or another repository
-const testApplicationRepository = require('../../repositories/testApplicationRepositorySheets');
+const testApplicationRepository = require('../../repositories/sheets/testApplicationRepositorySheets');
 
 const { v4: uuidv4 } = require('uuid');
 

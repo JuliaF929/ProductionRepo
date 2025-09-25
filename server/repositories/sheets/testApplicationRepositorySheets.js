@@ -1,7 +1,7 @@
-// repositories/testApplicationRepositorySheets.js
-const sheets = require('../dal/sheets/sheets');
-const logger = require('../logger');
-const sheetsConstants = require('../dal/sheets/sheetsConstants');
+// repositories/sheets/testApplicationRepositorySheets.js
+const sheets = require('../../dal/sheets/sheets');
+const logger = require('../../logger');
+const sheetsConstants = require('../../dal/sheets/sheetsConstants');
 
 module.exports = {
     addTestApplication: async (testApplication) => {

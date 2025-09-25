@@ -15,7 +15,7 @@ const CalibrationAppSchema = new mongoose.Schema({
 }, { _id: false }); // prevents Mongoose from auto-generating _id for each calib app
 
 const ItemSchema = new mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
+  //_id: mongoose.Schema.Types.ObjectId,
   serialNumber: {type: String, required: true, unique: true},
   type: String,
   creationdate: String,

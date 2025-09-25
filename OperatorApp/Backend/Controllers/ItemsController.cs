@@ -4,14 +4,9 @@ using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using System.Text;
 using System.Net.Http;
+using Backend.DTOs;
 
 namespace Backend.Controllers;
-
-public class NewItemDto
-{
-    public string SerialNumber { get; set; }
-    public string Type { get; set; }
-}
 
 [ApiController]
 [Route("api/[controller]")]
@@ -28,22 +23,42 @@ public class ItemsController : ControllerBase
     }
 
     [HttpGet]
-    public IActionResult GetAllItems()
+    public async Task<IActionResult> GetAllItems()
     {
-        _items.Clear(); // remove old items
-        _items.AddRange(new[]
-        {
-            new Item { SerialNumber = "001", Type = new ItemType {Name = "Type A"} },
-            new Item { SerialNumber = "002", Type = new ItemType {Name = "Type B"} },
-            new Item { SerialNumber = "003", Type = new ItemType {Name = "Type C"} }
-        });
+        _logger.LogInformation("GetAllItems called.");
 
-        _logger.LogInformation("kuku");
+        _items.Clear(); // remove old items
+        _logger.LogInformation("Cleared _items list.");
+
+        // GET all items request
+        var response = await _client.GetAsync("api/items");
+        response.EnsureSuccessStatusCode();
+
+        string result = await response.Content.ReadAsStringAsync();
+        _logger.LogInformation ($"GetAllItems - recieved {result} from server.");
+
+        using var doc = JsonDocument.Parse(result);
+        var items = doc.RootElement.EnumerateArray()
+                                                .Select(e => new Item
+                                                {
+                                                    SerialNumber = e.GetProperty("serialNumber").GetString(), // JSON property is case-sensitive
+                                                    Type = new ItemType
+                                                    {
+                                                        Name = e.GetProperty("type").GetString()
+                                                    }
+                                                })
+                                                .Where(i => !string.IsNullOrWhiteSpace(i.SerialNumber))
+                                                .DistinctBy(i => i.SerialNumber);
+
+        _items.AddRange(items);
+
+        //TODO: error handling
+        _logger.LogInformation($"GetAllItems - {JsonSerializer.Serialize(_items)}");
         return Ok(_items);
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateNewItem([FromBody] Item newItem)
+    public async Task<IActionResult> CreateNewItem([FromBody] FE2BE_CreateItemDto newItem)
     {
         try
         {            
@@ -52,13 +67,13 @@ public class ItemsController : ControllerBase
             if (string.IsNullOrWhiteSpace(newItem.SerialNumber))
                 return BadRequest("Item Serial Number is required");
 
-            var newItemToServer = new NewItemDto
+            var newItemToServer = new BE2Server_CreateItemDto
             {
                 SerialNumber = newItem.SerialNumber,
                 Type = newItem.Type!.Name
             };
 
-            // ❗ Explicitly disable camelCase when serializing
+            //Explicitly disable camelCase when serializing
             var pascalCaseOptions = new JsonSerializerOptions
             {
                 PropertyNamingPolicy = null // <== this is key
@@ -80,9 +95,6 @@ public class ItemsController : ControllerBase
 
             _logger.LogInformation ($"New item saved successfully at server, status is {resp.StatusCode}.");
 
-            //GetAllDefaultParametersForItemType(newItem.Type.Name);
-            //_items.Add(newItem);
-
             return Ok();
         }
         catch (Exception ex)
@@ -91,22 +103,6 @@ public class ItemsController : ControllerBase
             return BadRequest("Exception in CreateNewItem");
         }
     }
-
-    // //this is an internal function that shall be used during new item creation
-    // public async Task<List<string>> GetAllDefaultParametersForItemType(string itemType)
-    // {
-    //     _logger.LogInformation($"GetAllDefaultParametersForItemType - going to retrieve all parameter defaults for item of type {itemType}");
-        
-    //     // GET all default parameters for item type request
-    //     var response = await _client.GetAsync("api/parameter-defaults/" + itemType);
-    //     response.EnsureSuccessStatusCode();
-
-    //     string result = await response.Content.ReadAsStringAsync();
-    //     _logger.LogInformation ($"GetAllDefaultParametersForItemType - recieved {result} from server.");
-
-    //     return new List<string>();
-
-    // }
 }
 
 

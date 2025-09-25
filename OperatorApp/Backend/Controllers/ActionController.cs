@@ -194,7 +194,8 @@ public class ActionController : ControllerBase
             var outputJsonData = GetOutputJsonData(targetPath);
             if (outputJsonData == null)
             {
-                return BadRequest("Output json is invalid.");
+                _logger.LogInformation("CreateReport - Output json is invalid.");
+                return BadRequest("CreateReport - Output json is invalid.");
             }
             
             _logger.LogInformation($"Output Json data read, {outputJsonData}.");
@@ -267,8 +268,8 @@ public class ActionController : ControllerBase
             var outputJsonData = GetOutputJsonData(Path.Combine(AppContext.BaseDirectory, ACTIONS_RELATIVE_PATH));
             if (outputJsonData == null)
             {
-                _logger.LogInformation("Output json is invalid.");
-                return BadRequest("Output json is invalid.");
+                _logger.LogInformation("ExecuteAction - Output json is invalid.");
+                return BadRequest("ExecuteAction - Output json is invalid.");
             }
             var resultEntry = outputJsonData.FirstOrDefault(kvp => kvp.Key == "Result");
             if (string.IsNullOrEmpty(resultEntry.Value))

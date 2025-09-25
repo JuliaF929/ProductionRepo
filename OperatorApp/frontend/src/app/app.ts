@@ -47,10 +47,15 @@ export class App {
     this.itemActionsComponent.clear();
   }
 
+  onRefreshClicked(){
+    //TODO: implement
+    alert("Refresh button still not implemented.");
+  }
+
 
   appAddNewItem() {
     console.log(`appAddNewItem, selectedItem is ${this.selectedItem}`);
-    this.selectedItem = { SerialNumber: '', Type: { Name: '' } };
+    this.selectedItem = { SerialNumber: '', Type: { Name: '' }};
     this.isNewItemMode = true;
     this.isSidebarOpen = true;
 

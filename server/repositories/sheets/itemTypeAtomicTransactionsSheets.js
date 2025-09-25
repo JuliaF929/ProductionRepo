@@ -1,6 +1,6 @@
-const sheets = require('../dal/sheets/sheets');
-const sheetsConstants = require('../dal/sheets/sheetsConstants');
-const logger = require('../logger');
+const sheets = require('../../dal/sheets/sheets');
+const sheetsConstants = require('../../dal/sheets/sheetsConstants');
+const logger = require('../../logger');
 
 function buildItemTypeInsertRequest(itemType, sheetId) {
   return {
