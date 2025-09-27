@@ -406,13 +406,14 @@ function ParameterComponent({
 
   return (
     <div className="mb-3">
-      <label className="form-label">Parameter</label>
+      <label className="form-label mt-2">Parameter Name</label>
       <input
         type="text"
         className="form-control"
         id="ParameterName"
         onChange={(e) => onChange(id, 'name', e.target.value)}
       />
+      <label className="form-label mt-2">Parameter Description</label>
       <input
         type="text"
         className="form-control"
@@ -420,6 +421,7 @@ function ParameterComponent({
         onChange={(e) => onChange(id, 'description', e.target.value)}
       />
 
+      <label className="form-label mt-2">Parameter Type</label>
       <select
         className="form-select"
         value={selectedParameterType}
@@ -431,6 +433,7 @@ function ParameterComponent({
         ))}
       </select>
 
+      <label className="form-label mt-2">Parameter Default Value</label>
       <input
         type="text"
         className="form-control"

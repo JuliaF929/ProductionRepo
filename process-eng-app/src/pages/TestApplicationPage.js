@@ -9,9 +9,11 @@ function TestApplicationPage({action, testAppData}) {
   const [description, setDescription] = useState('');
   const [ECONumber, setECONumber] = useState('');
   const addTriggered = useRef(false);
+  const [testAppExeName, setTestAppExeName] = useState('');
 
   // Create a ref to programmatically click the hidden input
-  const fileInputRef = useRef(null);
+  const folderInputRef = useRef(null);
+  const fileExeInputRef = useRef(null);
 
     // Update the fields when a new testAppData is passed in:
     useEffect(() => {
@@ -33,13 +35,13 @@ function TestApplicationPage({action, testAppData}) {
 
 
  
-    // Trigger input click when user clicks the link or button
+    // Trigger input click when user clicks the link
     const handleOpenFolderPicker = (e) => {
       e.preventDefault();
-      fileInputRef.current.click();
+      folderInputRef.current?.click();
     };
-  
-    // Handle folder selection (fires automatically when user picks a folder)
+
+     // Handle folder selection (fires automatically when user picks a folder)
     const handleFolderSelect = (event) => {
       const files = Array.from(event.target.files);
       console.log('✅ Folder contents:', files);
@@ -52,7 +54,20 @@ function TestApplicationPage({action, testAppData}) {
       // TODO: You can start your auto-upload logic here
     };
 
-    const validateTestApplicationData = (name, versionNumber, description, ECONumber) => {
+    const handleChooseTestAppExe = (e) => {
+      e.preventDefault();
+      fileExeInputRef.current?.click();
+    };
+
+    const handleExeFileChosen = (event) => {
+      const file = event.target.files?.[0];
+      if (file) {
+        console.log(`Selected executable: ${file.name}`);
+        setTestAppExeName(file.name);
+      }
+    };
+
+    const validateTestApplicationData = (name, versionNumber, description, ECONumber, testAppExeName) => {
 
       //validations before pushing to the server
       if (!name) {
@@ -72,7 +87,10 @@ function TestApplicationPage({action, testAppData}) {
      }
      if (ECONumber.length > constants.GENERAL_STRING_MAX_CHARS )  {
       return { isValid: false, message: 'Test Application ECO# has to be shorter than ' + constants.GENERAL_STRING_MAX_CHARS + ' characters.'};
-    }
+     }
+     if (!testAppExeName) {
+       return { isValid: false, message: 'Test Application Executable Name is required.' };
+     }
   
     //TODO: more validations
   
@@ -80,7 +98,7 @@ function TestApplicationPage({action, testAppData}) {
   };
 
 
-  const handleAddTestApplicationOnServer = async (name, versionNumber, description, ECONumber) => {
+  const handleAddTestApplicationOnServer = async (name, versionNumber, description, ECONumber, testAppExeName) => {
     try {
       
       if (addTriggered.current) 
@@ -100,7 +118,8 @@ function TestApplicationPage({action, testAppData}) {
           name: name,
           versionNumber: versionNumber,
           description: description,
-          ECONumber: ECONumber
+          ECONumber: ECONumber,
+          testAppExeName: testAppExeName
         }),
       });
   
@@ -127,15 +146,15 @@ function TestApplicationPage({action, testAppData}) {
     // Create/Edit test application 
     const handleAddTestApplication = () => {
 
-    console.log(`before handleAddTestApplicationOnServer, new test application name: ${name}, versionNumber: ${versionNumber}, description: ${description}, ECO# ${ECONumber}`);
-    const { isValid, message } = validateTestApplicationData(name, versionNumber, description, ECONumber);
+    console.log(`before handleAddTestApplicationOnServer, new test application name: ${name}, versionNumber: ${versionNumber}, description: ${description}, ECO# ${ECONumber}, testAppExeName ${testAppExeName}`);
+    const { isValid, message } = validateTestApplicationData(name, versionNumber, description, ECONumber, testAppExeName);
     if (isValid == false) {
         alert(message);
         console.log(message);
         return;
     }
 
-    handleAddTestApplicationOnServer(name, versionNumber, description, ECONumber);
+    handleAddTestApplicationOnServer(name, versionNumber, description, ECONumber, testAppExeName);
 
     addTriggered.current = false;
 
@@ -173,17 +192,31 @@ function TestApplicationPage({action, testAppData}) {
 <div className="mb-4">
       {/* Custom link (or replace with a button if you prefer) */}
       <a href="#" onClick={handleOpenFolderPicker}>📂 Upload Test Application</a>
+      <br />
 
       {/* Hidden file input */}
       <input
         type="file"
         style={{ display: 'none' }}
-        ref={fileInputRef}
+        ref={folderInputRef}
         webkitdirectory="true"
         directory=""
         multiple
         onChange={handleFolderSelect}
       />
+
+      <a href="#" onClick={handleChooseTestAppExe}>⚙️ Choose Test Application Executable File</a>
+      <input
+        type="file"
+        ref={fileExeInputRef}
+        style={{ display: "none" }}
+        accept=".exe"
+        onChange={handleExeFileChosen}
+      />
+      <div style={{ marginTop: "8px", fontStyle: "italic" }}>
+          ✅ Selected: <strong>{testAppExeName}</strong>
+      </div>
+
 </div>
 )}
 

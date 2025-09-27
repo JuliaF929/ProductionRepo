@@ -7,9 +7,11 @@ const ITEM_TYPE_TEST_APPLICATIONS_SHEET_NAME     = 'ItemType_TestApplication';
 const ItemTypesLastColumnName = 'D';
 const ParameterDefaultsLastColumnName = 'F';
 const ParameterDefaultsItemTypeIDColumnName = 'F';
-const TestApplicationsLastColumnName = 'I';
+const TestApplicationsLastColumnName = 'J';
 const ItemTypeTestApplicationsLastColumnName = 'B';
 const ItemTypeIDInItemTypesTableColumnName = 'B';
+const ItemTypeTestApplicationsItemTypeID = 'A';
+const TestApplicationsTestApplicationIDColumnName = 'A';
 
 module.exports = {ITEM_TYPES_SPREADSHEET_ID,
                   ITEM_TYPES_SHEET_NAME,
@@ -21,5 +23,7 @@ module.exports = {ITEM_TYPES_SPREADSHEET_ID,
                   ParameterDefaultsItemTypeIDColumnName,
                   TestApplicationsLastColumnName,
                   ItemTypeTestApplicationsLastColumnName,
-                  ItemTypeIDInItemTypesTableColumnName};
+                  ItemTypeIDInItemTypesTableColumnName,
+                  ItemTypeTestApplicationsItemTypeID,
+                  TestApplicationsTestApplicationIDColumnName};
                   

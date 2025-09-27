@@ -48,8 +48,7 @@ export class App {
   }
 
   onRefreshClicked(){
-    //TODO: implement
-    alert("Refresh button still not implemented.");
+    window.location.reload();
   }
 
 

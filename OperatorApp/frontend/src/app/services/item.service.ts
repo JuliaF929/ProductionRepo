@@ -33,7 +33,9 @@ export class ItemService {
   }
 
   getItemActions(item: Item): Observable<ItemAction[]> {
-    const params = new HttpParams().set('itemSN', item.SerialNumber);
+    const params = new HttpParams()
+                                  .set('itemSN', item.SerialNumber)
+                                  .set('itemTypeName', item.Type.Name);
     return this.http.get<ItemAction[]>(this.apiItemActionsUrl, { params });
 
   }

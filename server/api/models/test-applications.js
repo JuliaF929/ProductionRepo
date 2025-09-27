@@ -1,5 +1,5 @@
 class TestApplication {
-    constructor({ _id, name, versionNumber, description, ECONumber, UploadDate, EffectiveDate, UploadUser, Path }) {
+    constructor({ _id, name, versionNumber, description, ECONumber, UploadDate, EffectiveDate, UploadUser, Path, testAppExeName }) {
       this._id = _id;
       this.name = name;
       this.versionNumber = versionNumber;
@@ -9,6 +9,7 @@ class TestApplication {
       this.EffectiveDate = EffectiveDate;
       this.UploadUser = UploadUser;
       this.Path = Path;
+      this.testAppExeName = testAppExeName;
     }
   }
   

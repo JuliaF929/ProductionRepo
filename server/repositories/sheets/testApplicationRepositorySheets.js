@@ -15,6 +15,7 @@ module.exports = {
         testApplication.EffectiveDate,
         testApplication.UploadUser,
         testApplication.Path,
+        testApplication.testAppExeName,
     ]);
   },
 
@@ -30,24 +31,41 @@ module.exports = {
       EffectiveDate: row[6],
       UploadUser: row[7],
       Path: row[8],
+      testAppExeName: row[9],
     }));
   },
 
-/*   getAllParameterDefaultsForItemType: async(itemTypeID) => {
+  getAllTestApplicationsForItemType: async(itemTypeID) => {
+
+    logger.debug(`getAllTestApplicationsForItemType for ${itemTypeID}.`);
+
+    //1. get from ItemType_TestApplication sheet all rows with given itemTypeID
     const rows = await sheets.getRowsByValue(sheetsConstants.ITEM_TYPES_SPREADSHEET_ID, 
-                                             sheetsConstants.PARAMETER_DEFAULTS_SHEET_NAME, 
-                                             sheetsConstants.ParameterDefaultsLastColumnName, 
+                                             sheetsConstants.ITEM_TYPE_TEST_APPLICATIONS_SHEET_NAME, 
+                                             sheetsConstants.ItemTypeTestApplicationsLastColumnName, 
                                              itemTypeID, 
-                                             sheetsConstants.ParameterDefaultsLastColumnName);
-    return rows.map(row => ({
-      uuid: row[0],
-      name: row[1],
-      description: row[2],
-      type: row[3],
-      defaultValue: row[4],
-      itemTypeID: row[5],
-    }));
-  }, */
+                                             sheetsConstants.ItemTypeTestApplicationsItemTypeID);
+
+    
+    logger.debug(`getAllTestApplicationsForItemType - got test apps IDs for ${itemTypeID} - ${JSON.stringify(rows, null, 2)}`)
+    //2. return from  TestApplications sheet all test application with given IDs
+    const allTestAppsForItemType = [];
+    for (const row of rows) 
+    {
+      //row[0] - itemTypeiD, row[1] - testAppID
+      const testAppId = row[1];
+      const testApp = await sheets.getRowsByValue(sheetsConstants.ITEM_TYPES_SPREADSHEET_ID, 
+                                                  sheetsConstants.TEST_APPLICATIONS_SHEET_NAME,
+                                                  sheetsConstants.TestApplicationsLastColumnName,
+                                                  testAppId,
+                                                  sheetsConstants.TestApplicationsTestApplicationIDColumnName);
+
+      allTestAppsForItemType.push(...testApp);
+    }
+    
+    return allTestAppsForItemType;
+
+  },
 
   deleteTestApplicationByUUID: async (uuid) => {
     const sheetId = await sheets.getSheetIdByName(sheetsConstants.ITEM_TYPES_SPREADSHEET_ID, sheetsConstants.TEST_APPLICATIONS_SHEET_NAME);
