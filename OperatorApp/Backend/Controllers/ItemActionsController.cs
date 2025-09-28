@@ -12,7 +12,7 @@ namespace Backend.Controllers;
 public class ItemActionsController : ControllerBase
 {
     private readonly ILogger<ItemActionsController> _logger;
-    private static List<ItemAction> _itemActions = new List<ItemAction>();
+    private static List<PlannedAction> _itemActions = new List<PlannedAction>();
     private readonly HttpClient _client;
 
     public ItemActionsController(ILogger<ItemActionsController> logger, IHttpClientFactory factory)
@@ -38,18 +38,22 @@ public class ItemActionsController : ControllerBase
         actions.EnsureSuccessStatusCode();
 
         var actionsReceivedFromServer = JsonSerializer.Deserialize<List<List<string>>>(await actions.Content.ReadAsStringAsync());
-        _logger.LogInformation($"Got from server : {actionsReceivedFromServer}");
+        _logger.LogInformation($"Got from server : {JsonSerializer.Serialize(actionsReceivedFromServer)}");
 
         _itemActions = actionsReceivedFromServer
-                        .Select((row, index) => new ItemAction
+                        .Select((row, index) => new PlannedAction
         {
                 Index = index + 1,
                 Name = row[1], // 2nd value from actionsReceivedFromServer array
-                LatestActionVersionNumber = "",
-                LatestRunResult = "NotStarted",
-                LatestReportUrl = "/assets/reports/checkA.pdf",
-                LatestRunDateTime = "",
-                LatestExecuter = $"Julia_{index + 1}"
+                PlannedVersion = row[2], // 3rd value from actionsReceivedFromServer array
+                CloudPath = row[8], //9th value from actionsReceivedFromServer array
+                ExeName = row[9],
+
+                // LatestActionVersionNumber = "",
+                // LatestRunResult = "NotStarted",
+                // LatestReportUrl = "/assets/reports/checkA.pdf",
+                // LatestRunDateTime = "",
+                // LatestExecuter = $"Julia_{index + 1}"
         })
         .ToList();
 

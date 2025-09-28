@@ -80,14 +80,14 @@ import { ExecuteActionResponse } from '../../models/execute-action-response.mode
           return;
         }
 
-        console.log(`Going to run action ${action.Name} for item ${this.item!.SerialNumber}`);
+        console.log(`Going to run action ${action.Name}, ver#${action.PlannedVersion}, path ${action.CloudPath}, exeName ${action.ExeName} for item ${this.item!.SerialNumber}`);
 
         this.closePdf();
 
         //do not allow any UI user interaction when the action is executed
         this.uiBlocked = true;
 
-        this.itemService.executeAction(action.Name, this.item!.SerialNumber).subscribe({
+        this.itemService.executeAction(action.Name, this.item!.SerialNumber, this.item!.Type!.Name, action.PlannedVersion, action.CloudPath, action.ExeName).subscribe({
           next: (actionResponse: ExecuteActionResponse) => {
 
             action.LatestRunResult = actionResponse.executionResult;

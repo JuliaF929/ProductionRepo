@@ -223,18 +223,20 @@ public class ActionController : ControllerBase
     }
 
     [HttpGet("execute")]
-    public IActionResult ExecuteAction([FromQuery] string actionName, [FromQuery] string itemSN)
+    public IActionResult ExecuteAction([FromQuery] string actionName, 
+                                       [FromQuery] string itemSN,
+                                       [FromQuery] string itemType,
+                                       [FromQuery] string actionVersion, 
+                                       [FromQuery] string actionPath,
+                                       [FromQuery] string actionExeName)
     {
         try
         {
             ExecuteActionResponse actionResponse = new ExecuteActionResponse();
 
-            _logger.LogInformation($"Starting ExecuteAction for action {actionName}, itemSN {itemSN}");
+            _logger.LogInformation($"Starting ExecuteAction for action {actionName}, itemSN {itemSN}, itemType {itemType}, actionVersion {actionVersion}, actionPath {actionPath}, actionExeName {actionExeName}.");
 
-            string actionLatestVer = "1.2.3.4"; //TODO: get latest version from server
-            _logger.LogInformation($"The returned by BE action ver# for action name {actionName} is {actionLatestVer}");
-
-            string actionFolderPath = PrepareActionFolder(actionName, actionLatestVer);
+            string actionFolderPath = PrepareActionFolder(actionName, actionVersion, actionPath);
             if (string.IsNullOrWhiteSpace(actionFolderPath))
             {
                 string errMsg = "Invalid action folder name";
@@ -245,30 +247,30 @@ public class ActionController : ControllerBase
             string inputFolderPath = ClearFolder(INPUT_FOLDER_NAME);
             string outputFolderPath = ClearFolder(OUTPUT_FOLDER_NAME);
 
-            //TODO: get item metadata from server
+            //TODO: get item metadata from server regarding the item's parameters
             var data = new Dictionary<string, string>
             {
                 { "SerialNumber", itemSN },
-                { "Type", "Type A" },
+                { "Type", itemType },
                 { "Param1", "12.36" },
                 { "Param2", "58.69" }
             };
 
-            string json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
+            string jsonInput = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
 
             string inputFilePath = Path.Combine(inputFolderPath, "input_" + itemSN + ".json");
-            System.IO.File.WriteAllText(inputFilePath, json);
+            System.IO.File.WriteAllText(inputFilePath, jsonInput);
 
             string startExecutionDateTime = DateTime.Now.ToString("yyyyMMMdd_HHmmss");
                
-            RunExecutable(actionFolderPath);
+            RunExecutable(actionFolderPath, actionExeName);
 
             string endExecutionDateTime = DateTime.Now.ToString("yyyyMMMdd_HHmmss");
 
             //TODO: send to the server execution details, startExecutionDateTime, endExecutionDateTime and the output
             //so all these can be written to DB
 
-            _logger.LogInformation($"Finished executing {actionName}, returning {actionLatestVer}.");
+            _logger.LogInformation($"Finished executing {actionName}, ver#{actionVersion}.");
 
             // parse output*.json to find the Result  entry (mandatory entry)
             var outputJsonData = GetOutputJsonData(Path.Combine(AppContext.BaseDirectory, ACTIONS_RELATIVE_PATH));
@@ -286,7 +288,7 @@ public class ActionController : ControllerBase
                 return BadRequest(errMsg);
             }
 
-            actionResponse.version = actionLatestVer;
+            actionResponse.version = actionVersion;
             actionResponse.startExecutionDateTime = startExecutionDateTime;
             actionResponse.endExecutionDateTime = endExecutionDateTime;
             actionResponse.executionResult = resultEntry.Value;
@@ -301,13 +303,11 @@ public class ActionController : ControllerBase
         }
     }
 
-    private void RunExecutable(string exePath)
+    private void RunExecutable(string exePath, string actionExeName)
     {
-        //TODO: get the executable name for the action from server
-        string exeName = "WinCalib_1.exe"; 
-        _logger.LogInformation($"Going to start {exeName} action from {exePath}.");
+        _logger.LogInformation($"Going to start {actionExeName} action from {exePath}.");
 
-        string exeFullPath = Path.Combine(exePath, exeName);
+        string exeFullPath = Path.Combine(exePath, actionExeName);
 
         var startInfo = new ProcessStartInfo
         {
@@ -319,16 +319,12 @@ public class ActionController : ControllerBase
         using var process = new Process { StartInfo = startInfo };
         process.Start();
 
-        // read output
-        //string output = process.StandardOutput.ReadToEnd();
-        //string error = process.StandardError.ReadToEnd();
-
         process.WaitForExit();
 
-        _logger.LogInformation($"Finished running action from {exePath}.");       
+        _logger.LogInformation($"Finished running exe {actionExeName} from {exePath}.");       
     }
 
-    private string PrepareActionFolder(string actionName, string actionVersion)
+    private string PrepareActionFolder(string actionName, string actionVersion, string actionPath)
     {
         // Prevent path traversal
         if (string.IsNullOrWhiteSpace(actionName) || actionName.Contains("..") || Path.IsPathRooted(actionName))
@@ -351,7 +347,7 @@ public class ActionController : ControllerBase
         {
             Directory.CreateDirectory(targetPath);
             //TODO:
-            //1. download from BE a zip for action+ver#
+            //1. download from server (actionPath) a zip for action
             //2. unzip
             _logger.LogInformation($"The folder {targetPath} did not exist, prepared.");
         }

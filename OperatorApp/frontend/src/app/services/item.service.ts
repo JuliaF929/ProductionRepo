@@ -40,10 +40,19 @@ export class ItemService {
 
   }
 
-  executeAction(actionName: string, itemSN: string) : Observable<ExecuteActionResponse> {
+  executeAction(actionName: string, 
+                itemSN: string,
+                itemType: string,
+                actionVersion: string, 
+                actionPath: string,
+                actionExeName: string) : Observable<ExecuteActionResponse> {
     const params = new HttpParams()
                                   .set('actionName', actionName)
-                                  .set('itemSN', itemSN);
+                                  .set('itemSN', itemSN)
+                                  .set('itemType', itemType)
+                                  .set('actionVersion', actionVersion)
+                                  .set('actionPath', actionPath)
+                                  .set('actionExeName', actionExeName);
 
     console.log("Calling:", this.apiActionUrl + "/execute");
     console.log("With params:", params.toString());
