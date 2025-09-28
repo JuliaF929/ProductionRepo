@@ -11,6 +11,7 @@ const parameterDefaultRepository = require('../../repositories/sheets/parameterD
 const itemRepository = require('../../repositories/mongodb/itemRepositoryMongo');
 
 router.get('/', async (req, res, next) => {
+    logger.debug(`Start getting all items (narrow)`);
     try 
     {
         const docs = await itemRepository.getAllNarrowItems();
@@ -18,6 +19,7 @@ router.get('/', async (req, res, next) => {
     } 
     catch (err) 
     {
+        logger.error(`Exception during getting all items: ${err}`);
         res.status(HTTP_STATUS.BAD_REQUEST).json({ error: err.message });
     }
 });
@@ -105,23 +107,21 @@ router.post('/', async (req, res, next) => {
     
 });
 
-router.get('/:itemSN', (req, res, next) => {
-    const sn = req.params.itemSN;
-    Item.findOne({ serialNumber: sn })
-    .exec()
-    .then(doc => {
-        console.log(doc);
-        if (doc) /*not null*/{
-            res.status(HTTP_STATUS.OK).json(doc)
-        } else {
-         res.status(HTTP_STATUS.NOT_FOUND).json({message: `Item with ${sn} was not found.`})   
-        }
-        
-    })
-    .catch(err => {
-        console.log(err);
-        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({error: err});
-    });
+router.get('/:itemSN', async (req, res, next) => {
+
+    logger.debug(`Start getting all parameters for itemSN: ${req.params.itemSN}`);
+
+    try 
+    {
+        const docs = await itemRepository.getParametersForItem(req.params.itemSN);
+        logger.debug(`Got parameters for itemSN ${req.params.itemSN} - ${JSON.stringify(docs, null, 2)}`);
+        res.status(HTTP_STATUS.OK).json(docs);
+    } 
+    catch (err) 
+    {
+        logger.error(`Exception during getting parameters for itemSN ${req.params.itemSN}: ${err}`);
+        res.status(HTTP_STATUS.BAD_REQUEST).json({ error: err.message });
+    }
 });
 
 module.exports = router;

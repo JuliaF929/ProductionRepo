@@ -23,5 +23,10 @@ module.exports = {
     },
     
     getActionsPassedForItem: async () => {},
-    getParametersForItem: async () => {},
+    
+    getParametersForItem: async (itemSerialNumber) => 
+    {
+        const item = await Item.findOne({ serialNumber: itemSerialNumber }, { parameters: 1, _id: 0 });
+        return item ? item.parameters : null;
+    },
 };

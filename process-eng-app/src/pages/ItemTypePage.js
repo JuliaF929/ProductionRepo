@@ -152,7 +152,21 @@ function ItemTypePage({action, itemTypeData}) {
     }
   };
 
-  const validateItemTypeData = (name, description, SNPrefix) => {
+  const validateParameters = (parameterDefaults) => {
+    return parameterDefaults.every(p => {
+      if (p.type === "integer") {
+        // must be a valid integer
+        return Number.isInteger(Number(p.defaultValue));
+      }
+      if (p.type === "double") {
+        // must be a valid number (float or int)
+        return !isNaN(p.defaultValue) && p.defaultValue.toString().trim() !== "";
+      }
+      return true; // skip validation for other types
+    });
+  };
+
+  const validateItemTypeData = (name, description, SNPrefix, parameterDefaults, testAppComponents) => {
 
     //validations before pushing to the server
     if (!name) {
@@ -170,10 +184,27 @@ function ItemTypePage({action, itemTypeData}) {
     return { isValid: false, message: 'Item Type SN Prefix has to be shorter than ' + constants.SN_PREFIX_MAX_CHARS + ' characters.'};
   }
 
-  //TODO: Validation of all paramters
-  //TODO: Validation of all test applications
+   //Validation of all parameters
+   
+   //check that there are no duplicates of the name
+   const names = parameterDefaults.map(p => p.name);
+   const hasDuplicates = new Set(names).size !== names.length;
 
-  return {isValid: true, message: ''};
+   if (hasDuplicates) {
+    return { isValid: false, message: 'Parameters with same names are not allowed.' };
+   }
+
+   //check that parameters of type integer have only digits
+   //check that parameters of type double have only digits and dot
+   if (!validateParameters(parameterDefaults)) {
+    return { isValid: false, message: "Some parameters with type 'integer'/'double' do not have a valid value." };
+   }
+
+
+   //Validation of all test applications
+   //in test applications can be duplicates...
+
+    return {isValid: true, message: ''};          
 };
   
   //currently mocked function, shall be replaced by 
@@ -214,7 +245,7 @@ function ItemTypePage({action, itemTypeData}) {
   const handleAddItemType = () => {
 
     console.log("before handleAddItemTypeOnServer, new item type name = " + name + ' ' + description + ' ' + SNPrefix);
-    const { isValid, message } = validateItemTypeData(name, description, SNPrefix);
+    const { isValid, message } = validateItemTypeData(name, description, SNPrefix, parameterDefaults, testAppComponents);
     if (isValid == false) {
         alert(message);
         console.log(message);
@@ -238,7 +269,7 @@ function ItemTypePage({action, itemTypeData}) {
     setTestAppComponents(prev => [
       ...prev,
       {
-        _id: Date.now(), // unique id only for frontend
+        id: Date.now(),
         selectedAppName: '',
         selectedAppVersion: ''
       }
@@ -249,7 +280,7 @@ function ItemTypePage({action, itemTypeData}) {
     setParameterDefaults(prev => [
       ...prev,
       {
-        _id: Date.now(), // unique id only for frontend
+        id: Date.now(), // unique id only for frontend
         name: '', description: '', type: '', defaultValue: ''
       }
     ]);
@@ -259,9 +290,56 @@ function ItemTypePage({action, itemTypeData}) {
     setTestAppComponents(prev => prev.filter(app => app.id !== id));
   };
 
+  const confirmTestApplication = (id) => {
+    setTestAppComponents(prev =>
+      prev.map(app =>
+        app.id === id
+          ? { ...app, confirmed: true }  // mark confirmed
+          : app
+      )
+    );
+  };
+
   const removeParameterDefault = (id) => {
     setParameterDefaults(prev => prev.filter(param => param.id !== id));
   };
+
+  const confirmParameterDefault = (id) => {
+    setParameterDefaults(prev => {
+      const updated = prev.map(param => {
+        if (param.id === id) {
+                  
+          //check if name is blank
+          if (!param.name || param.name.trim() === "") {
+            console.log("Parameter name cannot be blank.");
+            alert("Parameter name cannot be blank.");
+            return param; // don’t confirm
+          }
+
+          // validation for integer
+          if (param.type === "integer" && !Number.isInteger(Number(param.defaultValue))) {
+            console.log(`Parameter ${param.name} of type integer must have a valid integer value.`);
+            alert(`Parameter ${param.name} of type integer must have a valid integer value.`);
+            return param; // don’t confirm
+          }
+  
+          // validation for double
+          if (param.type === "double" && (isNaN(param.defaultValue) || param.defaultValue.toString().trim() === "")) {
+            console.log(`Parameter "${param.name}" of type double must have a valid double value.`);
+            alert(`Parameter "${param.name}" of type double must have a valid double value.`);
+            return param; // don’t confirm
+          }
+  
+          // ✅ valid → mark as confirmed
+          return { ...param, confirmed: true };
+        }
+        return param;
+      });
+  
+      return updated;
+    });
+  };
+  
 
   const handleParameterDefaultChange = (id, field, value) => {
     const updated = (parameterDefaults || []).map(param =>
@@ -310,6 +388,7 @@ function ItemTypePage({action, itemTypeData}) {
       setTestAppComponents(updated);
     }}
     onRemoveTestApplication={() => removeTestAppComponent(app.id)}
+    onConfirmTestApplication={() => confirmTestApplication(app.id)}
   />
 ))}
 
@@ -325,6 +404,7 @@ function ItemTypePage({action, itemTypeData}) {
     availableParametersTypes={availableParametersTypes}
     selectedParameterType={param.selectedParameterType}
     onSelectParameterType={() => {}}
+    onConfirmParameter={() => confirmParameterDefault(param.id)}
     onRemoveParameter={() => removeParameterDefault(param.id)}
     onChange={handleParameterDefaultChange}
   />
@@ -355,6 +435,7 @@ function TestApplicationComponent({
   onSelectAppName,
   onSelectAppVersion,
   onRemoveTestApplication,
+  onConfirmTestApplication,
   onChange
 }) {
   const appNames = [...new Set((testAppsFromServer || []).map(app => app.appName))];
@@ -389,6 +470,7 @@ function TestApplicationComponent({
         ))}
       </select>
 
+      <button className="btn btn-secondary" onClick={onConfirmTestApplication}>Confirm</button>
       <button className="btn btn-secondary" onClick={onRemoveTestApplication}>Remove</button>
     </div>
   );
@@ -399,6 +481,7 @@ function ParameterComponent({
                               availableParametersTypes, 
                               selectedParameterType, 
                               onSelectParameterType, 
+                              onConfirmParameter,
                               onRemoveParameter, 
                               onChange
 }) 
@@ -441,6 +524,7 @@ function ParameterComponent({
         onChange={(e) => onChange(id, 'defaultValue', e.target.value)}
       />
 
+      <button className="btn btn-secondary" onClick={onConfirmParameter}>Confirm</button>
       <button className="btn btn-secondary" onClick={onRemoveParameter}>Remove</button>
     </div>
   );

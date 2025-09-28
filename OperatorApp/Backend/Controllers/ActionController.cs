@@ -6,6 +6,8 @@ using System.Diagnostics;
 using PdfSharpCore.Drawing;
 using PdfSharpCore.Pdf;
 using Microsoft.Extensions.Options;
+using System.Net.Http;
+
 
 namespace Backend.Controllers;
 
@@ -15,6 +17,7 @@ public class ActionController : ControllerBase
 {
     private readonly ILogger<ActionController> _logger;
     private readonly AppConfig _config;
+    private readonly HttpClient _client;
 
     private const string ACTIONS_RELATIVE_PATH = "CalibrationApplications";
     private const string INPUT_FOLDER_NAME     = "Input";
@@ -23,10 +26,11 @@ public class ActionController : ControllerBase
     private const string ANGULAR_FOLDER_NAME   = "wwwroot"; 
 
     
-    public ActionController(ILogger<ActionController> logger, IOptions<AppConfig> config)
+    public ActionController(ILogger<ActionController> logger, IOptions<AppConfig> config, IHttpClientFactory factory)
     {
         _logger = logger;
         _config = config.Value;
+        _client = factory.CreateClient("ServerApi");
     }
 
     private Dictionary<string, string> GetOutputJsonData(string targetPath)
@@ -222,13 +226,20 @@ public class ActionController : ControllerBase
         }
     }
 
+    public class ParamLite
+    {
+        public string name { get; set; }
+        public string type { get; set; }
+        public string value { get; set; }
+    }
+
     [HttpGet("execute")]
-    public IActionResult ExecuteAction([FromQuery] string actionName, 
-                                       [FromQuery] string itemSN,
-                                       [FromQuery] string itemType,
-                                       [FromQuery] string actionVersion, 
-                                       [FromQuery] string actionPath,
-                                       [FromQuery] string actionExeName)
+    public async Task<IActionResult> ExecuteAction([FromQuery] string actionName, 
+                                              [FromQuery] string itemSN,
+                                              [FromQuery] string itemType,
+                                              [FromQuery] string actionVersion, 
+                                              [FromQuery] string actionPath,
+                                              [FromQuery] string actionExeName)
     {
         try
         {
@@ -247,21 +258,33 @@ public class ActionController : ControllerBase
             string inputFolderPath = ClearFolder(INPUT_FOLDER_NAME);
             string outputFolderPath = ClearFolder(OUTPUT_FOLDER_NAME);
 
-            //TODO: get item metadata from server regarding the item's parameters
-            var data = new Dictionary<string, string>
+            //TODO: julia - get item metadata from server regarding the item's parameters
+
+            var itemParameters = await _client.GetAsync($"api/items/{itemSN}");
+            itemParameters.EnsureSuccessStatusCode();
+
+            var itemParametersReceivedFromServer = JsonSerializer.Deserialize<List<ParamLite>>(await itemParameters.Content.ReadAsStringAsync());
+            _logger.LogInformation($"Parameters for item {itemSN} got from server : {JsonSerializer.Serialize(itemParametersReceivedFromServer)}");
+
+            var dataForInput = new Dictionary<string, string>
             {
                 { "SerialNumber", itemSN },
-                { "Type", itemType },
-                { "Param1", "12.36" },
-                { "Param2", "58.69" }
+                { "Type", itemType }
             };
 
-            string jsonInput = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
+            foreach (var param in itemParametersReceivedFromServer)
+                dataForInput.Add(param.name, param.value);
+
+            string jsonInput = JsonSerializer.Serialize(dataForInput, new JsonSerializerOptions { WriteIndented = true });
 
             string inputFilePath = Path.Combine(inputFolderPath, "input_" + itemSN + ".json");
             System.IO.File.WriteAllText(inputFilePath, jsonInput);
 
+            _logger.LogInformation($"Input json for action {actionName}, itemSN {itemSN} written to {inputFilePath} : {jsonInput}");
+
             string startExecutionDateTime = DateTime.Now.ToString("yyyyMMMdd_HHmmss");
+
+            _logger.LogInformation($"About to run executable {actionExeName} for action {actionName}, ver#{actionVersion}, startExecutionDateTime {startExecutionDateTime}.");
                
             RunExecutable(actionFolderPath, actionExeName);
 
