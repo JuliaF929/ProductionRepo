@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const logger = require('../../logger');
+const awsService = require('../../api/services/awsService');
 const { format } = require('date-fns');
 const { HTTP_STATUS } = require('../../../shared/constants');
 
@@ -132,5 +133,26 @@ router.get('/:itemTypeName', async (req, res) => {
     res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Failed to get all test applications for item type.' });
   }
 });
+
+router.get('/download-link/:testAppName/:testAppVersion', async (req, res) => {
+  const testAppName = req.params.testAppName;
+  const testAppVersion = req.params.testAppVersion;
+
+  logger.debug(`GET download link for test application ${testAppName}, version ${testAppVersion} started`);
+
+  try
+  {
+    const downloadSetup = await awsService.getTestApplicationDownloadSetup(testAppName, testAppVersion);
+    logger.debug(`Got download setup for test application ${testAppName}, version ${testAppVersion} - ${downloadSetup}`);
+    res.json(downloadSetup); // Client will use this URL to download //TODO: define setup as an API...
+  }
+  catch (error)
+  {
+    let errorStr = `Failed to get download link for test application ${testAppName}, version ${testAppVersion}`;
+    logger.debug(errorStr, `Error - ${error}`);
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: errorStr });
+  }
+});
+
 
 module.exports = router;

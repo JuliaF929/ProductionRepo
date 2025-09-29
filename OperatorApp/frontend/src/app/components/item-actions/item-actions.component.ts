@@ -87,7 +87,7 @@ import { ExecuteActionResponse } from '../../models/execute-action-response.mode
         //do not allow any UI user interaction when the action is executed
         this.uiBlocked = true;
 
-        this.itemService.executeAction(action.Name, this.item!.SerialNumber, this.item!.Type!.Name, action.PlannedVersion, action.CloudPath, action.ExeName).subscribe({
+        this.itemService.executeAction(action.Name, this.item!.SerialNumber, this.item!.Type!.Name, action.PlannedVersion, action.ExeName).subscribe({
           next: (actionResponse: ExecuteActionResponse) => {
 
             action.LatestRunResult = actionResponse.executionResult;

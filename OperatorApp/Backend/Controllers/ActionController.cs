@@ -7,6 +7,8 @@ using PdfSharpCore.Drawing;
 using PdfSharpCore.Pdf;
 using Microsoft.Extensions.Options;
 using System.Net.Http;
+using Backend.Services;
+using System.IO.Compression;
 
 
 namespace Backend.Controllers;
@@ -238,16 +240,15 @@ public class ActionController : ControllerBase
                                               [FromQuery] string itemSN,
                                               [FromQuery] string itemType,
                                               [FromQuery] string actionVersion, 
-                                              [FromQuery] string actionPath,
                                               [FromQuery] string actionExeName)
     {
         try
         {
             ExecuteActionResponse actionResponse = new ExecuteActionResponse();
 
-            _logger.LogInformation($"Starting ExecuteAction for action {actionName}, itemSN {itemSN}, itemType {itemType}, actionVersion {actionVersion}, actionPath {actionPath}, actionExeName {actionExeName}.");
+            _logger.LogInformation($"Starting ExecuteAction for action {actionName}, itemSN {itemSN}, itemType {itemType}, actionVersion {actionVersion}, actionExeName {actionExeName}.");
 
-            string actionFolderPath = PrepareActionFolder(actionName, actionVersion, actionPath);
+            string actionFolderPath = await PrepareActionFolder(actionName, actionVersion);
             if (string.IsNullOrWhiteSpace(actionFolderPath))
             {
                 string errMsg = "Invalid action folder name";
@@ -258,8 +259,7 @@ public class ActionController : ControllerBase
             string inputFolderPath = ClearFolder(INPUT_FOLDER_NAME);
             string outputFolderPath = ClearFolder(OUTPUT_FOLDER_NAME);
 
-            //TODO: julia - get item metadata from server regarding the item's parameters
-
+            //get item metadata from server regarding the item's parameters
             var itemParameters = await _client.GetAsync($"api/items/{itemSN}");
             itemParameters.EnsureSuccessStatusCode();
 
@@ -347,7 +347,7 @@ public class ActionController : ControllerBase
         _logger.LogInformation($"Finished running exe {actionExeName} from {exePath}.");       
     }
 
-    private string PrepareActionFolder(string actionName, string actionVersion, string actionPath)
+    private async Task<string> PrepareActionFolder(string actionName, string actionVersion)
     {
         // Prevent path traversal
         if (string.IsNullOrWhiteSpace(actionName) || actionName.Contains("..") || Path.IsPathRooted(actionName))
@@ -366,17 +366,40 @@ public class ActionController : ControllerBase
         string basePath = AppContext.BaseDirectory;
         string targetPath = Path.Combine(basePath, ACTIONS_RELATIVE_PATH, actionName + "_" + actionVersion);
 
-        if (!Directory.Exists(targetPath))
+        try
         {
-            Directory.CreateDirectory(targetPath);
-            //TODO:
-            //1. download from server (actionPath) a zip for action
-            //2. unzip
-            _logger.LogInformation($"The folder {targetPath} did not exist, prepared.");
+            if (!Directory.Exists(targetPath))
+            {
+                Directory.CreateDirectory(targetPath);
+
+                //1. get a url for the action zip from server 
+                var urlToDowloadTestApp = await _client.GetAsync($"api/test-applications/download-link/{actionName}/{actionVersion}");
+                urlToDowloadTestApp.EnsureSuccessStatusCode();
+
+                var urlToDowloadTestAppJson = await urlToDowloadTestApp.Content.ReadAsStringAsync();
+                _logger.LogInformation($"Url to download action {actionName}, ver#{actionVersion} got from server : {urlToDowloadTestAppJson}");
+
+                string urlStr = JsonDocument.Parse(urlToDowloadTestAppJson).RootElement.GetProperty("url").GetString();
+                string fileNameStr = JsonDocument.Parse(urlToDowloadTestAppJson).RootElement.GetProperty("fileName").GetString();
+
+                //2. download the action zip from received url
+                string zipFilePathAndName = Path.Combine(targetPath, fileNameStr);
+                await UploadDownloadService.DownloadFileAsync(urlStr, zipFilePathAndName);
+
+                //3. unzip
+                ZipFile.ExtractToDirectory(zipFilePathAndName, targetPath, overwriteFiles: true);
+
+                _logger.LogInformation($"The folder {targetPath} did not exist, prepared.");
+            }
+            else
+            {
+                _logger.LogInformation($"The folder {targetPath} exists. Doing nothing.");
+            }
         }
-        else
+        catch (Exception ex)
         {
-            _logger.LogInformation($"The folder {targetPath} exists. Doing nothing.");
+            _logger.LogError($"Exception in PrepareActionFolder, Ex. {ex.Message}.");
+            return string.Empty;
         }
 
         _logger.LogInformation($"The folder {targetPath} is ready.");

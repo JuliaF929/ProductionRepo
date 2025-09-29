@@ -2,7 +2,7 @@ const http = require('http');
 const os = require('os');
 const app = require('./app');
 const logger = require('./logger');
-const connectDB = require('./api/config/mongodb');
+const connectDB = require('./api/services/mongodbService');
 const { version } = require('./package.json');
 
 const port = process.env.PORT || 5000;
