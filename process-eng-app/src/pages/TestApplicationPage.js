@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import TextComponent from '../components/TextComponent';
 import constants from '../constants';
+import JSZip from "jszip";
 
 function TestApplicationPage({action, testAppData}) {
   const [name, setName] = useState('');
@@ -10,6 +11,8 @@ function TestApplicationPage({action, testAppData}) {
   const [ECONumber, setECONumber] = useState('');
   const addTriggered = useRef(false);
   const [testAppExeName, setTestAppExeName] = useState('');
+  const [testAppFolder, setTestAppFolder] = useState('');
+  const [zipBlob, setZipBlob] = useState(null);
 
   // Create a ref to programmatically click the hidden input
   const folderInputRef = useRef(null);
@@ -42,16 +45,44 @@ function TestApplicationPage({action, testAppData}) {
     };
 
      // Handle folder selection (fires automatically when user picks a folder)
-    const handleFolderSelect = (event) => {
+    const handleFolderSelect = async (event) => {
+
       const files = Array.from(event.target.files);
       console.log('✅ Folder contents:', files);
+
+      if (!files || files.length === 0) {
+        alert('Selected folder is empty, please select a folder with files.');
+        return;
+      }
+
+      if (files.length > 0) {
+        // Extract the folder name from the first file's path
+        const firstFilePath = files[0].webkitRelativePath;
+        const folderName = firstFilePath.split('/')[0]; // Get the top-level folder name
+        console.log(`Selected folder: ${folderName}`);
+        setTestAppFolder(folderName);
+      }
+
+      //save the zip blob to memory
+      const zip = new JSZip();
+      // Add each file to the zip, preserving folder structure
+      for (const file of files) 
+      {
+        // webkitRelativePath gives relative path inside selected folder
+        // webkitRelativePath is like "WinCalib/bin/app.exe"
+        const relativePath = file.webkitRelativePath.split("/").slice(1).join("/");
   
-      // Example: Print relative file paths
-      files.forEach(file => {
-        console.log(file.webkitRelativePath);  // Shows folder structure
-      });
-  
-      // TODO: You can start your auto-upload logic here
+        // To get only flat files, file.name is used instead
+        // but this way keeps subfolders (bin/app.exe) without the top-level folder
+        zip.file(relativePath, file);
+      }
+
+      // Generate the ZIP as a Blob
+      const blob = await zip.generateAsync({ type: "blob" });
+      setZipBlob(blob);
+
+      console.log("✅ ZIP created, size:", blob.size);
+
     };
 
     const handleChooseTestAppExe = (e) => {
@@ -67,7 +98,7 @@ function TestApplicationPage({action, testAppData}) {
       }
     };
 
-    const validateTestApplicationData = (name, versionNumber, description, ECONumber, testAppExeName) => {
+    const validateTestApplicationData = (name, versionNumber, description, ECONumber, testAppExeName, zipBlob) => {
 
       //validations before pushing to the server
       if (!name) {
@@ -91,14 +122,30 @@ function TestApplicationPage({action, testAppData}) {
      if (!testAppExeName) {
        return { isValid: false, message: 'Test Application Executable Name is required.' };
      }
+     //if test Application Folder is not selected
+     if (!zipBlob) {
+      return { isValid: false, message: 'Error creating Zip for Test Application. Please re-choose Test Application folder.' };
+     }
   
     //TODO: more validations
   
     return {isValid: true, message: ''};
   };
 
+  const uploadTestApplicationZip = async (presignedUrl) => {
+    console.log(`Uploading zip to presigned URL: ${presignedUrl}`);
+    const res = await fetch(presignedUrl, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/zip"
+      },
+      body: zipBlob
+    });
+    return res;
+  }
+  
 
-  const handleAddTestApplicationOnServer = async (name, versionNumber, description, ECONumber, testAppExeName) => {
+  const handleAddTestApplicationOnServer = async (name, versionNumber, description, ECONumber, testAppExeName, zipBlob) => {
     try {
       
       if (addTriggered.current) 
@@ -108,6 +155,32 @@ function TestApplicationPage({action, testAppData}) {
         }
 
       addTriggered.current = true;
+
+      //get aws upload URL
+      const awsResponse = await fetch(`${constants.API_BASE}/test-applications/upload-link/${encodeURIComponent(name)}/${encodeURIComponent(versionNumber)}`);
+      const awsResponseJson = await awsResponse.json();
+      if (!awsResponse.ok) {
+            let errStr = `Failed to get AWS upload URL for test application ${name}, version ${versionNumber}, status: ${awsResponse.status}`;
+            console.error(errStr);
+            alert(errStr);
+            return;
+      }
+
+      console.log(`Received AWS upload URL for test application ${name}, ver# ${versionNumber} - aws response: ${JSON.stringify(awsResponseJson, null, 2)}`);
+
+      //upload to aws
+      console.log(`Uploading test application zip to AWS S3, size: ${zipBlob.size} bytes, name: ${name}, ver#: ${versionNumber}, url: ${awsResponseJson.url}`);
+      const uploadResult = await uploadTestApplicationZip(awsResponseJson.url);
+      if (!uploadResult.ok) {
+        let errStr = `Failed to save test application for test application ${name}, version ${versionNumber}, status: ${uploadResult.status}`;
+        console.error(errStr);
+        alert(errStr);
+        return;
+      }
+
+      console.log(`Uploaded test application zip to AWS S3 for test application ${name}, version ${versionNumber}`);
+
+      console.log('Now adding test application metadata to the server (database)...');
 
       const response = await fetch(`${constants.API_BASE}/test-applications`, {
         method: 'POST',
@@ -128,7 +201,9 @@ function TestApplicationPage({action, testAppData}) {
       console.log('Raw response body:', rawBody);
 
       if (!response.ok) {
-        throw new Error('Failed to add test application with name ' + name);
+        const errStr = `Failed to add test application with name ${name}, ver# ${versionNumber}, status: ${response.status}`;
+        console.error(errStr);
+        alert(errStr);
       }
 
       try {
@@ -146,15 +221,15 @@ function TestApplicationPage({action, testAppData}) {
     // Create/Edit test application 
     const handleAddTestApplication = () => {
 
-    console.log(`before handleAddTestApplicationOnServer, new test application name: ${name}, versionNumber: ${versionNumber}, description: ${description}, ECO# ${ECONumber}, testAppExeName ${testAppExeName}`);
-    const { isValid, message } = validateTestApplicationData(name, versionNumber, description, ECONumber, testAppExeName);
+    console.log(`before handleAddTestApplicationOnServer, new test application name: ${name}, versionNumber: ${versionNumber}, description: ${description}, ECO# ${ECONumber}, testAppExeName ${testAppExeName}`);  
+    const { isValid, message } = validateTestApplicationData(name, versionNumber, description, ECONumber, testAppExeName, zipBlob);
     if (isValid == false) {
         alert(message);
         console.log(message);
         return;
     }
 
-    handleAddTestApplicationOnServer(name, versionNumber, description, ECONumber, testAppExeName);
+    handleAddTestApplicationOnServer(name, versionNumber, description, ECONumber, testAppExeName, zipBlob);
 
     addTriggered.current = false;
 
@@ -191,7 +266,7 @@ function TestApplicationPage({action, testAppData}) {
   {action !== 'view' && (
 <div className="mb-4">
       {/* Custom link (or replace with a button if you prefer) */}
-      <a href="#" onClick={handleOpenFolderPicker}>📂 Upload Test Application</a>
+      <a href="#" onClick={handleOpenFolderPicker}>📂 Choose Test Application Folder</a>
       <br />
 
       {/* Hidden file input */}
@@ -204,6 +279,9 @@ function TestApplicationPage({action, testAppData}) {
         multiple
         onChange={handleFolderSelect}
       />
+      <div style={{ marginTop: "8px", fontStyle: "italic" }}>
+          ✅ Folder Selected: <strong>{testAppFolder}</strong>
+      </div>
 
       <a href="#" onClick={handleChooseTestAppExe}>⚙️ Choose Test Application Executable File</a>
       <input
@@ -214,7 +292,7 @@ function TestApplicationPage({action, testAppData}) {
         onChange={handleExeFileChosen}
       />
       <div style={{ marginTop: "8px", fontStyle: "italic" }}>
-          ✅ Selected: <strong>{testAppExeName}</strong>
+          ✅ Executable File Selected: <strong>{testAppExeName}</strong>
       </div>
 
 </div>

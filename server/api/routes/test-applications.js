@@ -143,7 +143,7 @@ router.get('/download-link/:testAppName/:testAppVersion', async (req, res) => {
   try
   {
     const downloadSetup = await awsService.getTestApplicationDownloadSetup(testAppName, testAppVersion);
-    logger.debug(`Got download setup for test application ${testAppName}, version ${testAppVersion} - ${downloadSetup}`);
+    logger.debug(`Got download setup for test application ${testAppName}, version ${testAppVersion} - url: ${downloadSetup.url}, fileName: ${downloadSetup.fileName}`); 
     res.json(downloadSetup); // Client will use this URL to download //TODO: define setup as an API...
   }
   catch (error)
@@ -154,5 +154,24 @@ router.get('/download-link/:testAppName/:testAppVersion', async (req, res) => {
   }
 });
 
+router.get('/upload-link/:testAppName/:testAppVersion', async (req, res) => {
+  const testAppName = req.params.testAppName;
+  const testAppVersion = req.params.testAppVersion;
+
+  logger.debug(`GET upload link for test application ${testAppName}, version ${testAppVersion} started`);
+
+  try
+  {
+    const uploadSetup = await awsService.getTestApplicationUploadSetup(testAppName, testAppVersion);
+    logger.debug(`Got upload setup for test application ${testAppName}, version ${testAppVersion} - url: ${uploadSetup.url}`);
+    res.json(uploadSetup); // Client will use this URL to upload //TODO: define setup as an API...
+  }
+  catch (error)
+  {
+    let errorStr = `Failed to get upload link for test application ${testAppName}, version ${testAppVersion}`;
+    logger.debug(errorStr, `Error - ${error}`);
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: errorStr });
+  }
+});
 
 module.exports = router;
