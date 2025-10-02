@@ -242,17 +242,20 @@ function ItemTypePage({action, itemTypeData}) {
   };
 
   // Create/Edit item type 
-  const handleAddItemType = () => {
+  const handleAddItemType = async () => {
 
+    document.body.style.cursor = "wait";
+    
     console.log("before handleAddItemTypeOnServer, new item type name = " + name + ' ' + description + ' ' + SNPrefix);
     const { isValid, message } = validateItemTypeData(name, description, SNPrefix, parameterDefaults, testAppComponents);
     if (isValid == false) {
         alert(message);
         console.log(message);
+        document.body.style.cursor = "default";
         return;
     }
 
-    handleAddItemTypeOnServer(name, description, SNPrefix, parameterDefaults, testAppComponents);
+    await   handleAddItemTypeOnServer(name, description, SNPrefix, parameterDefaults, testAppComponents);
 
     addTriggered.current = false;
 
@@ -262,6 +265,14 @@ function ItemTypePage({action, itemTypeData}) {
     //TODO: select the new item type in the list of item types
     //TODO: selected item type's data is shown at the  right as usual 
     console.log("after handleAddItemTypeOnServer, new item type name = " + name);
+
+    //by refreshing we do:
+    //add new item type to the list of item types
+    //select the new item type in the list of item types (TODO:?)
+    //selected item type's's data is shown at the  right as usual (TODO:?)
+    window.location.reload(true);
+
+    document.body.style.cursor = "default";
 
   };
 

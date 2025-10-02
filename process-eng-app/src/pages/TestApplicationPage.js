@@ -219,26 +219,34 @@ function TestApplicationPage({action, testAppData}) {
     }
   };
     // Create/Edit test application 
-    const handleAddTestApplication = () => {
+    const handleAddTestApplication = async () => {
+
+    document.body.style.cursor = "wait";
 
     console.log(`before handleAddTestApplicationOnServer, new test application name: ${name}, versionNumber: ${versionNumber}, description: ${description}, ECO# ${ECONumber}, testAppExeName ${testAppExeName}`);  
     const { isValid, message } = validateTestApplicationData(name, versionNumber, description, ECONumber, testAppExeName, zipBlob);
     if (isValid == false) {
         alert(message);
         console.log(message);
+        document.body.style.cursor = "default";
         return;
     }
 
-    handleAddTestApplicationOnServer(name, versionNumber, description, ECONumber, testAppExeName, zipBlob);
+    await handleAddTestApplicationOnServer(name, versionNumber, description, ECONumber, testAppExeName, zipBlob);
 
     addTriggered.current = false;
 
     clearFields();
    
-    //TODO: add new test application to the list of test applications
-    //TODO: select the new test application in the list of test applications
-    //TODO: selected test application's data is shown at the  right as usual 
     console.log(`after handleAddTestApplicationOnServer, new test application name = ${name}`);
+
+    //by refreshing we do:
+    //add new test application to the list of test applications
+    //select the new test application in the list of test applications (TODO:?)
+    //selected test application's data is shown at the  right as usual (TODO:?)
+    window.location.reload(true);
+
+    document.body.style.cursor = "default";
 
   };
   return (
