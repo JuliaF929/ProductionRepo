@@ -39,17 +39,25 @@ var appConfig = builder.Configuration.GetSection("AppConfig").Get<AppConfig>();
 builder.WebHost.UseUrls(appConfig.BackendUrl);
 
 //TODO: add here logging of the OpeartorApp running (inside the Backend log)
-//get the cmd line argument passed from the DesktopHost and containing serverIP
+//get the cmd line arguments passed from the DesktopHost/MacHostApp and containing serverIP and serverPort
 string serverIP = "localhost";
-if (args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]))
+string serverPort = "5000";//only for development and testing from developer's machine
+Log.Information($"Command line arguments passed to the Backend of OperatorApp: {string.Join(", ", args)}");
+if (args.Length > 1 && !string.IsNullOrWhiteSpace(args[0]) && !string.IsNullOrWhiteSpace(args[1]))
 {
     serverIP = args[0];
+    serverPort = args[1];
+}
+else
+{
+    Log.Error($"No command line arguments passed to the Backend of OperatorApp. Exiting...");
+    return;
 }
 string version = "1.1.1.1";
 Log.Information($"----------- Started Backend of OperatorApp --- ver. {version} ---------------");
-Log.Information($"1. Server IP is {serverIP}");
+Log.Information($"1. Server IP is {serverIP}, Server Port is {serverPort}");
 
-string serverUrl = "http://" + serverIP + ":" + appConfig.ServerPort + "/";
+string serverUrl = "http://" + serverIP + ":" + serverPort + "/";
 Log.Information($"2. Rest requests will be sent to {serverUrl}");
 
 // Bind options and HttpClient

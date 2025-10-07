@@ -44,16 +44,18 @@ public partial class MainWindow : Window
 
         //get the cmd line parameter with the server IP definition (localhost vs ElasticIP of the AWS)
         string _serverIP = "localhost";
+        string _serverPort = "5000";//only for development and testing from developer's machine
 
-        // args[0] = exe path, args[1] = first user arg
+        // args[0] = exe path, args[1] = server IP, args[2] = server Port
         var args = Environment.GetCommandLineArgs();
-        if (args.Length > 1 && !string.IsNullOrWhiteSpace(args[1]))
+        if (args.Length == 3 && !string.IsNullOrWhiteSpace(args[1]) && !string.IsNullOrWhiteSpace(args[2]))
         {
            _serverIP = args[1];
+           _serverPort = args[2];
         }
         else
         {
-            Console.WriteLine("ServerIP shall be a cmd line argument. Now it is missing. Press any key to exit ...");
+            Console.WriteLine("ServerIP and ServerPort shall be a cmd line arguments. One or both are missing. Press any key to exit ...");
             Console.ReadLine();
             Environment.Exit(0);
         }
@@ -78,7 +80,7 @@ public partial class MainWindow : Window
 
         backendProcess.StartInfo.CreateNoWindow = true;
         backendProcess.StartInfo.UseShellExecute = false;
-        backendProcess.StartInfo.Arguments = _serverIP;
+        backendProcess.StartInfo.Arguments = _serverIP + " " + _serverPort;
 
         backendProcess.StartInfo.RedirectStandardOutput = true;
         backendProcess.StartInfo.RedirectStandardError = true;
