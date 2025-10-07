@@ -149,7 +149,7 @@ router.get('/download-link/:testAppName/:testAppVersion', async (req, res) => {
   catch (error)
   {
     let errorStr = `Failed to get download link for test application ${testAppName}, version ${testAppVersion}`;
-    logger.debug(errorStr, `Error - ${error}`);
+    logger.debug(`${errorStr}, Error - ${error}`);
     res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: errorStr });
   }
 });
@@ -169,7 +169,7 @@ router.get('/upload-link/:testAppName/:testAppVersion', async (req, res) => {
   catch (error)
   {
     let errorStr = `Failed to get upload link for test application ${testAppName}, version ${testAppVersion}`;
-    logger.debug(errorStr, `Error - ${error}`);
+    logger.debug(`${errorStr}, Error - ${error}`);
     res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: errorStr });
   }
 });
