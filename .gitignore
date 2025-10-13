@@ -11,6 +11,8 @@ OperatorApp/Backend/Logs/
 OperatorApp/frontend/dist/
 OperatorApp/Backend/wwwroot/
 OperatorApp/Publish/
+OperatorApp/Publish_arm64/
+OperatorApp/Publish_x64/
 OperatorApp/MacHostApp/bin/
 OperatorApp/MacHostApp/obj/
 
