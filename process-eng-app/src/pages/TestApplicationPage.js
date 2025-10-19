@@ -20,7 +20,7 @@ function TestApplicationPage({action, testAppData}) {
 
     // Update the fields when a new testAppData is passed in:
     useEffect(() => {
-      console.log('testAppData: ' + JSON.stringify(testAppData, null, 2));
+      //console.log('testAppData: ' + JSON.stringify(testAppData, null, 2));
       if (testAppData) {
         setName(testAppData.name || '');
         setVersionNumber(testAppData.versionNumber || '');
@@ -296,7 +296,7 @@ function TestApplicationPage({action, testAppData}) {
         type="file"
         ref={fileExeInputRef}
         style={{ display: "none" }}
-        accept=".exe"
+        accept="*"
         onChange={handleExeFileChosen}
       />
       <div style={{ marginTop: "8px", fontStyle: "italic" }}>

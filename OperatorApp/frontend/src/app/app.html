@@ -2,20 +2,22 @@
   <!-- Main Content -->
   <div class="container-fluid" [class.sidebar-open]="isSidebarOpen">
     <h1>🚀 Calibrate for All </h1>
-    <button type="button" class="btn btn-outline-secondary ms-3" (click)="onRefreshClicked()">
-      🔄 Refresh
-    </button>
+    
     <div class="row">
-      <div class="col">
+      <div class="col-lg">
 
-        <div class="card">
+        <div class="card h-100">
           <div class="card-body">
             <!-- Left Section -->
-            <div class="row">
+            <div class="row float-end gx-5">
               <div class="col mb-3">
+                <button type="button" class="btn btn-outline-secondary" (click)="onRefreshClicked()">
+                  <span><span class="material-symbols-outlined" style="font-size: 1rem;">refresh</span> Refresh</span>
+                </button>
                 <button type="button" class="btn btn-primary" (click)="appAddNewItem()">Add New Item</button>
               </div>
             </div>
+            <div style="clear: both;"></div>
             <!-- Table and its filter row -->
             <item-list [itemSelectedByParent]="selectedItem" (itemSelectedByUser)="onItemSelected($event)"
               (createNewItemEvent)="onItemAddedToTable($event)">
@@ -24,7 +26,9 @@
         </div>
       </div>
 
-      <div class="col">
+      <div class="col-lg">
+        <div class="card h-100">
+          <div class="card-body">
         <!-- Right Section -->
         <!-- Top Section -->
         <item-details [item]="selectedItem" [readonly]="!isNewItemMode && selectedItem !== null"
@@ -40,6 +44,8 @@
 
       </div>
     </div>
+  </div>
+</div>
 
   </div>
 

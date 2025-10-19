@@ -22,6 +22,8 @@ export class ItemListComponent implements OnInit {
     @Output() createNewItemEvent = new EventEmitter<Item | null>();
 
   public filteredItems = [...this.items];
+  public itemCount = 0;
+  public itemTypeCount = 0;
 
   filters = {
     SerialNumber: '',
@@ -42,6 +44,9 @@ export class ItemListComponent implements OnInit {
       item.SerialNumber.toLowerCase().includes(this.filters.SerialNumber.toLowerCase()) &&
       item.Type?.Name.toLowerCase().includes(this.filters.Type.toLowerCase())
     );
+
+    this.itemCount = this.filteredItems.length;
+    this.itemTypeCount = new Set(this.filteredItems.map(i => i.Type.Name)).size;
 
      // Clear selection if filtered list no longer contains the selected item
      if ((this.itemSelectedByParent) && (!this.filteredItems.some(it => it.SerialNumber === this.itemSelectedByParent!.SerialNumber)))
@@ -65,6 +70,8 @@ export class ItemListComponent implements OnInit {
       console.log('Those are all items:', itemsListFromBE);
       this.items = itemsListFromBE;
       this.filteredItems = [...this.items]; // <-- populate filteredItems
+      this.itemCount = this.items.length;
+      this.itemTypeCount = new Set(this.items.map(i => i.Type.Name)).size;
       this.cdr.detectChanges(); //Force Angular to refresh the view
     });
   }

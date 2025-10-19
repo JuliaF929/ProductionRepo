@@ -8,31 +8,35 @@ import HomePage from './pages/HomePage';
 
 function App() {
 
-  const [selectedItem, setSelectedItem] = useState(() => {
+  const [selectedVertMenu, setSelectedVertMenu] = useState(() => {
     return localStorage.getItem("selectedMenu") || "item-types-page";
   });
   
-
+  
   // Load from localStorage on first render
   //localStorage is a Web API provided by the browser
   //It lets you store simple key–value pairs that persist even after reload or closing the tab.
   //The data stays on the user’s computer until it’s explicitly cleared.
   useEffect(() => {
     const saved = localStorage.getItem("selectedMenu");
-    if (saved) {
-      setSelectedItem(saved);
+        if (saved) {
+      setSelectedVertMenu(saved);
     }
   }, []);
 
   // Save to localStorage whenever it changes
-  useEffect(() => { localStorage.setItem("selectedMenu", selectedItem); }, [selectedItem]);
+  useEffect(() => { 
+    console.log(`Selected menu changed to ${selectedVertMenu}`);
+    localStorage.setItem("selectedMenu", selectedVertMenu); 
+  }, [selectedVertMenu]);
 
   return (
     <Router>
       <Routes>
         <Route path="/" element={<HomePage
-                                            selectedItem={selectedItem}
-                                            setSelectedItem={setSelectedItem} />} />
+                                            selectedMenu={selectedVertMenu}
+                                            setSelectedMenu={setSelectedVertMenu}
+                                             />} />
       </Routes>
     </Router>
   );

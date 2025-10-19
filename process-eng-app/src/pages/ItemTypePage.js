@@ -224,13 +224,13 @@ function ItemTypePage({action, itemTypeData}) {
       }
   
       const testApplications = await response.json();
-      console.log(JSON.stringify(testApplications, null, 2));
+      //console.log(JSON.stringify(testApplications, null, 2));
   
       const testAppsToShow = (testApplications || []).map(app => ({
         appName: app.name,
         version: app.versionNumber
       }));
-      console.log(JSON.stringify(testAppsToShow, null, 2));
+      //console.log(JSON.stringify(testAppsToShow, null, 2));
       return testAppsToShow;
 
   }
