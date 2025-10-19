@@ -48,18 +48,23 @@ public partial class MainWindow : Window
 
     void StartBackend()
 	{
-        //get the cmd line parameter with the server IP definition (localhost vs ElasticIP of the AWS)
+        //get the 1st cmd line parameter with the server IP definition (localhost vs ElasticIP of the AWS)
         string _serverIP = "localhost";
 
-        // args[0] = exe path, args[1] = first user arg
+        //get the 2nd cmd line parameter with the server port definition (5000 for local host, 80 for AWS)
+        string _serverPort = "5000";
+
+
+        // args[0] = exe path, args[1] = first user arg, args[2] = second user arg
         var args = Environment.GetCommandLineArgs();
-        if (args.Length > 1 && !string.IsNullOrWhiteSpace(args[1]))
+        if (args.Length == 3 && !string.IsNullOrWhiteSpace(args[1]) && !string.IsNullOrWhiteSpace(args[2]))
         {
-           _serverIP = args[1];
+            _serverIP = args[1];
+            _serverPort = args[2];
         }
         else
         {
-            Console.WriteLine("ServerIP shall be a cmd line argument. Now it is missing. Press any key to exit ...");
+            Console.WriteLine("ServerIP and ServerPort shall be a cmd line arguments. One or both are missing. Press any key to exit ...");
             Console.ReadLine();
             Environment.Exit(0);
         }
@@ -80,7 +85,7 @@ public partial class MainWindow : Window
 			StartInfo = new ProcessStartInfo
 			{
 				FileName = backendPath,
-				Arguments = _serverIP,
+				Arguments = _serverIP + " " + _serverPort,
 				WorkingDirectory = Path.GetDirectoryName(backendPath),
 			    CreateNoWindow = true,
 			    UseShellExecute = false,
