@@ -85,6 +85,15 @@ function TestApplicationsPage({onCreateNewTestApplication, onEditTestApplication
         </div>
       </div>
 
+      <div className="row mb-2">
+        <div className="col-md-12">
+          <small className="text-muted">
+            Presenting {filteredTestApplications.length} of {testApps.length} test applications
+        </small>
+        </div>
+      </div>
+
+
       <div className="table-responsive">
         <table className="table table-hover">
           <thead>

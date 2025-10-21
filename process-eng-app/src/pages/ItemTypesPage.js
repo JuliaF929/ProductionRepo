@@ -78,6 +78,14 @@ function ItemTypesPage({onCreateNewItemType, onEditItemType, onSelectItemType}) 
         </div>
       </div>
 
+      <div className="row mb-2">
+        <div className="col-md-12">
+          <small className="text-muted">
+            Presented {filteredItemTypes.length} of {itemTypes.length} item types
+          </small>
+        </div>
+      </div>
+
       <div className="table-responsive">
         <table className="table table-hover">
           <thead>
