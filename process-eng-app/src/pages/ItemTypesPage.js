@@ -7,7 +7,9 @@ function ItemTypesPage({onCreateNewItemType, onEditItemType, onSelectItemType}) 
   const navigate = useNavigate();
   const [itemTypes, setItemTypes] = useState([]); 
   const [selectedId, setSelectedId] = useState(null);
-  
+  const [filterName, setFilterName] = useState('');
+  const [filterDescription, setFilterDescription] = useState('');
+
 
   useEffect(() => {
     // Fetch item types from server
@@ -35,12 +37,46 @@ function ItemTypesPage({onCreateNewItemType, onEditItemType, onSelectItemType}) 
     if (onSelectItemType) onSelectItemType(itemType);
   };
 
+  const filteredItemTypes = itemTypes.filter(item =>
+    (item.name?.toLowerCase() || '').includes(filterName.toLowerCase()) &&
+    (item.description?.toLowerCase() || '').includes(filterDescription.toLowerCase())
+  );
+  
   return (
     <div className="container mt-4">
       <h2>Item Types</h2>
       <button className="btn btn-primary mb-3" onClick={onCreateNewItemType}>
         Create new Item Type
       </button>
+
+      <div className="row mb-3">
+        <div className="col-md-4">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Filter by name..."
+            value={filterName}
+            onChange={e => setFilterName(e.target.value)}
+          />
+        </div>
+        <div className="col-md-4">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Filter by description..."
+            value={filterDescription}
+            onChange={e => setFilterDescription(e.target.value)}
+          />
+        </div>
+        <div className="col-md-2">
+          <button
+            className="btn btn-outline-secondary w-100"
+            onClick={() => { setFilterName(''); setFilterDescription(''); }}
+          >
+            Clear Filters
+          </button>
+        </div>
+      </div>
 
       <div className="table-responsive">
         <table className="table table-hover">
@@ -53,7 +89,7 @@ function ItemTypesPage({onCreateNewItemType, onEditItemType, onSelectItemType}) 
             </tr>
           </thead>
           <tbody>
-            {itemTypes.map(itemType => (
+            {filteredItemTypes.map(itemType => (
               <tr
                 key={itemType._id}
                 className={selectedId === itemType._id ? 'table-primary' : ''}

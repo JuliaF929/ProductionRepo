@@ -5,6 +5,9 @@ import constants from '../constants';
 function TestApplicationsPage({onCreateNewTestApplication, onEditTestApplication, onSelectTestApp}) {
   const [testApps, setTestApps] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
+  const [filterName, setFilterName] = useState('');
+  const [filterVersion, setFilterVersion] = useState('');
+  const [filterECO, setFilterECO] = useState('');
 
   useEffect(() => {
     // Fetch test applications from server
@@ -30,12 +33,57 @@ function TestApplicationsPage({onCreateNewTestApplication, onEditTestApplication
     setSelectedId(app._id); 
     if (onSelectTestApp) onSelectTestApp(app);
   };
+
+  const filteredTestApplications = testApps.filter(testApp =>
+    (testApp.name?.toLowerCase() || '').includes(filterName.toLowerCase()) &&
+    (testApp.versionNumber?.toLowerCase() || '').includes(filterVersion.toLowerCase()) &&
+    (testApp.ECONumber?.toLowerCase() || '').includes(filterECO.toLowerCase())
+  );
+  
   return (
     <div className="container mt-4">
       <h2>Test Applications</h2>
       <button className="btn btn-primary mb-3" onClick={onCreateNewTestApplication}>
         Create new Test Application
       </button>
+
+      <div className="row mb-3">
+        <div className="col-md-4">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Filter by name..."
+            value={filterName}
+            onChange={e => setFilterName(e.target.value)}
+          />
+        </div>
+        <div className="col-md-4">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Filter by version number..."
+            value={filterVersion}
+            onChange={e => setFilterVersion(e.target.value)}
+          />
+        </div>
+        <div className="col-md-4">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Filter by ECO Number..."
+            value={filterECO}
+            onChange={e => setFilterECO(e.target.value)}
+          />
+        </div>
+        <div className="col-md-2">
+          <button
+            className="btn btn-outline-secondary w-100"
+            onClick={() => { setFilterName(''); setFilterVersion(''); setFilterECO(''); }}
+          >
+            Clear Filters
+          </button>
+        </div>
+      </div>
 
       <div className="table-responsive">
         <table className="table table-hover">
@@ -49,7 +97,7 @@ function TestApplicationsPage({onCreateNewTestApplication, onEditTestApplication
             </tr>
           </thead>
           <tbody>
-            {testApps.map(app => (
+            {filteredTestApplications.map(app => (
               <tr
                 key={app._id}
                 className={selectedId === app._id ? 'table-primary' : ''}
