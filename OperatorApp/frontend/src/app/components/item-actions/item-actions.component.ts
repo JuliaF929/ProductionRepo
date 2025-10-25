@@ -95,38 +95,21 @@ import { ExecuteActionResponse } from '../../models/execute-action-response.mode
             action.LatestActionVersionNumber = actionResponse.version;
             action.LatestRunResult = actionResponse.executionResult;
         
+            const reportPdfPath = actionResponse.reportPdfPath;
+            console.log(`Received report pdf path to show: ${reportPdfPath}.`);
+
+            const reportPdfPathForAngular = "/assets/pdfjs/web/viewer.html?file=" + reportPdfPath;
+            console.log(`Report pdf path to show in angular: ${reportPdfPathForAngular}.`);
+            console.log(`Going to open report.`);
+
+            action.LatestReportUrl = reportPdfPathForAngular;
+            this.openPdf(action);
+
+            console.log(`Report opened.`);
             console.log(`Finished running ${action.Name} for item ${this.item!.SerialNumber}, version ${actionResponse.version}, result ${actionResponse.executionResult}`);
         
             this.uiBlocked = false;
-
-            this.itemService.createReportForAction(
-              action.Name,
-              actionResponse.version,
-              this.item!.SerialNumber,
-              this.item!.Type!.Name
-            ).subscribe({
-              next: (res: { path: string }) => {
-                const reportPdfPath = res.path;
-                console.log(`Received report pdf path to show: ${reportPdfPath}.`);
-                
-                this.cdr.detectChanges();
-
-                const reportPdfPathForAngular = "/assets/pdfjs/web/viewer.html?file=" + reportPdfPath;
-                console.log(`Report pdf path to show in angular: ${reportPdfPathForAngular}.`);
-                console.log(`Going to open report.`);
-
-                action.LatestReportUrl = reportPdfPathForAngular;
-                this.openPdf(action);
-
-                console.log(`Report opened.`);
-
-              },
-              error: (error: HttpErrorResponse) => {
-                console.error('Create report failed:', error);
-                this.uiBlocked = false;
-                this.cdr.detectChanges();
-              }
-            });
+            this.cdr.detectChanges();
           },
           error: (error: HttpErrorResponse) => {
             console.error('Execution failed:', error);

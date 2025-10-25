@@ -3,4 +3,5 @@ export interface ExecuteActionResponse {
     startExecutionDateTime: string;
     endExecutionDateTime: string;
     executionResult: string;
+    reportPdfPath: string;
   }

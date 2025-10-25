@@ -181,50 +181,35 @@ public class ActionController : ControllerBase
             XStringFormats.Center);
     }
 
-    [HttpGet("create-report")]
-    public IActionResult CreateReport([FromQuery] string actionName,
-                                      [FromQuery] string actionVersionNumber, 
-                                      [FromQuery] string itemSN,
-                                      [FromQuery] string itemType)
+    private string CreateReport(string actionName,
+                                string actionVersionNumber, 
+                                string itemSN,
+                                string itemType,
+                                Dictionary<string, string> outputJsonData)
     {
         try
         {
-            //the output json is located at the OUTPUT_FOLDER_NAME folder
-            // relative to the backend's current directory
-            string basePath = AppContext.BaseDirectory;
-            string targetPath = Path.Combine(basePath, ACTIONS_RELATIVE_PATH);
 
             _logger.LogInformation($"CreateReport - going to create report for item {itemSN}, action {actionName}, actionVersionNumber {actionVersionNumber}");
 
-            // parse as Dictionary or dynamic if structure is not predefined
-            var outputJsonData = GetOutputJsonData(targetPath);
-            if (outputJsonData == null)
-            {
-                string errMsg = "CreateReport - Output json is invalid.";
-                _logger.LogError(errMsg);
-                return BadRequest(errMsg);
-            }
-            
-            _logger.LogInformation($"Output Json data read, {JsonSerializer.Serialize(outputJsonData)}.");
-
-
             //put all metadata from json to report
             //put report at "Reports" folder
+            string basePath = AppContext.BaseDirectory;
             string pathForReport = CreatePdf(basePath, actionName, actionVersionNumber, itemSN, itemType, outputJsonData);
-            //in order to pass the pdf path to angular, ir shall be interpreted as a relative path as '/Reports/kuku.pdf'
+            //in order to pass the pdf path to angular, it shall be interpreted as a relative path as '/Reports/kuku.pdf'
             int basePathLength = basePath.Length;
             string pathForReportForAngularUse = pathForReport.Substring(basePathLength);
             pathForReportForAngularUse = pathForReportForAngularUse.Replace(ANGULAR_FOLDER_NAME, "").Replace("\\", "/");
             pathForReportForAngularUse = _config.BackendUrl + pathForReportForAngularUse;
 
-            //TODO: error handling
-            return Ok(new { path = pathForReportForAngularUse });
+            //TODO: error handling, if error - return empty string
+            return pathForReportForAngularUse;
         }
         catch (Exception ex)
         {
             string errMsg = "Exception in CreateReport";
             _logger.LogError($"{errMsg}, Ex. {ex.Message}.");
-            return BadRequest(errMsg);
+            return errMsg;
         }
     }
 
@@ -290,9 +275,6 @@ public class ActionController : ControllerBase
 
             string endExecutionDateTime = DateTime.Now.ToString("yyyyMMMdd_HHmmss");
 
-            //TODO: send to the server execution details, startExecutionDateTime, endExecutionDateTime and the output
-            //so all these can be written to DB
-
             _logger.LogInformation($"Finished executing {actionName}, ver#{actionVersion}.");
 
             // parse output*.json to find the Result  entry (mandatory entry)
@@ -311,6 +293,17 @@ public class ActionController : ControllerBase
                 return BadRequest(errMsg);
             }
 
+            string reportPath = CreateReport(actionName, actionVersion, itemSN, itemType, outputJsonData);
+            if (string.IsNullOrEmpty(reportPath))
+            {
+                string errMsg = "Failed to create report pdf.";
+                _logger.LogError(errMsg);
+                return BadRequest(errMsg);
+            }
+
+            //TODO: send to the server execution details, startExecutionDateTime, endExecutionDateTime and the output
+            //so all these can be written to DB
+            actionResponse.reportPdfPath = reportPath;
             actionResponse.version = actionVersion;
             actionResponse.startExecutionDateTime = startExecutionDateTime;
             actionResponse.endExecutionDateTime = endExecutionDateTime;

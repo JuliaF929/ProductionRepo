@@ -58,16 +58,4 @@ export class ItemService {
     return this.http.get<ExecuteActionResponse>(this.apiActionUrl + "/execute", {params});
   }
 
-  createReportForAction(actionName: string, actionVersionNumber: string, itemSN: string, itemType: string) : Observable<ActionReportResponse> {
-    const params = new HttpParams()
-                                  .set('actionName', actionName)
-                                  .set('actionVersionNumber', actionVersionNumber)
-                                  .set('itemSN', itemSN)
-                                  .set('itemType', itemType);
-
-    console.log("Calling:", this.apiActionUrl + "/create-report");
-    console.log("With params:", params.toString());
-                              
-    return this.http.get<ActionReportResponse>(this.apiActionUrl + "/create-report", {params});
-  }
 }
