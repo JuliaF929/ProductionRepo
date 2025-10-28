@@ -9,6 +9,8 @@ using Microsoft.Extensions.Options;
 using System.Net.Http;
 using Backend.Services;
 using System.IO.Compression;
+using Backend.DTOs;
+using System.Text;
 
 
 namespace Backend.Controllers;
@@ -300,9 +302,43 @@ public class ActionController : ControllerBase
                 _logger.LogError(errMsg);
                 return BadRequest(errMsg);
             }
+            
+            //remove the Result entry from output json data to be saved at server
+            outputJsonData.Remove("Result");
 
-            //TODO: send to the server execution details, startExecutionDateTime, endExecutionDateTime and the output
-            //so all these can be written to DB
+            var errorEntry = outputJsonData.FirstOrDefault(kvp => kvp.Key == "Error");
+            //remove the Error entry from output json data to be saved at server
+            outputJsonData.Remove("Error");
+
+            var newItemActionToServer = new BE2Server_CreateItemActionDto
+            {        
+                itemSerialNumber = itemSN,
+                itemType = itemType,
+                actionName = actionName,
+                actionSWVersion = actionVersion,
+                calibrixOperatorAppSWVersion = "1111",//TODo: set real ver#
+                runStartdate = startExecutionDateTime,
+                runStopdate = endExecutionDateTime,
+                result = resultEntry.Value,
+                errorMsg = errorEntry.Value,
+                stationName = "StationX", //TODO: fill real station name
+                siteName = "Rio de Janeiro", //TODO: fill real site name
+                operatorName = "Julia", //TODO: fill real operator name
+                parameters = outputJsonData.Select(kvp => new ActionParameter
+                {
+                    name = kvp.Key,
+                    value = kvp.Value
+                }).ToList()
+            };
+
+            var result = await SaveItemActionAtServer(newItemActionToServer);
+            if (result != string.Empty)
+            {
+                string errMsg = $"Failed to save action execution details at server, err = {result}.";
+                _logger.LogError(errMsg);
+                return BadRequest(errMsg);
+            }
+
             actionResponse.reportPdfPath = reportPath;
             actionResponse.version = actionVersion;
             actionResponse.startExecutionDateTime = startExecutionDateTime;
@@ -317,6 +353,33 @@ public class ActionController : ControllerBase
             _logger.LogError($"{errMsg}, Ex. {ex.Message}.");
             return BadRequest(errMsg);
         }
+    }
+
+    private async Task<string> SaveItemActionAtServer(BE2Server_CreateItemActionDto newItemActionToServer)
+    {
+        //Explicitly disable camelCase when serializing
+        var pascalCaseOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = null // <== this is key
+        };
+
+        string json = JsonSerializer.Serialize(newItemActionToServer, pascalCaseOptions);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        _logger.LogInformation ($"Going to post new item action : {json}.");
+
+        var resp = await _client.PostAsync("api/item-actions-history", content);
+        if (!resp.IsSuccessStatusCode)
+        {
+            var error = await resp.Content.ReadAsStringAsync();
+            string errorStr = $"Error {resp.StatusCode}: {error}";
+            _logger.LogError (errorStr);
+            return errorStr;
+        }
+
+        _logger.LogInformation ($"New item action saved successfully at server, status is {resp.StatusCode}.");
+
+        return string.Empty;
     }
 
     private void RunExecutable(string exePath, string actionExeName)

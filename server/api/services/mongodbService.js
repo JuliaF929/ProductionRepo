@@ -1,7 +1,8 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 
-const mongoUri = `${process.env.MONGO_DB_CONNECTION}:${process.env.MONGO_DB_PORT}/${process.env.ITEMS_COLLECTION_NAME}`;
+const mongoUri = `${process.env.MONGO_DB_CONNECTION}:${process.env.MONGO_DB_PORT}/${process.env.MONGO_DB_NAME}`;
+
 console.log("Connecting to MongoDB:", mongoUri);
 
 const connectDB = async () => {

@@ -24,4 +24,4 @@ const ItemSchema = new mongoose.Schema({
   calibAppsPassed: [CalibrationAppSchema] //array of passed calib/test applications
 });
 
-module.exports = mongoose.model('Item', ItemSchema);
+module.exports = mongoose.model('Item', ItemSchema, 'items');
