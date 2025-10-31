@@ -23,7 +23,7 @@
       </thead>
       <tbody>
         <tr *ngFor="let item of filteredItems; trackBy: trackBySerialNumber" (click)="onSelectItem(item)"
-          [class.selected]="item === itemSelectedByParent">
+        [class.selected]="item.SerialNumber === itemSelectedByParent?.SerialNumber">
           <td>{{ item.SerialNumber }}</td>
           <td>{{ item.Type.Name }}</td>
         </tr>

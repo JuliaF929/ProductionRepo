@@ -13,8 +13,8 @@ public class BE2Server_CreateItemActionDto
     public string actionName { get; set; }
     public string actionSWVersion { get; set; }
     public string calibrixOperatorAppSWVersion { get; set; }
-    public string runStartdate { get; set; }
-    public string runStopdate { get; set; }
+    public DateTime startExecutionDateTimeUTC { get; set; }
+    public DateTime endExecutionDateTimeUTC { get; set; }
     public string result { get; set; }
     public string errorMsg { get; set; }
     public string stationName { get; set; }

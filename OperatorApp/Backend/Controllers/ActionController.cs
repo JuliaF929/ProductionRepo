@@ -11,6 +11,7 @@ using Backend.Services;
 using System.IO.Compression;
 using Backend.DTOs;
 using System.Text;
+using System.Globalization;
 
 
 namespace Backend.Controllers;
@@ -63,6 +64,7 @@ public class ActionController : ControllerBase
                              string actionVersionNumber, 
                              string itemSN, 
                              string itemType, 
+                             DateTime endExecutionDateTimeLocal,
                              Dictionary<string, string> jsonData)
     {
         string pathForReport = Path.Combine(basePath, ANGULAR_FOLDER_NAME, REPORT_FOLDER_NAME);
@@ -71,8 +73,7 @@ public class ActionController : ControllerBase
         if (!Directory.Exists(pathForReport))
             Directory.CreateDirectory(pathForReport);
 
-        string reportCreationDateTime = DateTime.Now.ToString("yyyyMMMdd_HHmmss");
-        string reportPdfName = itemSN + "_" + actionName + "_" + reportCreationDateTime + "_" + "Report.pdf";  
+        string reportPdfName = itemSN + "_" + actionName + "_" + endExecutionDateTimeLocal.ToString("MMM-dd-yyyy_HH_mm", CultureInfo.InvariantCulture) + "_" + "Report.pdf";  
         string reportPdfPathAndName = Path.Combine(pathForReport, reportPdfName);
 
         var document = new PdfDocument();
@@ -100,7 +101,7 @@ public class ActionController : ControllerBase
         reportMetaData.Add("JuliaSW " + "Version#:", "6.6.6.6"); //TODO: set the ver# of this application
         reportMetaData.Add("Site", "Rio de Janeiro;-)"); //TODO: fill real site name
         reportMetaData.Add("Operator Name", "Julia"); //TODO: fill real operator name
-        reportMetaData.Add("Report Creation Date and Time", reportCreationDateTime);
+        reportMetaData.Add("Report Creation Date and Time", endExecutionDateTimeLocal.ToString("MMM dd, yyyy, h:mm tt", CultureInfo.InvariantCulture));
 
         foreach (var key in reportMetaData.Keys)
         {
@@ -131,13 +132,15 @@ public class ActionController : ControllerBase
         //table for operator sign
         int startX = 15;
         int startY = y;
-        int rowHeight = 30;
+        int rowHeight = 35;
         int colWidth = 115;
 
         string[] headers = { "", "Name", "Role", "Date", "Sign" };
         string[] rows_col_0 = { "Performed by", "Approved by" };
         string[] rows_col_1 = { "Julia", "" };
-        string[] rows_col_3 = { reportCreationDateTime, "" };
+        string[] rows_col_3 = { endExecutionDateTimeLocal.ToString("MMM dd, yyyy", CultureInfo.InvariantCulture) 
+                                + "\n" +
+                                endExecutionDateTimeLocal.ToString("h:mm tt", CultureInfo.InvariantCulture),"" };
 
         // Draw header row
         for (int col = 0; col < headers.Length; col++)
@@ -172,21 +175,30 @@ public class ActionController : ControllerBase
         return reportPdfPathAndName;
     }
 
-    private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int width, int height)
-    {
-        // Draw border
-        gfx.DrawRectangle(XPens.Black, x, y, width, height);
+private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int width, int height)
+{
+    // Draw border
+    gfx.DrawRectangle(XPens.Black, x, y, width, height);
 
-        // Draw text centered
-        gfx.DrawString(text, font, XBrushes.Black,
-            new XRect(x, y, width, height),
-            XStringFormats.Center);
+    // Split text by newline manually
+    var lines = text.Split('\n');
+
+    double lineHeight = font.GetHeight();
+
+    for (int i = 0; i < lines.Length; i++)
+    {
+        double textY = y + (i + 0.5) * lineHeight;  // adjust vertical positioning
+        gfx.DrawString(lines[i].Trim(), font, XBrushes.Black,
+            new XRect(x + 2, textY, width - 4, height),
+            XStringFormats.TopLeft);
     }
+}
 
     private string CreateReport(string actionName,
                                 string actionVersionNumber, 
                                 string itemSN,
                                 string itemType,
+                                DateTime endExecutionDateTimeLocal,
                                 Dictionary<string, string> outputJsonData)
     {
         try
@@ -197,7 +209,7 @@ public class ActionController : ControllerBase
             //put all metadata from json to report
             //put report at "Reports" folder
             string basePath = AppContext.BaseDirectory;
-            string pathForReport = CreatePdf(basePath, actionName, actionVersionNumber, itemSN, itemType, outputJsonData);
+            string pathForReport = CreatePdf(basePath, actionName, actionVersionNumber, itemSN, itemType, endExecutionDateTimeLocal, outputJsonData);
             //in order to pass the pdf path to angular, it shall be interpreted as a relative path as '/Reports/kuku.pdf'
             int basePathLength = basePath.Length;
             string pathForReportForAngularUse = pathForReport.Substring(basePathLength);
@@ -231,7 +243,7 @@ public class ActionController : ControllerBase
     {
         try
         {
-            ExecuteActionResponse actionResponse = new ExecuteActionResponse();
+            BE2FE_ExecuteActionResponse actionResponse = new BE2FE_ExecuteActionResponse();
 
             _logger.LogInformation($"Starting ExecuteAction for action {actionName}, itemSN {itemSN}, itemType {itemType}, actionVersion {actionVersion}, actionExeName {actionExeName}.");
 
@@ -269,13 +281,13 @@ public class ActionController : ControllerBase
 
             _logger.LogInformation($"Input json for action {actionName}, itemSN {itemSN} written to {inputFilePath} : {jsonInput}");
 
-            string startExecutionDateTime = DateTime.Now.ToString("yyyyMMMdd_HHmmss");
+            DateTime startExecutionDateTimeUTC = DateTime.UtcNow;
 
-            _logger.LogInformation($"About to run executable {actionExeName} for action {actionName}, ver#{actionVersion}, startExecutionDateTime {startExecutionDateTime}.");
+            _logger.LogInformation($"About to run executable {actionExeName} for action {actionName}, ver#{actionVersion}, startExecutionDateTimeUTC {startExecutionDateTimeUTC}.");
                
             RunExecutable(actionFolderPath, actionExeName);
 
-            string endExecutionDateTime = DateTime.Now.ToString("yyyyMMMdd_HHmmss");
+            DateTime endExecutionDateTimeUTC = DateTime.UtcNow;
 
             _logger.LogInformation($"Finished executing {actionName}, ver#{actionVersion}.");
 
@@ -295,7 +307,7 @@ public class ActionController : ControllerBase
                 return BadRequest(errMsg);
             }
 
-            string reportPath = CreateReport(actionName, actionVersion, itemSN, itemType, outputJsonData);
+            string reportPath = CreateReport(actionName, actionVersion, itemSN, itemType, endExecutionDateTimeUTC.ToLocalTime(), outputJsonData);
             if (string.IsNullOrEmpty(reportPath))
             {
                 string errMsg = "Failed to create report pdf.";
@@ -317,8 +329,8 @@ public class ActionController : ControllerBase
                 actionName = actionName,
                 actionSWVersion = actionVersion,
                 calibrixOperatorAppSWVersion = "1111",//TODo: set real ver#
-                runStartdate = startExecutionDateTime,
-                runStopdate = endExecutionDateTime,
+                startExecutionDateTimeUTC = startExecutionDateTimeUTC,
+                endExecutionDateTimeUTC = endExecutionDateTimeUTC,
                 result = resultEntry.Value,
                 errorMsg = errorEntry.Value,
                 stationName = "StationX", //TODO: fill real station name
@@ -341,8 +353,8 @@ public class ActionController : ControllerBase
 
             actionResponse.reportPdfPath = reportPath;
             actionResponse.version = actionVersion;
-            actionResponse.startExecutionDateTime = startExecutionDateTime;
-            actionResponse.endExecutionDateTime = endExecutionDateTime;
+            actionResponse.startExecutionDateTimeUTC = startExecutionDateTimeUTC;
+            actionResponse.endExecutionDateTimeUTC = endExecutionDateTimeUTC;
             actionResponse.executionResult = resultEntry.Value;
 
             return Ok(actionResponse);

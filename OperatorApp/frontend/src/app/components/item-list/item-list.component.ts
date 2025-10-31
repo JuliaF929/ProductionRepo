@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ChangeDetectorRef, OnChanges, SimpleChanges  } from '@angular/core';
 import { CommonModule, NgForOf, NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Item } from '../../models/item.model';
@@ -14,7 +14,7 @@ import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
   imports: [CommonModule, NgForOf, NgIf, FormsModule, HttpClientModule ],
   providers: [ItemService],
 })
-export class ItemListComponent implements OnInit {
+export class ItemListComponent implements OnInit, OnChanges {
     public items: Item[] = []; 
     @Output() itemSelectedByUser = new EventEmitter<Item | null>(); // Child selection -> Notify parent
 
@@ -25,6 +25,8 @@ export class ItemListComponent implements OnInit {
   public itemCount = 0;
   public itemTypeCount = 0;
 
+  selectedRow: any = null;
+
   filters = {
     SerialNumber: '',
     Type: ''
@@ -33,6 +35,21 @@ export class ItemListComponent implements OnInit {
   constructor(private itemService: ItemService, private cdr: ChangeDetectorRef) 
   {
     console.log('ItemListComponent constructor called!');
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['itemSelectedByParent'] && this.itemSelectedByParent) {
+      this.selectedRow = this.itemSelectedByParent;
+    }
+  }
+
+  onRowClicked(item: any) {
+    this.selectedRow = item;
+    this.itemSelectedByUser.emit(item);
+  }
+
+  isRowSelected(item: any) {
+    return this.selectedRow?.SerialNumber === item.SerialNumber;
   }
 
   trackBySerialNumber(index: number, item: Item): string {

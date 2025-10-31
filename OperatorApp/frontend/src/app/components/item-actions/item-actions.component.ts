@@ -7,7 +7,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Item } from '../../models/item.model';
 import { ItemService } from '../../services/item.service';
 import { ItemAction } from '../../models/item-action.model';
-import { ExecuteActionResponse } from '../../models/execute-action-response.model';
+import { BE2FE_ExecuteActionResponse } from '../../models/execute-action-response.model';
 
 @Component({
     selector: 'item-actions',
@@ -88,10 +88,10 @@ import { ExecuteActionResponse } from '../../models/execute-action-response.mode
         this.uiBlocked = true;
 
         this.itemService.executeAction(action.Name, this.item!.SerialNumber, this.item!.Type!.Name, action.PlannedVersion, action.ExeName).subscribe({
-          next: (actionResponse: ExecuteActionResponse) => {
+          next: (actionResponse: BE2FE_ExecuteActionResponse) => {
 
             action.LatestRunResult = actionResponse.executionResult;
-            action.LatestRunDateTime = actionResponse.endExecutionDateTime;
+            action.LatestRunDateTime = actionResponse.endExecutionDateTimeUTC;
             action.LatestActionVersionNumber = actionResponse.version;
             action.LatestRunResult = actionResponse.executionResult;
         

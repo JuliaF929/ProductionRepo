@@ -48,22 +48,8 @@ public class ItemActionsController : ControllerBase
                 PlannedVersion = row[2], // 3rd value from actionsReceivedFromServer array
                 CloudPath = row[8], //9th value from actionsReceivedFromServer array
                 ExeName = row[9],
-
-                // LatestActionVersionNumber = "",
-                // LatestRunResult = "NotStarted",
-                // LatestReportUrl = "/assets/reports/checkA.pdf",
-                // LatestRunDateTime = "",
-                // LatestExecuter = $"Julia_{index + 1}"
         })
         .ToList();
-
-        // _itemActions.AddRange(new[]
-        // {
-        //     new ItemAction { Index = 1, Name = actions[1], LatestActionVersionNumber = "", LatestRunResult = "NotStarted", LatestReportUrl = "/assets/reports/checkA.pdf", LatestRunDateTime = "", LatestExecuter = "Julia_1"},
-        //     new ItemAction { Index = 2, Name = "Action_2", LatestActionVersionNumber = "", LatestRunResult = "NotStarted", LatestReportUrl = "/assets/reports/checkA.pdf", LatestRunDateTime = "", LatestExecuter = "Julia_2"},
-        //     new ItemAction { Index = 3, Name = "Action_3", LatestActionVersionNumber = "", LatestRunResult = "NotStarted", LatestReportUrl = "/assets/reports/checkA.pdf", LatestRunDateTime = "", LatestExecuter = "Julia_3"},
-        //     new ItemAction { Index = 4, Name = "Action_4", LatestActionVersionNumber = "", LatestRunResult = "NotStarted", LatestReportUrl = "/assets/reports/checkA.pdf", LatestRunDateTime = "", LatestExecuter = "Julia_4"}
-        // });
 
         _logger.LogInformation("ItemActions filled in BE.");
         return Ok(_itemActions);

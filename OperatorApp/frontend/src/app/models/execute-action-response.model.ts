@@ -1,7 +1,7 @@
-export interface ExecuteActionResponse {
+export interface BE2FE_ExecuteActionResponse {
     version: string;
-    startExecutionDateTime: string;
-    endExecutionDateTime: string;
+    startExecutionDateTimeUTC: string;
+    endExecutionDateTimeUTC: string;
     executionResult: string;
     reportPdfPath: string;
   }

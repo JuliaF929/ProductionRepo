@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Item } from '../models/item.model';
 import { ItemType } from '../models/item-type.model';
 import { ItemAction } from '../models/item-action.model';
-import { ExecuteActionResponse } from '../models/execute-action-response.model';
+import { BE2FE_ExecuteActionResponse } from '../models/execute-action-response.model';
 import { ActionReportResponse } from '../models/action-report.model';
 import { Observable } from 'rxjs';
 
@@ -44,7 +44,7 @@ export class ItemService {
                 itemSN: string,
                 itemType: string,
                 actionVersion: string, 
-                actionExeName: string) : Observable<ExecuteActionResponse> {
+                actionExeName: string) : Observable<BE2FE_ExecuteActionResponse> {
     const params = new HttpParams()
                                   .set('actionName', actionName)
                                   .set('itemSN', itemSN)
@@ -55,7 +55,7 @@ export class ItemService {
     console.log("Calling:", this.apiActionUrl + "/execute");
     console.log("With params:", params.toString());
 
-    return this.http.get<ExecuteActionResponse>(this.apiActionUrl + "/execute", {params});
+    return this.http.get<BE2FE_ExecuteActionResponse>(this.apiActionUrl + "/execute", {params});
   }
 
 }

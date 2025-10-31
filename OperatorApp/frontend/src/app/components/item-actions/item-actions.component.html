@@ -57,7 +57,7 @@
           <!-- Execution Date -->
           <td>
             <ng-container *ngIf="action.LatestRunResult !== 'NotStarted'; else noData">
-              {{ action.LatestRunDateTime }}
+              {{ action.LatestRunDateTime | date:'medium'}}
             </ng-container>
           </td>
 
