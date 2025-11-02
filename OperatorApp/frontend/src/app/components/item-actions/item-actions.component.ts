@@ -31,10 +31,18 @@ import { BE2FE_ExecuteActionResponse } from '../../models/execute-action-respons
 
     uiBlocked = false;
 
+    showMessageBox = false;
+    messageBoxText = '';
+
     constructor(private itemService: ItemService, private cdr: ChangeDetectorRef, public sanitizer: DomSanitizer) 
     {
         console.log('ItemActionsComponent constructor called!');
     }
+    
+    closeMessageBox() {
+      this.showMessageBox = false;
+    }
+
     ngOnInit() 
     {
         console.log(`ItemActionsComponent - ngOnInit called!`);
@@ -80,7 +88,7 @@ import { BE2FE_ExecuteActionResponse } from '../../models/execute-action-respons
           return;
         }
 
-        console.log(`Going to run action ${action.Name}, ver#${action.PlannedVersion}, path ${action.CloudPath}, exeName ${action.ExeName} for item ${this.item!.SerialNumber}`);
+        console.log(`Going to run action ${action.Name}, ver#${action.PlannedVersion}, exeName ${action.ExeName} for item ${this.item!.SerialNumber}`);
 
         this.closePdf();
 
@@ -115,9 +123,13 @@ import { BE2FE_ExecuteActionResponse } from '../../models/execute-action-respons
             console.error('Execution failed:', error);
             this.uiBlocked = false;
             this.cdr.detectChanges();
+
+            this.messageBoxText = `Execution of ${action.Name} failed.`;
+            this.showMessageBox = true;
+            this.cdr.detectChanges();
           }
         });
-        
+
     }
 
     clear()

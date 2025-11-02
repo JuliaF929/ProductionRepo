@@ -46,7 +46,7 @@ public class ItemActionsController : ControllerBase
                 Index = index + 1,
                 Name = row[1], // 2nd value from actionsReceivedFromServer array
                 PlannedVersion = row[2], // 3rd value from actionsReceivedFromServer array
-                CloudPath = row[8], //9th value from actionsReceivedFromServer array
+                //CloudPath = row[8], //9th value from actionsReceivedFromServer array
                 ExeName = row[9],
         })
         .ToList();

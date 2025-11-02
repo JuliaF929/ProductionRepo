@@ -79,4 +79,16 @@
             </iframe>
             <button *ngIf="selectedPdf" (click)="closePdf()">Close PDF</button>
           </div>
+
+          <div class="message-box-overlay" *ngIf="showMessageBox">
+            <div class="message-box">
+              <div class="message-box-content">
+                <p>{{ messageBoxText }}</p>
+              </div>
+          
+              <div class="message-box-actions">
+                <button (click)="closeMessageBox()">OK</button>
+              </div>
+            </div>
+          </div>
 </main>

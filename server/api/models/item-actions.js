@@ -8,7 +8,7 @@ const ActionParameterSchema = new mongoose.Schema({
   
 const ItemActionSchema = new mongoose.Schema({
   //_id: mongoose.Schema.Types.ObjectId,
-  itemSerialNumber: {type: String, required: true, unique: true},
+  itemSerialNumber: {type: String, required: true},
   itemType: String,
   actionName: String,
   actionSWVersion: String,
