@@ -4,10 +4,10 @@ const logger = require('../../logger');
 const awsService = require('../services/awsService');
 const { format } = require('date-fns');
 const { HTTP_STATUS } = require('../../../shared/constants');
+const itemActionService = require('../services/itemActionService');
 
 const ItemAction = require('../models/item-actions');
 
-const itemActionsHistoryRepository = require('../../repositories/mongodb/itemActionHistoryRepositoryMongo');
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -37,16 +37,22 @@ router.post('/', async (req, res, next) => {
    
     try {
            
-        const result = await itemActionsHistoryRepository.addItemAction(itemAction);
-        logger.debug(`Item Action ${req.body.actionName} for item SN ${req.body.itemSerialNumber} saved with result ${result}`);
    
-        res.status(HTTP_STATUS.CREATED).json({
-               message: "Handling POST requests to /items-actions-history",
-           });
+        const saveResult = await itemActionService.saveActionAndUpdateParams(itemAction);
+        if (saveResult?.ok) {
+            return res.status(HTTP_STATUS.CREATED).json({
+                success: true,
+                message: "Item Action created successfully.",
+            });
+        }     
+        return res.status(500).json({ 
+            success: false, 
+            message: "Unknown failure during item action creation." 
+        });
        } catch (err) {
            logger.debug(`Exception during saving item action ${req.body.actionName} for item SN ${req.body.itemSerialNumber}: ${err}`);
-           res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
-               error: err
+           return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+               message: err
            });
        }
 

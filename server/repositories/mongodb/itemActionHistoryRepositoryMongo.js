@@ -6,9 +6,9 @@ const mongoose = require('mongoose');
 
 module.exports = {
 
-    addItemAction: async (itemAction) => 
+    addItemAction: async (itemAction, session) => 
     {
-        return await itemAction.save();
+        return await itemAction.save({ session });
     },
 
     getAllItemsActions: async () => 

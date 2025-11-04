@@ -1,6 +1,6 @@
 //itemActionRepository - neutral interface
 
 module.exports = {
-    addItemAction: async (itemAction) => {},
+    addItemAction: async (itemAction, session) => {},
     getAllItemsActions: async () => {},
   };

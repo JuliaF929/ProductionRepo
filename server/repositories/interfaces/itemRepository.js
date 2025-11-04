@@ -6,4 +6,5 @@ module.exports = {
     getAllNarrowItems: async () => {},
     getActionsPassedForItem: async () => {},
     getParametersForItem: async () => {},
+    updateItemParameters: async (itemSerialNumber, newParams, session) => {},
   };
