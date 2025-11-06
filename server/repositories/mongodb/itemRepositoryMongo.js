@@ -18,8 +18,8 @@ module.exports = {
 
     getAllNarrowItems: async () => 
     {
-        // Exclude parameters and calibAppsPassed arrays by setting them to 0
-        return await Item.find({}, { parameters: 0, calibAppsPassed: 0 });
+        // Exclude parameters array by setting them to 0
+        return await Item.find({}, { parameters: 0 });
     },
     
     getActionsPassedForItem: async () => {},
