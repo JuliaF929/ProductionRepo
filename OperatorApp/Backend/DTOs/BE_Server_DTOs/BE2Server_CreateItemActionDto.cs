@@ -17,6 +17,7 @@ public class BE2Server_CreateItemActionDto
     public DateTime endExecutionDateTimeUTC { get; set; }
     public string result { get; set; }
     public string errorMsg { get; set; }
+    public string reportStream {get; set;}
     public string stationName { get; set; }
     public string siteName { get; set; }
     public string operatorName { get; set; }

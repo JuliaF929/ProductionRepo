@@ -1,6 +1,6 @@
 const { S3Client, GetObjectCommand, PutObjectCommand } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
-
+const logger = require('../../logger');
 
 const s3 = new S3Client({ region: "us-east-2" });
 const bucketName = "production-julia-s3";
@@ -24,6 +24,15 @@ function getTestApplicationFileName(testAppName, testAppVersion) {
 function getTestApplicationS3Key(testAppName, testAppVersion) {
   const fileName = getTestApplicationFileName(testAppName, testAppVersion);
   return `dummy-company/test-applications/${testAppName}/${fileName}`;
+}
+
+function getReportFileName(itemSerialNumber, actionName, actionVersion, timestampUTC) {
+  return `report_${itemSerialNumber}_${actionName}_${actionVersion}_${timestampUTC}.pdf`;
+}
+
+function getReportS3Key(itemType, itemSerialNumber, actionName, actionVersion, timestampUTC) {
+  const fileName = getReportFileName(itemSerialNumber, actionName, actionVersion, timestampUTC);
+  return `dummy-company/reports/${itemType}/${itemSerialNumber}/${fileName}`;
 }
 
 async function getTestApplicationDownloadSetup(testAppName, testAppVersion) {
@@ -60,4 +69,31 @@ async function getTestApplicationUploadSetup(testAppName, testAppVersion) {
     return { url };
 }
 
-module.exports = { getTestApplicationDownloadSetup, getTestApplicationUploadSetup };
+async function uploadReport(itemType, itemSerialNumber, actionName, actionVersion, timestampUTC, pdfBuffer) {
+  
+  try
+  {
+    const itemTypeNormalized = itemType.toLowerCase();
+    const itemSerialNumberNormalized = itemSerialNumber.toLowerCase();
+    const actionNameNormalized = actionName.toLowerCase();
+    const actionVersionNormalized = actionVersion.toLowerCase();
+
+    let awsFilePathAndName = getReportS3Key(itemTypeNormalized, itemSerialNumberNormalized, actionNameNormalized, actionVersionNormalized, timestampUTC);
+
+    //upload report to s3
+    await s3.send(new PutObjectCommand({ Bucket: bucketName, 
+                                         Key: awsFilePathAndName, 
+                                         Body: pdfBuffer,
+                                         ContentType: "application/pdf" }));
+
+    return "";
+  }
+  catch (err) {
+    msg = `Failed to upload report for item SN ${itemSerialNumber}, action ${actionName}, version ${actionVersion} at ${timestampUTC}: ${err}`;
+    logger.debug(msg);
+
+    return msg;
+  }
+}
+
+module.exports = { getTestApplicationDownloadSetup, getTestApplicationUploadSetup, uploadReport };

@@ -36,7 +36,23 @@ router.post('/', async (req, res, next) => {
     });
    
     try {
-           
+        //TODO: think how to upload a report and save item action at the same transaction
+
+        uploadResult = await awsService.uploadReport(req.body.itemType, 
+                                                     req.body.itemSerialNumber, 
+                                                     req.body.actionName, 
+                                                     req.body.actionSWVersion, 
+                                                     req.body.endExecutionDateTimeUTC, 
+                                                     Buffer.from(req.body.reportStream, 'base64'));
+        if (uploadResult !== "") {
+            logger.debug(`Failed to upload report for item SN ${req.body.itemSerialNumber}, action ${req.body.actionName}, version ${req.body.actionSWVersion} at ${req.body.endExecutionDateTimeUTC}: ${uploadResult}`);
+            return res.status(500).json({ 
+                success: false, 
+                message: `Failed to upload report: ${uploadResult}` 
+            });
+        }
+
+        logger.debug(`Report saved for item ${req.body.itemSerialNumber}, action ${req.body.actionName}, version ${req.body.actionSWVersion} at ${req.body.endExecutionDateTimeUTC}`);
    
         const saveResult = await itemActionService.saveActionAndUpdateParams(itemAction);
         if (saveResult?.ok) {
@@ -55,6 +71,9 @@ router.post('/', async (req, res, next) => {
                message: err
            });
        }
+
+       const reportBuffer = Buffer.from(req.body.reportStream, 'base64');
+       
 
 });
 

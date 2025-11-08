@@ -16,6 +16,18 @@ using System.Globalization;
 
 namespace Backend.Controllers;
 
+public class ReportPdf
+{
+    public string path;
+    public byte[] stream;
+
+    public ReportPdf(string path, byte[] stream)
+    {
+        this.path = path;
+        this.stream = stream;
+    }
+}
+
 [ApiController]
 [Route("api/[controller]")]
 public class ActionController : ControllerBase
@@ -59,7 +71,7 @@ public class ActionController : ControllerBase
         return JsonSerializer.Deserialize<Dictionary<string, string>>(jsonContent);
     }
 
-    private string CreatePdf(string basePath, 
+    private ReportPdf CreatePdf(string basePath, 
                              string actionName, 
                              string actionVersionNumber, 
                              string itemSN, 
@@ -169,10 +181,17 @@ public class ActionController : ControllerBase
             }
         }
 
-
         document.Save(reportPdfPathAndName);
 
-        return reportPdfPathAndName;
+        // Convert to byte[]
+        byte[] reportPdfBytesStream;
+        using (var stream = new MemoryStream())
+        {
+            document.Save(stream, false); // false = don't close the stream
+            reportPdfBytesStream = stream.ToArray();
+        }
+
+        return new ReportPdf(reportPdfPathAndName, reportPdfBytesStream);
     }
 
 private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int width, int height)
@@ -194,7 +213,7 @@ private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int 
     }
 }
 
-    private string CreateReport(string actionName,
+    private ReportPdf CreateReport(string actionName,
                                 string actionVersionNumber, 
                                 string itemSN,
                                 string itemType,
@@ -209,21 +228,21 @@ private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int 
             //put all metadata from json to report
             //put report at "Reports" folder
             string basePath = AppContext.BaseDirectory;
-            string pathForReport = CreatePdf(basePath, actionName, actionVersionNumber, itemSN, itemType, endExecutionDateTimeLocal, outputJsonData);
+            ReportPdf reportPdf = CreatePdf(basePath, actionName, actionVersionNumber, itemSN, itemType, endExecutionDateTimeLocal, outputJsonData);
             //in order to pass the pdf path to angular, it shall be interpreted as a relative path as '/Reports/kuku.pdf'
             int basePathLength = basePath.Length;
-            string pathForReportForAngularUse = pathForReport.Substring(basePathLength);
+            string pathForReportForAngularUse = reportPdf.path.Substring(basePathLength);
             pathForReportForAngularUse = pathForReportForAngularUse.Replace(ANGULAR_FOLDER_NAME, "").Replace("\\", "/");
             pathForReportForAngularUse = _config.BackendUrl + pathForReportForAngularUse;
 
             //TODO: error handling, if error - return empty string
-            return pathForReportForAngularUse;
+            return new ReportPdf(pathForReportForAngularUse, reportPdf.stream);
         }
         catch (Exception ex)
         {
             string errMsg = "Exception in CreateReport";
             _logger.LogError($"{errMsg}, Ex. {ex.Message}.");
-            return errMsg;
+            return null;
         }
     }
 
@@ -307,8 +326,8 @@ private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int 
                 return BadRequest(errMsg);
             }
 
-            string reportPath = CreateReport(actionName, actionVersion, itemSN, itemType, endExecutionDateTimeUTC.ToLocalTime(), outputJsonData);
-            if (string.IsNullOrEmpty(reportPath))
+            ReportPdf reportPdf = CreateReport(actionName, actionVersion, itemSN, itemType, endExecutionDateTimeUTC.ToLocalTime(), outputJsonData);
+            if (reportPdf == null)
             {
                 string errMsg = "Failed to create report pdf.";
                 _logger.LogError(errMsg);
@@ -333,6 +352,7 @@ private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int 
                 endExecutionDateTimeUTC = endExecutionDateTimeUTC,
                 result = resultEntry.Value,
                 errorMsg = errorEntry.Value,
+                reportStream = Convert.ToBase64String(reportPdf.stream),
                 stationName = "StationX", //TODO: fill real station name
                 siteName = "Rio de Janeiro", //TODO: fill real site name
                 operatorName = "Julia", //TODO: fill real operator name
@@ -351,7 +371,8 @@ private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int 
                 return BadRequest(errMsg);
             }
 
-            actionResponse.reportPdfPath = reportPath;
+            //actionResponse is going to frontend, so no need to pass a stream
+            actionResponse.reportPdfPath = reportPdf.path;
             actionResponse.version = actionVersion;
             actionResponse.startExecutionDateTimeUTC = startExecutionDateTimeUTC;
             actionResponse.endExecutionDateTimeUTC = endExecutionDateTimeUTC;

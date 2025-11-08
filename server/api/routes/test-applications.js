@@ -155,6 +155,7 @@ router.get('/download-link/:testAppName/:testAppVersion', async (req, res) => {
 });
 
 router.get('/upload-link/:testAppName/:testAppVersion', async (req, res) => {
+  //TODO: why this is a separate endpoint?
   const testAppName = req.params.testAppName;
   const testAppVersion = req.params.testAppVersion;
 
