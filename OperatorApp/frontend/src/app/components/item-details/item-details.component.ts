@@ -39,8 +39,8 @@ import { ItemService } from '../../services/item.service';
         if (changes['item'] && this.item) {
             this.item = structuredClone(this.item); // make local copy to avoid binding issues
             // Match item.Type by name with one from availableTypes
-            const match = this.availableTypes.find(t => t.Name === this.item!.Type?.Name);
-            if (match) {
+                        const match = this.availableTypes.find(t => t.Name === this.item!.Type?.Name);
+                        if (match) {
               this.item.Type = match;
             }
           }
@@ -73,7 +73,7 @@ import { ItemService } from '../../services/item.service';
 
     setItemDetails(item: Item)
     {
-        this.item = { SerialNumber: item.SerialNumber, Type: { Name: item?.Type?.Name } };
+                this.item = { SerialNumber: item.SerialNumber, Type: { Name: item?.Type?.Name } };
     }
 
     saveNewItem()

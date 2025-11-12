@@ -8,11 +8,40 @@ module.exports = {
 
     addItemAction: async (itemAction, session) => 
     {
-        return await itemAction.save({ session });
+        try
+        {
+            return await itemAction.save({ session });
+        }
+        catch (error) 
+        {
+            logger.error(`Error adding action ${itemAction.actionName} for itemSN ${itemAction.itemSerialNumber}: ${error.message}`);
+            throw error;
+        }
     },
 
     getAllItemsActions: async () => 
     {
-        return await ItemAction.find({});
+        try
+        {
+            return await ItemAction.find({});
+        }
+        catch (error) 
+        {
+            logger.error(`Error retrieving all items actions : ${error.message}`);
+            throw error;
+        }
     },
+
+    getActionsDoneForItemSN: async (itemSN) => 
+    {
+        try 
+        {
+            return await ItemAction.find({ itemSerialNumber: itemSN });
+        } 
+        catch (error) 
+        {
+            logger.error(`Error retrieving actions for item SN ${itemSN}: ${error.message}`);
+            throw error;
+        }
+    }
 };

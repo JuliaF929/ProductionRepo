@@ -1,5 +1,4 @@
-export interface ItemAction {
-    Index: number;
+export interface BE2FE_ActionForItemDto {
     itemSerialNumber: string;
     itemType: string;
     actionName: string;
@@ -9,4 +8,4 @@ export interface ItemAction {
     latestResult: string;
     latestOperatorName: string;
     latestActionVersionNumber: string;
-}
+  }

@@ -16,57 +16,67 @@
     <table class="table table-hover">
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Version#</th>
-          <th>Result</th>
-          <th>Report</th>
-          <th>End Date & Time</th>
+          <th>Action Name</th>
+          <th>Last Run</th>
+          <th>Last Result</th>
+          <th>Last Version#</th>
+          <th>Last Report</th>
           <th>Executed By</th>
+          <th>Run</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let action of itemActions">
+          
+          <!-- Action Name -->
           <td>
-            <button type="button" class="btn btn-primary" (click)="executeAction(action)">
-              {{ action.Name }}
-            </button>
+            <ng-container *ngIf="action.latestResult !== 'NotStarted'; else noData">
+                {{ action.actionName }}
+            </ng-container>
+          </td>
+
+          <!-- Execution Date -->
+          <td>
+            <ng-container *ngIf="action.latestResult !== 'NotStarted'; else noData">
+                {{ action.latestExecutionDateTimeUTC | date:'medium'}}
+            </ng-container>
+          </td>
+          
+          <!-- Execution Result -->
+          <td>
+            <ng-container *ngIf="action.latestResult !== 'NotStarted'; else noData">
+                {{ action.latestResult }}
+            </ng-container>
           </td>
 
           <!-- Action version number executed -->
           <td>
-            <ng-container *ngIf="action.LatestRunResult !== 'NotStarted'; else noData">
-                {{ action.LatestActionVersionNumber }}
-            </ng-container>
-          </td>
-
-          <!-- Execution Result -->
-          <td>
-            <ng-container *ngIf="action.LatestRunResult !== 'NotStarted'; else noData">
-                {{ action.LatestRunResult }}
+            <ng-container *ngIf="action.latestResult !== 'NotStarted'; else noData">
+                {{ action.latestActionVersionNumber }}
             </ng-container>
           </td>
 
           <!-- PDF Report Link -->
           <td>
-            <ng-container *ngIf="action.LatestRunResult !== 'NotStarted'; else noData">
-              <a href="#" (click)="openPdf(action); $event.preventDefault()">Open Report</a>
+            <ng-container *ngIf="action.latestResult !== 'NotStarted'; else noData">
+                <a href="#" (click)="downloadAndOpenPdf(action); $event.preventDefault()">Open Report</a>
             </ng-container>
             <ng-template #noData>-</ng-template>
           </td>
 
-          <!-- Execution Date -->
+          <!-- Executed By -->
           <td>
-            <ng-container *ngIf="action.LatestRunResult !== 'NotStarted'; else noData">
-              {{ action.LatestRunDateTime | date:'medium'}}
+            <ng-container *ngIf="action.latestResult !== 'NotStarted'; else noData">
+                {{ action.latestOperatorName }}
             </ng-container>
           </td>
 
-          <!-- Executed By -->
           <td>
-            <ng-container *ngIf="action.LatestRunResult !== 'NotStarted'; else noData">
-              {{ action.LatestExecuter }}
-            </ng-container>
+            <button type="button" class="btn btn-primary" (click)="executeAction(action)">
+              Run
+            </button>
           </td>
+
         </tr>
       </tbody>
     </table>

@@ -1,4 +1,4 @@
-namespace Backend.Models;
+namespace Backend.DTOs;
 
 public class BE2FE_ExecuteActionResponse
 {

@@ -3,9 +3,10 @@ import { Injectable } from '@angular/core';
 import { Item } from '../models/item.model';
 import { ItemType } from '../models/item-type.model';
 import { ItemAction } from '../models/item-action.model';
-import { BE2FE_ExecuteActionResponse } from '../models/execute-action-response.model';
+import { BE2FE_ExecuteActionResponse } from '../DTOs/BE2FE_ExecuteActionResponse';
 import { ActionReportResponse } from '../models/action-report.model';
 import { Observable } from 'rxjs';
+import { BE2FE_ActionForItemDto } from '../DTOs/BE2FE_ActionForItemDto';
 
 @Injectable({
   providedIn: 'root',
@@ -32,11 +33,11 @@ export class ItemService {
     return this.http.get<ItemType[]>(this.apiItemTypesUrl);
   }
 
-  getItemActions(item: Item): Observable<ItemAction[]> {
+  getItemActions(item: Item): Observable<BE2FE_ActionForItemDto[]> {
     const params = new HttpParams()
                                   .set('itemSN', item.SerialNumber)
                                   .set('itemTypeName', item.Type.Name);
-    return this.http.get<ItemAction[]>(this.apiItemActionsUrl, { params });
+    return this.http.get<BE2FE_ActionForItemDto[]>(this.apiItemActionsUrl, { params });
 
   }
 

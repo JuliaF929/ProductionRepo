@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Net.Http;
 using System.Text.Json;
+using Backend.DTOs;
 
 namespace Backend.Controllers;
 
@@ -12,7 +13,6 @@ namespace Backend.Controllers;
 public class ItemActionsController : ControllerBase
 {
     private readonly ILogger<ItemActionsController> _logger;
-    private static List<PlannedAction> _itemActions = new List<PlannedAction>();
     private readonly HttpClient _client;
 
     public ItemActionsController(ILogger<ItemActionsController> logger, IHttpClientFactory factory)
@@ -24,35 +24,36 @@ public class ItemActionsController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllItemActions(string itemSN, string itemTypeName)
     {
-        //TODO:
-        //2. download actions already done for this itemSN
-        //3. remove duplicates for this itemSN so only the latest instance of each action remains
-        //4. merge data of actions already done by this itemSN to default actions list for this item type 
-        //5. return merged list
-
-        _itemActions.Clear();
+        List<BE2FE_ActionForItemDto> _itemActionsDtos = new List<BE2FE_ActionForItemDto>();
 
         _logger.LogInformation($"GetAllItemActions - going to get item ations for itemSN {itemSN}, item Type Name {itemTypeName}.");
-        //1. download default actions for given item type
-        var actions = await _client.GetAsync($"api/test-applications/{itemTypeName}");
+        //1. download merged list of default and done actions for given item according to its item type
+        var actions = await _client.GetAsync($"api/test-applications/{itemTypeName}/{itemSN}");
         actions.EnsureSuccessStatusCode();
 
-        var actionsReceivedFromServer = JsonSerializer.Deserialize<List<List<string>>>(await actions.Content.ReadAsStringAsync());
+        var actionsReceivedFromServer = JsonSerializer.Deserialize<List<Server2BE_ActionForItemDto>>(await actions.Content.ReadAsStringAsync());
         _logger.LogInformation($"Got from server : {JsonSerializer.Serialize(actionsReceivedFromServer)}");
 
-        _itemActions = actionsReceivedFromServer
-                        .Select((row, index) => new PlannedAction
+        //2. copy server2be dtos list to be2fe dtos list 
+        foreach (var actionFromServer in actionsReceivedFromServer)
         {
-                Index = index + 1,
-                Name = row[1], // 2nd value from actionsReceivedFromServer array
-                PlannedVersion = row[2], // 3rd value from actionsReceivedFromServer array
-                //CloudPath = row[8], //9th value from actionsReceivedFromServer array
-                ExeName = row[9],
-        })
-        .ToList();
+            BE2FE_ActionForItemDto actionForFEDto = new BE2FE_ActionForItemDto
+            {
+                itemSerialNumber = actionFromServer.itemSerialNumber,
+                itemType = actionFromServer.itemType,
+                actionName = actionFromServer.actionName,
+                actionSWVersionForExecution = actionFromServer.actionSWVersionForExecution,
+                actionExeName = actionFromServer.actionExeName,
+                latestExecutionDateTimeUTC = actionFromServer.latestExecutionDateTimeUTC,
+                latestResult = actionFromServer.latestResult,
+                latestOperatorName = actionFromServer.latestOperatorName,
+                latestActionVersionNumber = actionFromServer.latestActionVersionNumber
+            };
+            _itemActionsDtos.Add(actionForFEDto);
+        }
 
-        _logger.LogInformation("ItemActions filled in BE.");
-        return Ok(_itemActions);
+        _logger.LogInformation("ItemActions DTO filled in BE.");
+        return Ok(_itemActionsDtos);
     }
 }
 
