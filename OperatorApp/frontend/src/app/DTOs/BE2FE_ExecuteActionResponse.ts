@@ -3,5 +3,6 @@ export interface BE2FE_ExecuteActionResponse {
     startExecutionDateTimeUTC: string;
     endExecutionDateTimeUTC: string;
     executionResult: string;
+    operatorName: string;
     reportPdfPath: string;
   }

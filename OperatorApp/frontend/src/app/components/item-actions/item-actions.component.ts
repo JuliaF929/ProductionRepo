@@ -106,6 +106,7 @@ import { BE2FE_ActionForItemDto } from '../../DTOs/BE2FE_ActionForItemDto';
             action.latestResult = actionResponse.executionResult;
             action.latestExecutionDateTimeUTC = actionResponse.endExecutionDateTimeUTC;
             action.latestActionVersionNumber = actionResponse.version;
+            action.latestOperatorName = actionResponse.operatorName;
         
             const reportPdfPath = actionResponse.reportPdfPath;
             console.log(`Received report pdf path to show: ${reportPdfPath}.`);

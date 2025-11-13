@@ -377,6 +377,7 @@ private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int 
             actionResponse.startExecutionDateTimeUTC = startExecutionDateTimeUTC;
             actionResponse.endExecutionDateTimeUTC = endExecutionDateTimeUTC;
             actionResponse.executionResult = resultEntry.Value;
+            actionResponse.operatorName = "Julia"; //TODO: fill real operator name
 
             return Ok(actionResponse);
         }
