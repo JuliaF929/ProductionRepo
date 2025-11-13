@@ -30,35 +30,35 @@
           
           <!-- Action Name -->
           <td>
-            <ng-container *ngIf="action.latestResult !== 'NotStarted'; else noData">
+            <ng-container>
                 {{ action.actionName }}
             </ng-container>
           </td>
 
           <!-- Execution Date -->
           <td>
-            <ng-container *ngIf="action.latestResult !== 'NotStarted'; else noData">
+            <ng-container>
                 {{ action.latestExecutionDateTimeUTC | date:'medium'}}
             </ng-container>
           </td>
           
           <!-- Execution Result -->
           <td>
-            <ng-container *ngIf="action.latestResult !== 'NotStarted'; else noData">
+            <ng-container>
                 {{ action.latestResult }}
             </ng-container>
           </td>
 
           <!-- Action version number executed -->
           <td>
-            <ng-container *ngIf="action.latestResult !== 'NotStarted'; else noData">
+            <ng-container>
                 {{ action.latestActionVersionNumber }}
             </ng-container>
           </td>
 
           <!-- PDF Report Link -->
           <td>
-            <ng-container *ngIf="action.latestResult !== 'NotStarted'; else noData">
+            <ng-container>
                 <a href="#" (click)="downloadAndOpenPdf(action); $event.preventDefault()">Open Report</a>
             </ng-container>
             <ng-template #noData>-</ng-template>
@@ -66,7 +66,7 @@
 
           <!-- Executed By -->
           <td>
-            <ng-container *ngIf="action.latestResult !== 'NotStarted'; else noData">
+            <ng-container>
                 {{ action.latestOperatorName }}
             </ng-container>
           </td>
