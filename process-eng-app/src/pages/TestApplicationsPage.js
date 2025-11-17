@@ -75,7 +75,7 @@ function TestApplicationsPage({onCreateNewTestApplication, onEditTestApplication
             onChange={e => setFilterECO(e.target.value)}
           />
         </div>
-        <div className="col-md-2">
+        <div className="col-md-4">
           <button
             className="btn btn-outline-secondary w-100"
             onClick={() => { setFilterName(''); setFilterVersion(''); setFilterECO(''); }}
