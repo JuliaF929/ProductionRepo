@@ -9,6 +9,7 @@ import { ItemService } from '../../services/item.service';
 import { ItemAction } from '../../models/item-action.model';
 import { BE2FE_ExecuteActionResponse } from '../../DTOs/BE2FE_ExecuteActionResponse';
 import { BE2FE_ActionForItemDto } from '../../DTOs/BE2FE_ActionForItemDto';
+import { BE2FE_ReportResponse } from '../../DTOs/BE2FE_ReportResponse';
 
 @Component({
     selector: 'item-actions',
@@ -50,9 +51,40 @@ import { BE2FE_ActionForItemDto } from '../../DTOs/BE2FE_ActionForItemDto';
 
     }
 
+    adjustReportPathForPdfJs(reportPdfPath: string)
+    {
+      const reportPdfPathForAngular = "/assets/pdfjs/web/viewer.html?file=" + reportPdfPath;
+      console.log(`Report pdf path to show in angular: ${reportPdfPathForAngular}.`);
+
+      return reportPdfPathForAngular;
+    }
+
     downloadAndOpenPdf(action: ItemAction)
     {
+      this.itemService.downloadReportForPastAction(action.actionName, action.latestActionVersionNumber, action.latestExecutionDateTimeUTC, this.item!.SerialNumber, this.item!.Type!.Name).subscribe({
+        next: (reportResponse: BE2FE_ReportResponse) => {
+
+          const reportPdfPath = reportResponse.reportPdfPath;
+          console.log(`Downloaded report pdf path to show: ${reportPdfPath}.`);
+
+          const reportPdfPathForAngular = this.adjustReportPathForPdfJs(reportPdfPath);
+          console.log(`Going to open report.`);
+
+          this.openPdf(reportPdfPathForAngular);
+
+          console.log(`Report opened.`);
       
+          this.cdr.detectChanges();
+        },
+        error: (error: HttpErrorResponse) => {
+          console.error('Download report failed:', error);
+          this.cdr.detectChanges();
+
+          this.messageBoxText = `Download report of ${action.actionName} executed at ${action.latestExecutionDateTimeUTC} failed.`;
+          this.showMessageBox = true;
+          this.cdr.detectChanges();
+        }
+      });
     }
     openPdf (reportPdfPath: string) {
       if (reportPdfPath !== null) {
@@ -111,8 +143,7 @@ import { BE2FE_ActionForItemDto } from '../../DTOs/BE2FE_ActionForItemDto';
             const reportPdfPath = actionResponse.reportPdfPath;
             console.log(`Received report pdf path to show: ${reportPdfPath}.`);
 
-            const reportPdfPathForAngular = "/assets/pdfjs/web/viewer.html?file=" + reportPdfPath;
-            console.log(`Report pdf path to show in angular: ${reportPdfPathForAngular}.`);
+            const reportPdfPathForAngular = this.adjustReportPathForPdfJs(reportPdfPath);
             console.log(`Going to open report.`);
 
             this.openPdf(reportPdfPathForAngular);

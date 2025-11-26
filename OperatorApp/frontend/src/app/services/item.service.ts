@@ -4,9 +4,9 @@ import { Item } from '../models/item.model';
 import { ItemType } from '../models/item-type.model';
 import { ItemAction } from '../models/item-action.model';
 import { BE2FE_ExecuteActionResponse } from '../DTOs/BE2FE_ExecuteActionResponse';
-import { ActionReportResponse } from '../models/action-report.model';
 import { Observable } from 'rxjs';
 import { BE2FE_ActionForItemDto } from '../DTOs/BE2FE_ActionForItemDto';
+import { BE2FE_ReportResponse } from '../DTOs/BE2FE_ReportResponse';
 
 @Injectable({
   providedIn: 'root',
@@ -57,6 +57,24 @@ export class ItemService {
     console.log("With params:", params.toString());
 
     return this.http.get<BE2FE_ExecuteActionResponse>(this.apiActionUrl + "/execute", {params});
+  }
+
+  downloadReportForPastAction(actionName: string, 
+                              actionVersion: string,
+                              endExecutionDateTimeUTC: string, 
+                              itemSN: string, 
+                              itemTypeName: string): Observable<BE2FE_ReportResponse> {
+    const params = new HttpParams()
+                                  .set('actionName', actionName)
+                                  .set('actionVersion', actionVersion)
+                                  .set('endExecutionDateTimeUTC', endExecutionDateTimeUTC)
+                                  .set('itemSN', itemSN)
+                                  .set('itemTypeName', itemTypeName);
+
+    console.log("Calling:", this.apiActionUrl + "/report");
+    console.log("With params:", params.toString());
+
+    return this.http.get<BE2FE_ReportResponse>(this.apiActionUrl + "/report", { params });
   }
 
 }

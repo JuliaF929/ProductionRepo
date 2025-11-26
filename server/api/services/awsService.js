@@ -26,15 +26,52 @@ function getTestApplicationS3Key(testAppName, testAppVersion) {
   return `dummy-company/test-applications/${testAppName}/${fileName}`;
 }
 
+function normalizePart(str) {
+  return String(str)
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_")           // replace spaces with underscores
+    .replace(/[^\w\-.]/g, "");      // allow A-Z, a-z, 0-9, _, -, and DOT
+}
+
 function getReportFileName(itemSerialNumber, actionName, actionVersion, timestampUTC) {
-  return `report_${itemSerialNumber}_${actionName}_${actionVersion}_${timestampUTC}.pdf`;
+  if (!itemSerialNumber || !actionName || !actionVersion || !timestampUTC) {
+    throw new Error("Invalid parameters to generate report file name.");
+  }
+
+  const sn = normalizePart(itemSerialNumber);
+  const name = normalizePart(actionName);
+  const version = normalizePart(actionVersion);
+  const ts = normalizePart(timestampUTC);
+
+  return `report_${sn}_${name}_${version}_${ts}.pdf`;
 }
 
 function getReportS3Key(itemType, itemSerialNumber, actionName, actionVersion, timestampUTC) {
   const fileName = getReportFileName(itemSerialNumber, actionName, actionVersion, timestampUTC);
-  return `dummy-company/reports/${itemType}/${itemSerialNumber}/${fileName}`;
+  const itemTypeNormalized = normalizePart(itemType);
+  const itemSerialNumberNormalized = normalizePart(itemSerialNumber);
+
+  return `dummy-company/reports/${itemTypeNormalized}/${itemSerialNumberNormalized}/${fileName}`;
 }
 
+async function getReportDownloadSetup(itemType, itemSN, actionName, actionVersion, timestampUTC) {
+  
+  const fileName = getReportFileName(itemSN, actionName, actionVersion, timestampUTC);
+  let awsFilePathAndName = getReportS3Key(itemType, itemSN, actionName, actionVersion, timestampUTC); 
+
+  // Generate a presigned URL for the S3 object
+  const command = new GetObjectCommand({ Bucket: bucketName, Key: awsFilePathAndName });
+  // Link valid for 5 minutes
+  const url = await getSignedUrl(s3, command, { expiresIn: 300 });
+
+  logger.debug(`Generated presigned URL for report download: ${url}, fileName: ${fileName}`);
+
+  return {
+    url,
+    fileName
+  };
+}
 async function getTestApplicationDownloadSetup(testAppName, testAppVersion) {
   
   const testAppNameNormalized = testAppName.toLowerCase();
@@ -96,4 +133,8 @@ async function uploadReport(itemType, itemSerialNumber, actionName, actionVersio
   }
 }
 
-module.exports = { getTestApplicationDownloadSetup, getTestApplicationUploadSetup, uploadReport };
+module.exports = { getTestApplicationDownloadSetup, 
+                   getTestApplicationUploadSetup, 
+                   uploadReport, 
+                   getReportDownloadSetup,
+                   getReportFileName };

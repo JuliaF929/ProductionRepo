@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const logger = require('../../logger');
-const { CALIBRATION_PASS_RESULT } = require('./constants');
+const { CALIBRATION_PASS_RESULT } = require('../../constants');
 
 const itemRepository = require('../../repositories/mongodb/itemRepositoryMongo');
 const itemActionsHistoryRepository = require('../../repositories/mongodb/itemActionHistoryRepositoryMongo');

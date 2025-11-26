@@ -38,7 +38,7 @@
           <!-- Execution Date -->
           <td>
             <ng-container>
-                {{ action.latestExecutionDateTimeUTC | date:'medium'}}
+                {{ action.latestExecutionDateTimeUTC | date:'MMM d, y, h:mm a'}}
             </ng-container>
           </td>
           
@@ -58,10 +58,12 @@
 
           <!-- PDF Report Link -->
           <td>
-            <ng-container>
+            <ng-container *ngIf="action.latestResult !== '-'">
                 <a href="#" (click)="downloadAndOpenPdf(action); $event.preventDefault()">Open Report</a>
             </ng-container>
-            <ng-template #noData>-</ng-template>
+            <ng-container *ngIf="action.latestResult === '-'">
+              -
+            </ng-container>
           </td>
 
           <!-- Executed By -->

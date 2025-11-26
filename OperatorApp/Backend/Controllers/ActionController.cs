@@ -42,12 +42,21 @@ public class ActionController : ControllerBase
     private const string REPORT_FOLDER_NAME    = "Reports";
     private const string ANGULAR_FOLDER_NAME   = "wwwroot"; 
 
+    private string _pathForReport = string.Empty;
+    private string _basePath = string.Empty;
     
     public ActionController(ILogger<ActionController> logger, IOptions<AppConfig> config, IHttpClientFactory factory)
     {
         _logger = logger;
         _config = config.Value;
         _client = factory.CreateClient("ServerApi");
+
+        _basePath = AppContext.BaseDirectory;
+        _pathForReport = Path.Combine(_basePath, ANGULAR_FOLDER_NAME, REPORT_FOLDER_NAME);
+
+        //ensure folder exists
+        if (!Directory.Exists(_pathForReport))
+            Directory.CreateDirectory(_pathForReport);
     }
 
     private Dictionary<string, string> GetOutputJsonData(string targetPath)
@@ -71,22 +80,55 @@ public class ActionController : ControllerBase
         return JsonSerializer.Deserialize<Dictionary<string, string>>(jsonContent);
     }
 
-    private ReportPdf CreatePdf(string basePath, 
-                             string actionName, 
+    private async Task<string> GetReportNameForAction(string itemSN, 
+                                          string actionName,
+                                          string actionSWVersion,
+                                          DateTime endExecutionDateTimeUTC)
+    {
+        //report name will contain UTC time
+
+        //get desired report name from server to have only one place where report name format is defined
+        var actionDataToServer = new BE2Server_ActionDataDto
+        {
+            itemType = string.Empty,//item type not relevant for report name
+            itemSN = itemSN,
+            actionName = actionName,
+            actionSWVersion = actionSWVersion,
+            endExecutionDateTimeUTC = endExecutionDateTimeUTC
+        };
+
+        //Explicitly disable camelCase when serializing
+        var pascalCaseOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = null // <== this is key
+        };
+
+        string json = JsonSerializer.Serialize(actionDataToServer, pascalCaseOptions);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        _logger.LogInformation ($"Going to recieve name for report for : {json}.");
+
+        //GET by default accepts only query parameters, so we use POST here
+        //we dont want million of parameters in the url
+        var reportName = await _client.PostAsync($"api/item-actions-history/report-name", content);
+        reportName.EnsureSuccessStatusCode();
+
+        var reportNameJson = await reportName.Content.ReadAsStringAsync();
+        _logger.LogInformation($"Report name for action name {actionName}, itemSN {itemSN}, endExecutionDateTimeUTC {endExecutionDateTimeUTC} got from server : {reportNameJson}");
+
+        return JsonSerializer.Deserialize<string>(reportNameJson);
+    }
+
+    private async Task<ReportPdf> CreatePdf(string actionName, 
                              string actionVersionNumber, 
                              string itemSN, 
                              string itemType, 
-                             DateTime endExecutionDateTimeLocal,
+                             DateTime endExecutionDateTimeUTC,
                              Dictionary<string, string> jsonData)
     {
-        string pathForReport = Path.Combine(basePath, ANGULAR_FOLDER_NAME, REPORT_FOLDER_NAME);
 
-        //ensure folder exists
-        if (!Directory.Exists(pathForReport))
-            Directory.CreateDirectory(pathForReport);
-
-        string reportPdfName = itemSN + "_" + actionName + "_" + endExecutionDateTimeLocal.ToString("MMM-dd-yyyy_HH_mm", CultureInfo.InvariantCulture) + "_" + "Report.pdf";  
-        string reportPdfPathAndName = Path.Combine(pathForReport, reportPdfName);
+        string reportPdfName = await GetReportNameForAction(itemSN, actionName, actionVersionNumber, endExecutionDateTimeUTC);
+        string reportPdfPathAndName = Path.Combine(_pathForReport, reportPdfName);
 
         var document = new PdfDocument();
         var page = document.AddPage();
@@ -113,7 +155,8 @@ public class ActionController : ControllerBase
         reportMetaData.Add("JuliaSW " + "Version#:", "6.6.6.6"); //TODO: set the ver# of this application
         reportMetaData.Add("Site", "Rio de Janeiro;-)"); //TODO: fill real site name
         reportMetaData.Add("Operator Name", "Julia"); //TODO: fill real operator name
-        reportMetaData.Add("Report Creation Date and Time", endExecutionDateTimeLocal.ToString("MMM dd, yyyy, h:mm tt", CultureInfo.InvariantCulture));
+        reportMetaData.Add("Report Creation Date and Time Local", endExecutionDateTimeUTC.ToLocalTime().ToString("MMM dd, yyyy, h:mm tt", CultureInfo.InvariantCulture));
+        reportMetaData.Add("Report Creation Date and Time UTC", endExecutionDateTimeUTC.ToString("O"));
 
         foreach (var key in reportMetaData.Keys)
         {
@@ -150,9 +193,9 @@ public class ActionController : ControllerBase
         string[] headers = { "", "Name", "Role", "Date", "Sign" };
         string[] rows_col_0 = { "Performed by", "Approved by" };
         string[] rows_col_1 = { "Julia", "" };
-        string[] rows_col_3 = { endExecutionDateTimeLocal.ToString("MMM dd, yyyy", CultureInfo.InvariantCulture) 
+        string[] rows_col_3 = { endExecutionDateTimeUTC.ToLocalTime().ToString("MMM dd, yyyy", CultureInfo.InvariantCulture) 
                                 + "\n" +
-                                endExecutionDateTimeLocal.ToString("h:mm tt", CultureInfo.InvariantCulture),"" };
+                                endExecutionDateTimeUTC.ToLocalTime().ToString("h:mm tt", CultureInfo.InvariantCulture),"" };
 
         // Draw header row
         for (int col = 0; col < headers.Length; col++)
@@ -194,8 +237,8 @@ public class ActionController : ControllerBase
         return new ReportPdf(reportPdfPathAndName, reportPdfBytesStream);
     }
 
-private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int width, int height)
-{
+    private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int width, int height)
+    {
     // Draw border
     gfx.DrawRectangle(XPens.Black, x, y, width, height);
 
@@ -211,13 +254,13 @@ private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int 
             new XRect(x + 2, textY, width - 4, height),
             XStringFormats.TopLeft);
     }
-}
+    }
 
-    private ReportPdf CreateReport(string actionName,
+    private async Task<ReportPdf> CreateReport(string actionName,
                                 string actionVersionNumber, 
                                 string itemSN,
                                 string itemType,
-                                DateTime endExecutionDateTimeLocal,
+                                DateTime endExecutionDateTimeUTC,
                                 Dictionary<string, string> outputJsonData)
     {
         try
@@ -227,13 +270,9 @@ private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int 
 
             //put all metadata from json to report
             //put report at "Reports" folder
-            string basePath = AppContext.BaseDirectory;
-            ReportPdf reportPdf = CreatePdf(basePath, actionName, actionVersionNumber, itemSN, itemType, endExecutionDateTimeLocal, outputJsonData);
-            //in order to pass the pdf path to angular, it shall be interpreted as a relative path as '/Reports/kuku.pdf'
-            int basePathLength = basePath.Length;
-            string pathForReportForAngularUse = reportPdf.path.Substring(basePathLength);
-            pathForReportForAngularUse = pathForReportForAngularUse.Replace(ANGULAR_FOLDER_NAME, "").Replace("\\", "/");
-            pathForReportForAngularUse = _config.BackendUrl + pathForReportForAngularUse;
+            ReportPdf reportPdf = await CreatePdf(actionName, actionVersionNumber, itemSN, itemType, endExecutionDateTimeUTC, outputJsonData);
+
+            string pathForReportForAngularUse = GetReportPathForAngularUse(reportPdf.path);
 
             //TODO: error handling, if error - return empty string
             return new ReportPdf(pathForReportForAngularUse, reportPdf.stream);
@@ -246,11 +285,33 @@ private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int 
         }
     }
 
+    private string GetReportPathForAngularUse(string reportPdfPath)
+    {
+        //in order to pass the pdf path to angular, it shall be interpreted as a relative path as '/Reports/kuku.pdf'
+        int basePathLength = _basePath.Length;
+        string pathForReportForAngularUse = reportPdfPath.Substring(basePathLength);
+        pathForReportForAngularUse = pathForReportForAngularUse.Replace(ANGULAR_FOLDER_NAME, "").Replace("\\", "/");
+        pathForReportForAngularUse = _config.BackendUrl + pathForReportForAngularUse;
+
+        return pathForReportForAngularUse;
+    }
+
     public class ParamLite
     {
         public string name { get; set; }
         public string type { get; set; }
         public string value { get; set; }
+    }
+
+    private DateTime NormalizeDateTime(DateTime dt)
+    {
+        return new DateTime(dt.Year, 
+                            dt.Month, 
+                            dt.Day, 
+                            dt.Hour, 
+                            dt.Minute, 
+                            dt.Second, 
+                            DateTimeKind.Utc);
     }
 
     [HttpGet("execute")]
@@ -301,12 +362,14 @@ private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int 
             _logger.LogInformation($"Input json for action {actionName}, itemSN {itemSN} written to {inputFilePath} : {jsonInput}");
 
             DateTime startExecutionDateTimeUTC = DateTime.UtcNow;
+            startExecutionDateTimeUTC = NormalizeDateTime(startExecutionDateTimeUTC);
 
             _logger.LogInformation($"About to run executable {actionExeName} for action {actionName}, ver#{actionVersion}, startExecutionDateTimeUTC {startExecutionDateTimeUTC}.");
                
             RunExecutable(actionFolderPath, actionExeName);
 
             DateTime endExecutionDateTimeUTC = DateTime.UtcNow;
+            endExecutionDateTimeUTC = NormalizeDateTime(endExecutionDateTimeUTC);
 
             _logger.LogInformation($"Finished executing {actionName}, ver#{actionVersion}.");
 
@@ -326,7 +389,7 @@ private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int 
                 return BadRequest(errMsg);
             }
 
-            ReportPdf reportPdf = CreateReport(actionName, actionVersion, itemSN, itemType, endExecutionDateTimeUTC.ToLocalTime(), outputJsonData);
+            ReportPdf reportPdf = await CreateReport(actionName, actionVersion, itemSN, itemType, endExecutionDateTimeUTC, outputJsonData);
             if (reportPdf == null)
             {
                 string errMsg = "Failed to create report pdf.";
@@ -384,6 +447,73 @@ private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int 
         catch (Exception ex)
         {
             string errMsg = "Exception in ExecuteAction";
+            _logger.LogError($"{errMsg}, Ex. {ex.Message}.");
+            return BadRequest(errMsg);
+        }
+    }
+
+    [HttpGet("report")]
+    public async Task<IActionResult> DownloadReportForPastAction([FromQuery] string itemTypeName,
+                                              [FromQuery] string itemSN,
+                                              [FromQuery] string actionName, 
+                                              [FromQuery] string actionVersion,
+                                              [FromQuery] DateTime endExecutionDateTimeUTC
+                                              )
+    {
+        try
+        {
+            BE2FE_ReportResponseDto reportResponse = new BE2FE_ReportResponseDto();
+
+            _logger.LogInformation ($"Going to start DownloadReportForPastAction for itemType={itemTypeName}, itemSN={itemSN}, actionName={actionName}, actionVersion={actionVersion}, endExecutionDateTimeUTC {endExecutionDateTimeUTC}.");
+
+            var actionDataToServer = new BE2Server_ActionDataDto
+            {
+                itemType = itemTypeName,
+                itemSN = itemSN,
+                actionName = actionName,
+                actionSWVersion = actionVersion,
+                endExecutionDateTimeUTC = endExecutionDateTimeUTC
+            };
+
+            //Explicitly disable camelCase when serializing
+            var pascalCaseOptions = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = null // <== this is key
+            };
+
+            string json = JsonSerializer.Serialize(actionDataToServer, pascalCaseOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            _logger.LogInformation ($"Going to recieve report pdf for : {json}.");
+
+            //1. get a url for the report from server 
+            //GET by default accepts only query parameters, so we use POST here
+            //we dont want million of parameters in the url
+            var urlToDowloadReport = await _client.PostAsync($"api/item-actions-history/download-link-report", content);
+            urlToDowloadReport.EnsureSuccessStatusCode();
+
+            var urlToDowloadReportJson = await urlToDowloadReport.Content.ReadAsStringAsync();
+            _logger.LogInformation($"Url to download report for action name {actionName}, action version {actionVersion}, itemSN {itemSN}, endExecutionDateTimeUTC {endExecutionDateTimeUTC} got from server : {urlToDowloadReportJson}");
+
+            string urlStr = JsonDocument.Parse(urlToDowloadReportJson).RootElement.GetProperty("url").GetString();
+            string fileNameStr = JsonDocument.Parse(urlToDowloadReportJson).RootElement.GetProperty("fileName").GetString();
+
+            //2. download the report from received url
+            string reportFilePathAndName = Path.Combine(_pathForReport, fileNameStr);
+            _logger.LogInformation ($"Going to download report from {urlStr} to {reportFilePathAndName}.");
+            await UploadDownloadService.DownloadFileAsync(urlStr, reportFilePathAndName);
+
+            //3. prepare response to frontend
+            string pathForReportForAngularUse = GetReportPathForAngularUse(reportFilePathAndName);
+            _logger.LogInformation ($"Report pdf path for angular is {pathForReportForAngularUse}.");
+            reportResponse.reportPdfPath = pathForReportForAngularUse;
+
+            _logger.LogInformation ($"Report downloaded to {pathForReportForAngularUse}.");
+            return Ok(reportResponse);
+        }
+        catch (Exception ex)
+        {
+            string errMsg = "Exception in DownloadReportForPastAction";
             _logger.LogError($"{errMsg}, Ex. {ex.Message}.");
             return BadRequest(errMsg);
         }
@@ -453,8 +583,7 @@ private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int 
         }
 
         // relative to the backend's current directory
-        string basePath = AppContext.BaseDirectory;
-        string targetPath = Path.Combine(basePath, ACTIONS_RELATIVE_PATH, actionName + "_" + actionVersion);
+        string targetPath = Path.Combine(_basePath, ACTIONS_RELATIVE_PATH, actionName + "_" + actionVersion);
 
         try
         {
@@ -474,6 +603,7 @@ private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int 
 
                 //2. download the action zip from received url
                 string zipFilePathAndName = Path.Combine(targetPath, fileNameStr);
+                _logger.LogInformation ($"Going to download action from {urlStr} to {zipFilePathAndName}.");
                 await UploadDownloadService.DownloadFileAsync(urlStr, zipFilePathAndName);
 
                 //3. unzip
@@ -500,8 +630,7 @@ private void DrawCell(XGraphics gfx, XFont font, string text, int x, int y, int 
     private string ClearFolder(string folderName)
     {
         // relative to the backend's current directory
-        string basePath = AppContext.BaseDirectory;
-        string targetPath = Path.Combine(basePath, ACTIONS_RELATIVE_PATH, folderName);
+        string targetPath = Path.Combine(_basePath, ACTIONS_RELATIVE_PATH, folderName);
 
         if (!Directory.Exists(targetPath))
         {
