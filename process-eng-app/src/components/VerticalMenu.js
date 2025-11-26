@@ -6,6 +6,7 @@ const menuItems = [
   { label: 'Test Applications', key: 'test-applications-page' },
   { label: 'Items Dashboard', key: 'items-dashboard'},
   { label: 'Runs Dashboard', key: 'runs-dashboard'},
+  { label: 'Settings', key: 'settings-page' },
   { label: 'About', key: 'about-page' }
 ];
 
