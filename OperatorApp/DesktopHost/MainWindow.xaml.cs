@@ -30,7 +30,7 @@ public partial class MainWindow : Window
         InitializeComponent();
 
         //TODO: After connecting DB get from BE the company name here
-        OperatorAppWindow.Title = "Julia - Manufacturing Operator Application";
+        OperatorAppWindow.Title = "Calibrix";
         OperatorAppWindow.WindowState = WindowState.Maximized;
 
         AllocConsole();
