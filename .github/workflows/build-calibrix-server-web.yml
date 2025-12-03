@@ -1,0 +1,103 @@
+name: Build Calibrix (server + process-eng-app)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-web:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # needed for tags
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'      # Calibrix node version in use
+          cache: 'npm'
+
+      - name: Read base version (major.minor)
+        id: base_version
+        run: |
+          MAJOR=$(jq '.major' version.json)
+          MINOR=$(jq '.minor' version.json)
+          echo "MAJOR=$MAJOR" >> $GITHUB_ENV
+          echo "MINOR=$MINOR" >> $GITHUB_ENV
+          echo "BASE_VERSION=$MAJOR.$MINOR" >> $GITHUB_ENV
+
+      - name: Compute next patch from git tags
+        id: patch
+        run: |
+          BASE_VERSION="${BASE_VERSION:-$MAJOR.$MINOR}"
+
+          # get last tag vBASE_VERSION.x (e.g. v1.4.23)
+          LAST_TAG=$(git tag --list "v${BASE_VERSION}.*" | sort -V | tail -n 1)
+
+          if [ -z "$LAST_TAG" ]; then
+            PATCH=0
+          else
+            # LAST_TAG looks like v1.4.23 → strip prefix and base, keep patch
+            LAST_PART=${LAST_TAG#v$BASE_VERSION.}
+            PATCH=$((LAST_PART + 1))
+          fi
+
+          echo "PATCH=$PATCH" >> $GITHUB_ENV
+          echo "VERSION=$BASE_VERSION.$PATCH" >> $GITHUB_ENV
+          echo "version=$BASE_VERSION.$PATCH" >> $GITHUB_OUTPUT
+
+      - name: Show version
+        run: echo "Building version $VERSION"
+
+      # ---- Update server/package.json version --------------------
+      - name: Set server version
+        working-directory: server
+        run: |
+          jq ".version = \"$VERSION\"" package.json > package.tmp && mv package.tmp package.json
+
+      # ---- Update process-eng-app/package.json version & env -------------
+      - name: Set process-eng-app version
+        working-directory: process-eng-app
+        run: |
+          jq ".version = \"$VERSION\"" package.json > package.tmp && mv package.tmp package.json
+          # optional env file for build
+          echo "REACT_APP_CALIBRIX_WEB_FRONTEND_VERSION=$VERSION" > .env.ci
+
+      # ---- Install & build server ----
+      - name: Install server
+        working-directory: server
+        run: npm ci
+
+      - name: Test server
+        working-directory: server
+        run: npm test -- --watch=false || echo "no tests"
+
+      # here you might build a docker image, zip, etc.
+
+      # ---- Install & build process-eng-app (Calibrix web frontend) ----
+      - name: Install process-eng-app 
+        working-directory: process-eng-app
+        run: npm ci
+
+      - name: Build process-eng-app
+        working-directory: process-eng-app
+        env:
+          CI: false
+          REACT_APP_CALIBRIX_WEB_FRONTEND_VERSION: ${{ env.VERSION }}
+        run: npm run build
+
+      # ---- Create git tag (for patch) and push it -----------------
+      - name: Create and push tag
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git tag "v$VERSION"
+          git push origin "v$VERSION"

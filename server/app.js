@@ -13,16 +13,11 @@ const cors = require('cors');
 app.use(cors({ origin: 'http://localhost:3000' }));//julia 
 
 
-const itemRoutes = require('./api/routes/items');
-const itemTypesRoutes = require('./api/routes/item-types');
-const testApplicationsRoutes = require('./api/routes/test-applications');
-const parameterDefaultsRoutes = require('./api/routes/parameter-defaults');
-const itemActionsHistoryRoutes = require('./api/routes/item-actions-history');
-
 app.use('/api/items', require('./api/routes/items'));
 app.use('/api/item-types', require('./api/routes/item-types'));
 app.use('/api/test-applications', require('./api/routes/test-applications'));
 app.use('/api/parameter-defaults', require('./api/routes/parameter-defaults'));
 app.use('/api/item-actions-history', require('./api/routes/item-actions-history'));
+app.use('/api/version', require('./api/routes/version'));
 
 module.exports = app; 
