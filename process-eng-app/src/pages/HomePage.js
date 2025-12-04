@@ -6,6 +6,7 @@ import ItemTypesPage from './ItemTypesPage';
 import ItemTypePage from './ItemTypePage';
 import TestApplicationsPage from './TestApplicationsPage';
 import TestApplicationPage from './TestApplicationPage';
+import AboutPage from './AboutPage';
 
 function HomePage({ selectedMenu, setSelectedMenu }) {
   //const [leftPanelSelected, setLeftPanelSelected] = useState(null);
@@ -37,7 +38,7 @@ function HomePage({ selectedMenu, setSelectedMenu }) {
   else if (selectedMenu === 'items-dashboard') content = <div style={{ padding: 20 }}><h2>Items Dashboard</h2><p>This is the items dashboard.</p></div>;
   else if (selectedMenu === 'runs-dashboard') content = <div style={{ padding: 20 }}><h2>Runs dashboard</h2><p>This is the runs dashboard.</p></div>;
   else if (selectedMenu === 'settings-page') content = <div style={{ padding: 20 }}><h2>Settings</h2><p>This is the Settings section.</p></div>;
-  else if (selectedMenu === 'about-page') content = <div style={{ padding: 20 }}><h2>About</h2><p>This is the About section.</p></div>;
+  else if (selectedMenu === 'about-page') content = <AboutPage/>;
 
   return (
     <div className="container-fluid" style={{ display: 'flex', height: '100vh' }}>
