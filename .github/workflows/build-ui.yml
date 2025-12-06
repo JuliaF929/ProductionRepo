@@ -1,9 +1,16 @@
 name: Build process-eng-app
 
 on:
+  # Run automatically when a new tag is pushed, e.g. v1.0.5
   push:
     tags:
-      - 'v*'   # build when you create a release tag
+      - 'v*'
+
+  # Allow manual run from the Actions UI (for testing)
+  workflow_dispatch:
+
+permissions:
+  contents: write   # needed for attaching files to releases
 
 jobs:
   build:
@@ -11,12 +18,13 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
+          cache: 'npm'
 
       - name: Install deps
         working-directory: process-eng-app
@@ -24,14 +32,24 @@ jobs:
 
       - name: Build React app
         working-directory: process-eng-app
+        env:
+          CI: false
         run: npm run build
 
-      - name: Package artifact
+      - name: Package build/ as zip
         run: |
           cd process-eng-app
           zip -r ../process-eng-app-build.zip build/
 
-      - name: Upload release artifact
+      # 1) Upload as GitHub Actions artifact (shown on the run page)
+      - name: Upload artifact to Actions
+        uses: actions/upload-artifact@v4
+        with:
+          name: process-eng-app-build
+          path: process-eng-app-build.zip
+
+      # 2) Attach to GitHub Release when this run was triggered by a tag
+      - name: Attach zip to GitHub Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
