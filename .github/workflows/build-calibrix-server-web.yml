@@ -15,6 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          token: ${{ secrets.PAT_FOR_WORKFLOW }} 
           fetch-depth: 0          # needed for tags
 
       - name: Install jq
