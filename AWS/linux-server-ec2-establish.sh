@@ -20,6 +20,11 @@ NODE_MAJOR=18
 TIMEZONE="Asia/Jerusalem"
 # ------------------
 
+# Resolve APP_DIR = one level up from where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+APP_DIR="$(dirname "$SCRIPT_DIR")"
+
+
 echo "[1/5] Timezone"
 sudo timedatectl set-timezone "$TIMEZONE"
 
