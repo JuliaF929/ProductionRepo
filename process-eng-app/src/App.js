@@ -65,7 +65,7 @@ function App() {
                                             setSelectedMenu={setSelectedVertMenu}
                                              />} />
       </Routes>
-    </Router>
+    </Router> 
   );
 }
 
