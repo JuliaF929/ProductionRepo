@@ -11,11 +11,11 @@ set -euo pipefail
 #this script shall be run to publish process-eng-app at the same EC2 as a server
 #it shall run after running linux-server-ec2-establish.sh
 #chmod +x linux-process-eng-app-ec2-after-server-establish.sh
-#./linux-process-eng-app-ec2-after-server-establish.sh "<put here the Elastic IP allocated>" ProductionEC2 process-eng-app 5000
+#./linux-process-eng-app-ec2-after-server-establish.sh "<put here the Elastic IP allocated>" CalibrixEC2 process-eng-app 5000
 
 # --- PARAMETERS ---
 ELASTIC_IP=${1:-"127.0.0.1"}        # first arg
-EC2_NAME=${2:-"ProductionEC2"}      # second arg
+EC2_NAME=${2:-"CalibrixEC2"}      # second arg
 CLIENT_NAME=${3:-"process-eng-app"} # third arg
 SERVER_PORT=${4:-"5000"}            # fourth arg                                         
 # ------------------

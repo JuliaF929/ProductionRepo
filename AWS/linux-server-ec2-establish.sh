@@ -8,42 +8,29 @@
 set -euo pipefail
 
 #usage
-#chmod +x linux-server-ec2-establish.sh
-#./linux-server-ec2-establish.sh https://github.com/JuliaF929/ProductionRepo.git ProductionEC2 ProductionServer
+#bash ./linux-server-ec2-establish.sh ProductionServer
 
-# --- PARAMETERS ---
-GIT_REPO=${1:-"https://github.com/JuliaF929/ProductionRepo.git"}  # first arg
-EC2_NAME=${2:-"ProductionEC2"}                                    # second arg
-SERVER_NAME=${3:-"ProductionServer"}                              # third arg
+# --- CMD LINE PARAMETERS ---
+SERVER_NAME=${1:-"ProductionServer"}
+# ------------------
+
+# --- CONFIGURATION ---
 APP_PORT=5000                                         
 NODE_MAJOR=18
 TIMEZONE="Asia/Jerusalem"
 # ------------------
 
-echo "=== Setup for EC2: $EC2_NAME, Service: $SERVER_NAME ==="
-
-echo "[1/7] Timezone"
+echo "[1/5] Timezone"
 sudo timedatectl set-timezone "$TIMEZONE"
 
-echo "[2/7] Update OS"
+echo "[2/5] Update OS"
 sudo apt update && sudo apt -y upgrade
 
-echo "[3/7] Prepare app dir"
-APP_DIR="/opt/$EC2_NAME"
-sudo mkdir -p "$APP_DIR"
-sudo chown ubuntu:ubuntu "$APP_DIR"
-
-echo "[4/7] Install Node.js + tools"
+echo "[3/5] Install Node.js + tools"
 curl -fsSL "https://deb.nodesource.com/setup_${NODE_MAJOR}.x" | sudo -E bash -
 sudo apt -y install nodejs nginx git unzip
 
-echo "[5/7] Get app & install deps"
-cd "$APP_DIR"
-git clone "$GIT_REPO" .   # clone repo into APP_DIR
-cd "$APP_DIR/server"
-npm ci --omit=dev         # install only production deps
-
-echo "[6/7] Create systemd service"
+echo "[4/5] Create systemd service"
 sudo tee /etc/systemd/system/$SERVER_NAME.service >/dev/null <<UNIT
 [Unit]
 Description=$SERVER_NAME Node.js Service
@@ -64,7 +51,7 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now $SERVER_NAME
 sudo systemctl status $SERVER_NAME --no-pager
 
-echo "[7/7] Configure Nginx reverse proxy"
+echo "[5/5] Configure Nginx reverse proxy"
 sudo tee /etc/nginx/sites-available/$SERVER_NAME >/dev/null <<NGINX
 server {
     listen 80;
