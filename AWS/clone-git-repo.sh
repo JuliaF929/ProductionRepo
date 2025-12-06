@@ -20,8 +20,6 @@ APP_DIR="/opt/$EC2_NAME"
 sudo mkdir -p "$APP_DIR"
 sudo chown ubuntu:ubuntu "$APP_DIR"
 
-echo "[2/2] Get app & install deps"
+echo "[2/2] Get sources"
 cd "$APP_DIR"
 git clone "$GIT_REPO" .   # clone repo into APP_DIR
-cd "$APP_DIR/server"
-npm ci --omit=dev         # install only production deps

@@ -34,6 +34,8 @@ sudo apt update && sudo apt -y upgrade
 echo "[3/5] Install Node.js + tools"
 curl -fsSL "https://deb.nodesource.com/setup_${NODE_MAJOR}.x" | sudo -E bash -
 sudo apt -y install nodejs nginx git unzip
+cd "$APP_DIR/server"
+npm ci --omit=dev         # install only production deps
 
 echo "[4/5] Create systemd service"
 sudo tee /etc/systemd/system/$SERVER_NAME.service >/dev/null <<UNIT
