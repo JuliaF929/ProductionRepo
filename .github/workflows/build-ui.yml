@@ -4,7 +4,7 @@ on:
   # Run automatically when a new tag is pushed, e.g. v1.0.5
   push:
     tags:
-      - 'v*'
+      - '*'
 
   # Allow manual run from the Actions UI (for testing)
   workflow_dispatch:
