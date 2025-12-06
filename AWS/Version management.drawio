@@ -1,0 +1,70 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" version="29.2.3">
+  <diagram name="Page-1" id="GLbVwuvdVR-bFlrkucZr">
+    <mxGraphModel dx="983" dy="536" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="4t-aDHyvLRFrtTtwTQRl-1" parent="1" style="whiteSpace=wrap;html=1;aspect=fixed;" value="" vertex="1">
+          <mxGeometry height="750" width="750" x="80" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="4t-aDHyvLRFrtTtwTQRl-2" parent="1" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" value="version.json&lt;br&gt;&lt;br&gt;&lt;div&gt;root folder&lt;br&gt;&lt;br&gt;major.minor&lt;br&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="120" x="130" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="4t-aDHyvLRFrtTtwTQRl-3" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=default;fillColor=#DFFDFF;align=center;verticalAlign=middle;rounded=0;" value="&lt;b&gt;1.&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="60" x="160" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="4t-aDHyvLRFrtTtwTQRl-6" parent="1" style="shape=or;whiteSpace=wrap;html=1;direction=south;fillColor=#FFFFEB;" value="Manually update for new version" vertex="1">
+          <mxGeometry height="90" width="80" x="150" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="4t-aDHyvLRFrtTtwTQRl-7" edge="1" parent="1" source="4t-aDHyvLRFrtTtwTQRl-2" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" target="4t-aDHyvLRFrtTtwTQRl-6" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="410" y="230" as="sourcePoint" />
+            <mxPoint x="460" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4t-aDHyvLRFrtTtwTQRl-9" parent="1" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" value="&lt;div&gt;Commit to main branch in git&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="120" x="300" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="4t-aDHyvLRFrtTtwTQRl-10" parent="1" style="shape=or;whiteSpace=wrap;html=1;direction=south;fillColor=#FFFFEB;" value="Manually, any change" vertex="1">
+          <mxGeometry height="90" width="80" x="320" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="4t-aDHyvLRFrtTtwTQRl-11" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=default;fillColor=#DFFDFF;align=center;verticalAlign=middle;rounded=0;" value="&lt;b&gt;2.&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="60" x="330" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="4t-aDHyvLRFrtTtwTQRl-12" parent="1" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" value="&lt;div&gt;CI at git&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="120" x="450" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="4t-aDHyvLRFrtTtwTQRl-13" parent="1" style="shape=or;whiteSpace=wrap;html=1;direction=south;fillColor=#FFFFEB;" value="Automatic" vertex="1">
+          <mxGeometry height="90" width="80" x="470" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="4t-aDHyvLRFrtTtwTQRl-14" edge="1" parent="1" source="4t-aDHyvLRFrtTtwTQRl-9" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" target="4t-aDHyvLRFrtTtwTQRl-10" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="320" y="280" as="sourcePoint" />
+            <mxPoint x="320" y="300" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4t-aDHyvLRFrtTtwTQRl-15" edge="1" parent="1" source="4t-aDHyvLRFrtTtwTQRl-12" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="4t-aDHyvLRFrtTtwTQRl-13" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="460" y="280" as="sourcePoint" />
+            <mxPoint x="460" y="300" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4t-aDHyvLRFrtTtwTQRl-16" parent="1" style="shape=document;whiteSpace=wrap;html=1;boundedLbl=1;align=left;" value="&lt;div&gt;read version.json&lt;/div&gt;&lt;div&gt;find latest tag matching v1.4.*&lt;/div&gt;&lt;div&gt;increment patch&lt;/div&gt;&lt;div&gt;produce VERSION=&quot;major.minor.X&quot;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="200" x="420" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="4t-aDHyvLRFrtTtwTQRl-17" edge="1" parent="1" source="4t-aDHyvLRFrtTtwTQRl-13" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.438;entryY=0.033;entryDx=0;entryDy=0;entryPerimeter=0;" target="4t-aDHyvLRFrtTtwTQRl-16" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="560" y="290" as="sourcePoint" />
+            <mxPoint x="560" y="310" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4t-aDHyvLRFrtTtwTQRl-18" parent="1" style="shape=document;whiteSpace=wrap;html=1;boundedLbl=1;align=left;" value="&lt;div&gt;CI updates version in:&lt;/div&gt;&lt;div&gt;✔ server/package.json&lt;/div&gt;&lt;div&gt;✔ process-eng-app/package.json&lt;/div&gt;&lt;div&gt;✔ REACT_APP_CALIBRIX_WEB_FRONTEND_VERSION injected at build&lt;/div&gt;&lt;div&gt;This made both server &amp;amp; web embed the same VERSION.&lt;/div&gt;" vertex="1">
+          <mxGeometry height="170" width="330" x="420" y="470" as="geometry" />
+        </mxCell>
+        <mxCell id="4t-aDHyvLRFrtTtwTQRl-19" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=default;fillColor=#DFFDFF;align=center;verticalAlign=middle;rounded=0;" value="&lt;b&gt;3.&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="60" x="480" y="110" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
