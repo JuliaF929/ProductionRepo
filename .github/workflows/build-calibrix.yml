@@ -71,7 +71,7 @@ jobs:
         run: |
           jq ".version = \"$VERSION\"" package.json > package.tmp && mv package.tmp package.json
           # optional env file for build
-          echo "REACT_APP_CALIBRIX_WEB_FRONTEND_VERSION=$VERSION" > .env.ci
+          echo "REACT_APP_CALIBRIX_WEB_FRONTEND_VERSION=$VERSION" > .env.production
 
       # ---- Install & build server ----
       - name: Install server
