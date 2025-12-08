@@ -70,7 +70,6 @@ jobs:
         working-directory: process-eng-app
         run: |
           jq ".version = \"$VERSION\"" package.json > package.tmp && mv package.tmp package.json
-          # optional env file for build
           if grep -q "^REACT_APP_CALIBRIX_WEB_FRONTEND_VERSION=" .env.production; then
             sed -i "s/^REACT_APP_CALIBRIX_WEB_FRONTEND_VERSION=.*/REACT_APP_CALIBRIX_WEB_FRONTEND_VERSION=$VERSION/" .env.production;
           else
@@ -86,27 +85,9 @@ jobs:
         working-directory: server
         run: npm test -- --watch=false || echo "no tests"
 
-      # here you might build a docker image, zip, etc.
 
-      # ---- Install & build process-eng-app (Calibrix web frontend) ----
-      - name: Install process-eng-app 
-        working-directory: process-eng-app
-        run: npm ci
 
-      - name: DEBUG — show .env.production
-        working-directory: process-eng-app
-        run: |
-          echo "CONTENTS OF .env.production:"
-          cat .env.production
-
-      - name: Build process-eng-app
-        working-directory: process-eng-app
-        env:
-          CI: false
-          REACT_APP_CALIBRIX_WEB_FRONTEND_VERSION: ${{ env.VERSION }}
-        run: npm run build
-
-      # ---- Create git tag (for patch) and push it -----------------
+      # ---- Create git tag and push it -----------------
       - name: Create and push tag
         if: github.ref == 'refs/heads/main'
         run: |
