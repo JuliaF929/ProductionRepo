@@ -93,6 +93,12 @@ jobs:
         working-directory: process-eng-app
         run: npm ci
 
+      - name: DEBUG — show .env.production
+        working-directory: process-eng-app
+        run: |
+          echo "CONTENTS OF .env.production:"
+          cat .env.production
+
       - name: Build process-eng-app
         working-directory: process-eng-app
         env:
