@@ -104,6 +104,10 @@ sudo mkdir -p "$TARGET_DIR"
 echo "Unzipping frontend artifact..."
 sudo unzip -q "$TMP_FILE" -d "$TARGET_DIR"
 
+echo "Moving frontend static files from build folder to parent folder..."
+sudo mv "$TARGET_DIR/build/"* "$TARGET_DIR/"
+sudo rm -rf "$TARGET_DIR/build"
+
 echo "Frontend updated successfully."
 
 # -----------------------------
