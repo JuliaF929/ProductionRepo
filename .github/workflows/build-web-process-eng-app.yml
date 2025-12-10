@@ -26,6 +26,18 @@ jobs:
           node-version: 22
           cache: 'npm'
 
+      # ---- ADD ONLY THIS BLOCK: update .env.production ----
+      - name: Update .env.production
+        working-directory: process-eng-app
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/}"
+          VERSION="${VERSION#v}"
+          sed -i '/REACT_APP_CALIBRIX_WEB_FRONTEND_VERSION=/d' .env.production
+          echo "REACT_APP_CALIBRIX_WEB_FRONTEND_VERSION=$VERSION" >> .env.production
+          echo "--- FINAL .env.production ---"
+          cat .env.production
+      # ------------------------------------------------------
+
       - name: Install deps
         working-directory: process-eng-app
         run: npm ci
