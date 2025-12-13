@@ -108,18 +108,22 @@ function ItemTypesPage({onCreateNewItemType, onEditItemType, onSelectItemType}) 
                 <td>{itemType.description}</td>
                 <td>
                   <button
-                    className="btn btn-sm btn-warning"
+                    className="btn btn-sm btn-outline-secondary"
                     onClick={e => { e.stopPropagation(); handleEdit(itemType); }}
                   >
-                    Edit
+                    <span class="material-symbols-outlined">
+                      edit
+                    </span>  
                   </button>
                 </td>
                 <td>
                   <button
-                    className="btn btn-sm btn-danger"
+                    className="btn btn-sm btn-outline-danger"
                     onClick={e => { e.stopPropagation(); handleDelete(itemType); }}
                   >
-                    Delete
+                    <span class="material-symbols-outlined">
+                      delete
+                    </span>  
                   </button>
                 </td>
               </tr>
