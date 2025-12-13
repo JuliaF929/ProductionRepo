@@ -37,16 +37,17 @@ sudo systemctl stop mongod
 
 echo "=== Configuring replica set in mongod.conf ==="
 
-# Add the replication block ONLY if not already present
-if ! grep -q "replication:" /etc/mongod.conf; then
-    sudo bash -c 'echo "
+# Remove any existing (commented or active) replication block
+sudo sed -i '/^[#[:space:]]*replication:/,/^[^[:space:]]/d' /etc/mongod.conf
+
+# Add correct replication block
+sudo bash -c 'cat >> /etc/mongod.conf <<EOF
+
 replication:
-  replSetName: \"rs0\"
-" >> /etc/mongod.conf'
-    echo "Replica set block added."
-else
-    echo "Replica set already configured — skipping."
-fi
+  replSetName: "rs0"
+EOF'
+
+echo "Replica set block ensured."
 
 # Optional: allow external access (same as before)
 if grep -q "bindIp: 127.0.0.1" /etc/mongod.conf; then
