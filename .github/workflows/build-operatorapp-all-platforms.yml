@@ -5,6 +5,9 @@ on:
     tags:
       - '*'
 
+permissions:
+  contents: write   # needed for attaching files to releases
+
 jobs:
   build-windows:
     runs-on: windows-latest
@@ -24,8 +27,16 @@ jobs:
           cd OperatorApp
           .\win-publish-release.ps1
 
+      - name: Zip Windows Desktop artifact
+        shell: pwsh
+        run: |
+          cd OperatorApp/Publish
+          Compress-Archive `
+            -Path * `
+            -DestinationPath ../Calibrix-Desktop-Operator-Windows-${{ env.VERSION }}.zip
+
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            OperatorApp/output/Calibrix-Desktop-Windows-${{ env.VERSION }}.zip
+            OperatorApp/Calibrix-Desktop-Operator-Windows-${{ env.VERSION }}.zip
