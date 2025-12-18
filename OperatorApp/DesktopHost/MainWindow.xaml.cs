@@ -10,6 +10,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
+using System.Reflection;
+using System;
 
 namespace DesktopHost;
 
@@ -29,8 +31,14 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
+        string version =
+                Assembly.GetExecutingAssembly()
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+                .InformationalVersion
+                ?? "unknown";
+
         //TODO: After connecting DB get from BE the company name here
-        OperatorAppWindow.Title = "Calibrix";
+        OperatorAppWindow.Title = $"Calibrix Operator Windows - version {version}";;
         OperatorAppWindow.WindowState = WindowState.Maximized;
 
         AllocConsole();

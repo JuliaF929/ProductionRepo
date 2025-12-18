@@ -1,0 +1,29 @@
+name: Release Operator App
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version
+        shell: bash
+        run: |
+          echo "APP_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Build Windows Desktop
+        run: |
+          cd OperatorApp
+          win-publish-release.ps1
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            OperatorApp/output/Calibrix-Desktop-Windows-${{ env.VERSION }}.zip
