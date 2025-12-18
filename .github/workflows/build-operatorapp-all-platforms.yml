@@ -33,6 +33,7 @@ jobs:
       - name: Build Windows Installer
         shell: pwsh
         run: |
+          cd OperatorApp
           iscc win-calibrix-install.iss
 
       - name: Upload installer
