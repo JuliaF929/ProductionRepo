@@ -1,5 +1,5 @@
 #define MyAppName "Calibrix Desktop Operator Windows"
-#define MyAppVersion "{#GetEnv('APP_VERSION')}"
+#define MyAppVersion GetEnv("APP_VERSION")
 #define MyAppExeName "CalibrixOperatorWin.exe"
 
 [Setup]
