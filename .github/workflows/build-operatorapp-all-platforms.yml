@@ -27,16 +27,15 @@ jobs:
           cd OperatorApp
           .\win-publish-release.ps1
 
-      - name: Zip Windows Desktop artifact
+      - name: Install Inno Setup
+        run: choco install innosetup -y
+
+      - name: Build Windows Installer
         shell: pwsh
         run: |
-          cd OperatorApp/Publish
-          Compress-Archive `
-            -Path * `
-            -DestinationPath ../Calibrix-Desktop-Operator-Windows-${{ env.VERSION }}.zip
+          iscc win-calibrix-install.iss
 
-      - name: Upload to GitHub Release
+      - name: Upload installer
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            OperatorApp/Calibrix-Desktop-Operator-Windows-${{ env.VERSION }}.zip
+          files: CalibrixOperatorWin*.exe
