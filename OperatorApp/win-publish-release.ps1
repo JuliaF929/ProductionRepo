@@ -52,7 +52,7 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-ng build --configuration production
+npx ng build --configuration production
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Angular build failed!"
     if (-not $env:GITHUB_ACTIONS) {
