@@ -20,7 +20,7 @@ jobs:
       - name: Build Windows Desktop
         run: |
           cd OperatorApp
-          win-publish-release.ps1
+          .\win-publish-release.ps1
 
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
