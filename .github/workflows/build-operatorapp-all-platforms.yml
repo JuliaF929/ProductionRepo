@@ -15,7 +15,9 @@ jobs:
       - name: Extract version
         shell: bash
         run: |
-          echo "APP_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "PATCH=$(echo $VERSION | cut -d. -f3)" >> $GITHUB_ENV
 
       - name: Build Windows Desktop
         run: |

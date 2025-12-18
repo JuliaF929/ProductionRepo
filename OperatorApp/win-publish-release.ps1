@@ -30,7 +30,7 @@ if ($env:GITHUB_ACTIONS -eq "true") {
     Write-Host "Using PATCH from CI: $Patch"
 }
 else {
-    Write-Host "Local DEV build detected will be performed with -1 patch"
+    Write-Host "Local DEV build detected will be performed with 0 patch"
     $Patch = "0"
 }
 
