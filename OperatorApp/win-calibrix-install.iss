@@ -12,7 +12,7 @@ Compression=lzma
 SolidCompression=yes
 
 [Files]
-Source: "OperatorApp\Publish\*"; DestDir: "{app}"; Flags: recursesubdirs
+Source: "Publish\*"; DestDir: "{app}"; Flags: recursesubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
