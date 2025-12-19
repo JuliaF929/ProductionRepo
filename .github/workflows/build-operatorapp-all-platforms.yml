@@ -39,4 +39,4 @@ jobs:
       - name: Upload installer
         uses: softprops/action-gh-release@v2
         with:
-          files: CalibrixOperatorWin*.exe
+          files: OperatorApp/Output/CalibrixOperatorWin*.exe
