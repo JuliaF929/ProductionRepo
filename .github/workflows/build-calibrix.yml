@@ -160,13 +160,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Extract version
-        shell: pwsh
-        run: |
-          $env:APP_VERSION = "${{ needs.compute-tag-and-version.outputs.app_version }}"
-          echo "APP_VERSION=$APP_VERSION" >> $GITHUB_ENV
-
       - name: Build Windows Desktop
+        shell: pwsh
+        env:
+          APP_VERSION: ${{ needs.compute-tag-and-version.outputs.app_version }}
         run: |
           cd OperatorApp
           .\win-publish-release.ps1

@@ -2,6 +2,11 @@ Write-Host "[1/6] Decide DEV vs CI and compose version numbers (Windows requires
 
 if ($env:GITHUB_ACTIONS -eq "true") {
     Write-Host "CI build detected"
+
+    Write-Host "=== DEBUG VERSION ==="
+    Write-Host "APP_VERSION = '$env:APP_VERSION'"
+    Write-Host "====================="
+    
     $Version = $env:APP_VERSION
 }
 else {
