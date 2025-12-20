@@ -204,8 +204,9 @@ jobs:
           fetch-depth: 0
 
       - name: Create and push tag
-        TAG_VERSION="${{ needs.compute-tag-and-version.outputs.tag_version }}"
         if: github.ref == 'refs/heads/main'
+        env:
+          TAG_VERSION: ${{ needs.compute-tag-and-version.outputs.tag_version }}
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
