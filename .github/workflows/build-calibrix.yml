@@ -175,6 +175,7 @@ jobs:
         shell: pwsh
         run: |
           cd OperatorApp
+          Write-Host "APP_VERSION=$env:APP_VERSION"
           iscc /DMyAppVersion="$env:APP_VERSION" win-calibrix-install.iss
 
       - name: Upload installer

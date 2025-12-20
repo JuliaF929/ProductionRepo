@@ -1,3 +1,6 @@
+#ifndef MyAppVersion
+  #error MyAppVersion "NOT_DEFINED"
+#endif
 #define MyAppName "Calibrix Desktop Operator Windows"
 #define MyAppVersion MyAppVersion
 #define MyAppExeName "CalibrixOperatorWin.exe"
