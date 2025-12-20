@@ -100,8 +100,11 @@ dotnet publish DesktopHost/DesktopHost.csproj `
     -c Release `
     -r win-x64 `
     --self-contained `
-    -o Publish `
-    -p:Version=$Version `
+    -p:Version=$env:Version `
+    -p:AssemblyVersion=$env:Version `
+    -p:FileVersion=$env:Version `
+    -p:PackageVersion=$env:Version `
+    -o Publish
 
 
 if ($LASTEXITCODE -ne 0) {

@@ -68,7 +68,6 @@ jobs:
           uses: actions/setup-node@v4
           with:
             node-version: '22'      # Calibrix node version in use
-            cache: 'npm'
 
         - name: Install jq
           run: sudo apt-get update && sudo apt-get install -y jq
@@ -99,7 +98,6 @@ jobs:
           uses: actions/setup-node@v4
           with:
             node-version: 22
-            cache: 'npm'
 
         - name: Install jq
           run: sudo apt-get update && sudo apt-get install -y jq
