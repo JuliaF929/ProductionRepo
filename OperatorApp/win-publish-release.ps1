@@ -8,7 +8,7 @@ if ($env:GITHUB_ACTIONS -eq "true") {
     Write-Host "====================="
     
     $Version = $env:APP_VERSION
-    Write-Host "Version = '$env:Version'"
+    Write-Host "Version = '$Version'"
 }
 else {
     Write-Host "Local DEV build will have ver#: major.minor.0.0"
@@ -106,10 +106,10 @@ dotnet publish DesktopHost/DesktopHost.csproj `
     -c Release `
     -r win-x64 `
     --self-contained `
-    -p:Version=$env:Version `
-    -p:AssemblyVersion=$env:Version `
-    -p:FileVersion=$env:Version `
-    -p:PackageVersion=$env:Version `
+    -p:Version=$Version `
+    -p:AssemblyVersion=$Version `
+    -p:FileVersion=$Version `
+    -p:PackageVersion=$Version `
     -o Publish
 
 
