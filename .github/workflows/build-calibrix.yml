@@ -180,8 +180,8 @@ jobs:
           Write-Host "APP_VERSION=$env:APP_VERSION"
           iscc /DMyAppVersion="$env:APP_VERSION" win-calibrix-install.iss
 
-      - name: Upload installer
-        uses: softprops/action-gh-release@v2
+      - name: Upload OperatorApp installer
+        uses: actions/upload-artifact@v4
         with:
           files: OperatorApp/Output/CalibrixOperatorWin*.exe
 
