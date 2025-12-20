@@ -132,9 +132,10 @@ jobs:
           run: npm run build
 
         - name: Package build/ as zip
+          shell: bash
           run: |
-          cd process-eng-app
-          zip -r ../process-eng-app-build.zip build/
+            cd process-eng-app
+            zip -r ../process-eng-app-build.zip build/
 
         #Upload as GitHub Actions artifact
         - name: Upload artifact to Actions
