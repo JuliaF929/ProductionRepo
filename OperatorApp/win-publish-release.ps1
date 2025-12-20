@@ -8,6 +8,7 @@ if ($env:GITHUB_ACTIONS -eq "true") {
     Write-Host "====================="
     
     $Version = $env:APP_VERSION
+    Write-Host "Version = '$env:Version'"
 }
 else {
     Write-Host "Local DEV build will have ver#: major.minor.0.0"
@@ -100,7 +101,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host "[5/6] Publishing CalibrixOperatorWin (Release)..."
-
+Write-Host "Version = '$env:Version'"
 dotnet publish DesktopHost/DesktopHost.csproj `
     -c Release `
     -r win-x64 `
