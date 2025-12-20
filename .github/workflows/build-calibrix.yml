@@ -173,6 +173,8 @@ jobs:
 
       - name: Build Windows Installer
         shell: pwsh
+        env:
+          APP_VERSION: ${{ needs.compute-tag-and-version.outputs.app_version }}
         run: |
           cd OperatorApp
           Write-Host "APP_VERSION=$env:APP_VERSION"
