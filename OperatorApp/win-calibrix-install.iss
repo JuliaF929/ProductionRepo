@@ -5,7 +5,7 @@
 [Setup]
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
-DefaultDirName={autopf}\{#MyAppName}
+DefaultDirName=C:\{#MyAppName}
 DefaultGroupName={#MyAppName}
 OutputBaseFilename=CalibrixOperatorWin_{#MyAppVersion}
 Compression=lzma

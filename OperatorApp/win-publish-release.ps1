@@ -1,45 +1,34 @@
-Write-Host "[1/8] Read major/minor from version.json..."
-
-$versionPath = Join-Path $PSScriptRoot "..\version.json"
-
-if (-not (Test-Path $versionPath)) {
-    Write-Error "version.json not found at $versionPath"
-    exit 1
-}
-
-$version = Get-Content -Raw $versionPath | ConvertFrom-Json
-
-$Major = $version.major
-$Minor = $version.minor
-
-Write-Host "Major version: $Major"
-Write-Host "Minor version: $Minor"
-
-
-Write-Host "[2/8] Decide DEV vs CI..."
+Write-Host "[1/6] Decide DEV vs CI and compose version numbers (Windows requires numeric-only 4 placeholders version number)..."
 
 if ($env:GITHUB_ACTIONS -eq "true") {
     Write-Host "CI build detected"
+    $Version = $env:APP_VERSION
+}
+else {
+    Write-Host "Local DEV build will have ver#: major.minor.0.0"
 
-    if (-not $env:PATCH) {
-        Write-Error "PATCH not set in CI"
+    # Read from version.json and append 0.0 
+    $versionPath = Join-Path $PSScriptRoot "..\version.json"
+
+    if (-not (Test-Path $versionPath)) {
+        Write-Error "version.json not found at $versionPath"
         exit 1
     }
 
-    $Patch = $env:PATCH
-    Write-Host "Using PATCH from CI: $Patch"
-}
-else {
-    Write-Host "Local DEV build detected will be performed with 0 patch"
-    $Patch = "0"
+    $version = Get-Content -Raw $versionPath | ConvertFrom-Json
+
+    $Major = $version.major
+    $Minor = $version.minor
+
+    Write-Host "Major version: $Major"
+    Write-Host "Minor version: $Minor"
+
+    $Version = "$Major.$Minor.0.0"
 }
 
-Write-Host "[3/8] Compose version numbers (Windows requires numeric-only 4 placeholders version number)..."
-
-$Version = "$Major.$Minor.$Patch.0"
 Write-Host "Version: $Version"
 
-Write-Host "[4/8] Building Angular ..."
+Write-Host "[2/6] Building Angular ..."
 
 Push-Location Frontend
 
@@ -63,7 +52,7 @@ if ($LASTEXITCODE -ne 0) {
 
 Pop-Location
 
-Write-Host "[5/8] Copying Angular build to Backend\wwwroot..."
+Write-Host "[3/6] Copying Angular build to Backend\wwwroot..."
 
 $wwwrootPath = Join-Path $PSScriptRoot "Backend\wwwroot"
 $sourcePath  = Join-Path $PSScriptRoot "Frontend\dist\frontend\browser"
@@ -89,7 +78,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 
-Write-Host "[6/8] Publishing Backend (Release)..."
+Write-Host "[4/6] Publishing Backend (Release)..."
 
 dotnet publish Backend/Backend.csproj `
     -c Release `
@@ -105,7 +94,7 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
-Write-Host "[7/8] Publishing CalibrixOperatorWin (Release)..."
+Write-Host "[5/6] Publishing CalibrixOperatorWin (Release)..."
 
 dotnet publish DesktopHost/DesktopHost.csproj `
     -c Release `
@@ -124,7 +113,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 
-Write-Host "[8/8] Moving Backend into Publish\Backend..."
+Write-Host "[6/6] Moving Backend into Publish\Backend..."
 
 $sourcePath      = Join-Path $PSScriptRoot "TempPublish\Backend"
 $destinationPath = Join-Path $PSScriptRoot "Publish\Backend"
