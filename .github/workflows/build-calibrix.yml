@@ -142,13 +142,6 @@ jobs:
             name: process-eng-app-build
             path: process-eng-app-build.zip
 
-        #Attach to GitHub Release when this run was triggered by a tag
-        - name: Attach zip to GitHub Release
-          uses: softprops/action-gh-release@v1
-          if: startsWith(github.ref, 'refs/tags/')
-          with:
-            files: process-eng-app-build.zip
-
     build-operator-app:
       needs: compute-tag-and-version
       runs-on: windows-latest
@@ -183,8 +176,9 @@ jobs:
       - name: Upload OperatorApp installer
         uses: actions/upload-artifact@v4
         with:
-          files: OperatorApp/Output/CalibrixOperatorWin*.exe
-
+          name: CalibrixOperatorWin
+          path: OperatorApp/Output/CalibrixOperatorWin*.exe
+          
     create-and-push-tag:
       needs: 
         - compute-tag-and-version
