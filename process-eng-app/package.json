@@ -1,6 +1,6 @@
 {
   "name": "calibrix-web-frontend",
-  "version": "1.0.0",
+  "version": "NA",
   "private": true,
   "proxy": "http://localhost:5000",
   "dependencies": {

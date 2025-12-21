@@ -90,6 +90,10 @@ dotnet publish Backend/Backend.csproj `
     -c Release `
     -r win-x64 `
     --self-contained `
+    -p:Version=$Version `
+    -p:AssemblyVersion=$Version `
+    -p:FileVersion=$Version `
+    -p:PackageVersion=$Version `
     -o TempPublish\Backend
 
 if ($LASTEXITCODE -ne 0) {

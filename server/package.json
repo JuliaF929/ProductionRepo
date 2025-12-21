@@ -1,6 +1,6 @@
 {
   "name": "calibrix-server",
-  "version": "1.0.0",   
+  "version": "NA",   
   "description": "A production calibration helper application.",
   "main": "index.js",
   "scripts": {

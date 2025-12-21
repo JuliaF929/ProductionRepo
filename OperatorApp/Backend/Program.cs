@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Microsoft.Extensions.Options;
+using System.Reflection;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,7 +55,12 @@ else
     Log.Error($"No command line arguments passed to the Backend of OperatorApp. Exiting...");
     return;
 }
-string version = "1.1.1.1";
+
+string version =
+                Assembly.GetExecutingAssembly()
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+                .InformationalVersion
+                ?? "unknown";
 Log.Information($"----------- Started Backend of OperatorApp --- ver. {version} ---------------");
 Log.Information($"1. Server IP is {serverIP}, Server Port is {serverPort}");
 
