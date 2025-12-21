@@ -36,11 +36,20 @@ begin
       'Configure Calibrix server connection'
     );
 
+  { Label }
+  with TLabel.Create(ServerPage) do
+  begin
+    Parent := ServerPage.Surface;
+    Caption := 'Server IP address:';
+    Left := ScaleX(15);
+    Top := ScaleY(15);
+  end;
+
   { Server IP }
   ServerIPEdit := TEdit.Create(ServerPage);
   ServerIPEdit.Parent := ServerPage.Surface;
-  ServerIPEdit.Left := 0;
-  ServerIPEdit.Top := 0;
+  ServerIPEdit.Left := ScaleX(15);
+  ServerIPEdit.Top := ScaleY(30);
   ServerIPEdit.Width := ServerPage.SurfaceWidth;
   ServerIPEdit.Text := '127.0.0.1';
 
@@ -48,27 +57,18 @@ begin
   with TLabel.Create(ServerPage) do
   begin
     Parent := ServerPage.Surface;
-    Caption := 'Server IP address:';
-    Left := 0;
-    Top := ServerIPEdit.Top - ScaleY(15);
+    Caption := 'Server port:';
+    Left := ScaleX(15);
+    Top := ScaleY(60);
   end;
 
   { Server Port }
   ServerPortEdit := TEdit.Create(ServerPage);
   ServerPortEdit.Parent := ServerPage.Surface;
-  ServerPortEdit.Left := 0;
-  ServerPortEdit.Top := ServerIPEdit.Top + ScaleY(45);
+  ServerPortEdit.Left := ScaleX(15);
+  ServerPortEdit.Top := ScaleY(75);
   ServerPortEdit.Width := ServerPage.SurfaceWidth;
   ServerPortEdit.Text := '5000';
-
-  { Label }
-  with TLabel.Create(ServerPage) do
-  begin
-    Parent := ServerPage.Surface;
-    Caption := 'Server port:';
-    Left := 0;
-    Top := ServerPortEdit.Top - ScaleY(15);
-  end;
 end;
 
 function GetServerIP(Param: string): string;
