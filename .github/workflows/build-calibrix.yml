@@ -142,7 +142,7 @@ jobs:
             name: process-eng-app-build
             path: process-eng-app-build.zip
 
-    build-operator-app:
+    build-win-operator-app:
       needs: compute-tag-and-version
       runs-on: windows-latest
 
@@ -178,13 +178,13 @@ jobs:
         with:
           name: CalibrixOperatorWin
           path: OperatorApp/Output/CalibrixOperatorWin*.exe
-          
+
     create-and-push-tag:
       needs: 
         - compute-tag-and-version
         - build-server
         - build-process-eng-app
-        - build-operator-app
+        - build-win-operator-app
       runs-on: ubuntu-latest
       permissions:
         contents: write
@@ -205,3 +205,27 @@ jobs:
 
           git tag "v$TAG_VERSION"
           git push origin "v$TAG_VERSION"
+
+    upload-artifacts:
+      needs: 
+        - build-process-eng-app
+        - build-win-operator-app
+        - create-and-push-tag
+      runs-on: ubuntu-latest
+      permissions:
+        contents: write
+  
+      steps:
+      
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: CalibrixOperatorWin
+          path: OperatorApp/Output
+
+      - name: Upload OperatorApp installer to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.compute-tag-and-version.outputs.tag_version }}
+          files: OperatorApp/Output/CalibrixOperatorWin*.exe
