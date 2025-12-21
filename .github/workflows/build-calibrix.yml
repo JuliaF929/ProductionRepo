@@ -208,6 +208,7 @@ jobs:
 
     upload-artifacts:
       needs: 
+        - compute-tag-and-version
         - build-process-eng-app
         - build-win-operator-app
         - create-and-push-tag
