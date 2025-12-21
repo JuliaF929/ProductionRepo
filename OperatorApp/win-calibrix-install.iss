@@ -18,10 +18,7 @@ SolidCompression=yes
 Source: "Publish\*"; DestDir: "{app}"; Flags: recursesubdirs
 
 [Icons]
-Name: "{commondesktop}\{#MyAppName}";
-Filename: "{app}\{#MyAppExeName}";
-Parameters: "{code:GetServerIP} {code:GetServerPort}";
-WorkingDir: "{app}"
+Name: "{commondesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Parameters: "{code:GetServerIP} {code:GetServerPort}"; WorkingDir: "{app}"
 
 [Code]
 
