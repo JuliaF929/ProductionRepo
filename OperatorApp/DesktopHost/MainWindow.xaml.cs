@@ -12,6 +12,8 @@ using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using System.Reflection;
 using System;
+using Microsoft.Web.WebView2.Core;
+using System.Text.Json;
 
 namespace DesktopHost;
 
@@ -103,9 +105,36 @@ public partial class MainWindow : Window
         // Give backend a second to start up
         Thread.Sleep(2000);
 
-        // Load Angular UI from Backend
-        webView.Source = new Uri(backendUrl);
+        // Initialize WebView2 and register message handler
+        Loaded += async (_, __) =>
+        {
+            await webView.EnsureCoreWebView2Async();
+
+            webView.CoreWebView2.WebMessageReceived += WebMessageReceived;
+
+            // Load Angular UI from Backend
+            webView.Source = new Uri(backendUrl);
+        };
     }
+
+    private void WebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
+    {
+        try
+        {
+            var msg = JsonSerializer.Deserialize<HostMessage>(e.WebMessageAsJson);
+
+            if (msg?.Type == "EXIT_APP")
+            {
+                Application.Current.Shutdown();
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Invalid WebView message: {ex}");
+        }
+    }
+
+    private record HostMessage(string Type);
 
     protected override void OnClosed(EventArgs e)
     {

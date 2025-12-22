@@ -25,6 +25,9 @@ export class ItemListComponent implements OnInit, OnChanges {
   public itemCount = 0;
   public itemTypeCount = 0;
 
+  showMessageBox = false;
+  messageBoxText = '';
+
   selectedRow: any = null;
 
   filters = {
@@ -35,6 +38,13 @@ export class ItemListComponent implements OnInit, OnChanges {
   constructor(private itemService: ItemService, private cdr: ChangeDetectorRef) 
   {
     console.log('ItemListComponent constructor called!');
+  }
+
+  closeMessageBox() {
+    console.log('Closing message box and application.');
+    console.log("chrome.webview exists?", !!(window as any).chrome?.webview);
+    // Close the app if versions are not valid
+    (window as any).chrome?.webview?.postMessage({Type: 'EXIT_APP'});
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -78,7 +88,23 @@ export class ItemListComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
+    this.validateSystemVersions();
     this.loadItems();
+  }
+
+  validateSystemVersions() {
+    this.itemService.validateSystemVersions().subscribe({
+      next: (response: any) => {
+        console.log('System versions valid.');
+      },
+      error: (error: HttpErrorResponse) => {
+        let msg = `System versions validation failed:\n ${error.error}`;
+
+        console.error(msg);
+        this.messageBoxText = msg;
+        this.showMessageBox = true;
+      }
+    });
   }
 
   loadItems() {

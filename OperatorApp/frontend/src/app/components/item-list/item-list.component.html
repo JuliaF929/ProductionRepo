@@ -31,4 +31,16 @@
     </table>
   </div>
   </div>
+
+  <div class="message-box-overlay" *ngIf="showMessageBox">
+    <div class="message-box">
+      <div class="message-box-content">
+        <p>{{ messageBoxText }}</p>
+      </div>
+  
+      <div class="message-box-actions">
+        <button (click)="closeMessageBox()">Exit...</button>
+      </div>
+    </div>
+  </div>
 </main>

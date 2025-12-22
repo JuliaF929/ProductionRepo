@@ -18,6 +18,7 @@ export class ItemService {
   private apiItemTypesUrl = '/api/itemtype';
   private apiItemActionsUrl = '/api/itemactions';
   private apiActionUrl = '/api/action';
+  private apiGeneralUrl = '/api/general';
 
   constructor(private http: HttpClient) {}
 
@@ -75,6 +76,10 @@ export class ItemService {
     console.log("With params:", params.toString());
 
     return this.http.get<BE2FE_ReportResponse>(this.apiActionUrl + "/report", { params });
+  }
+
+  validateSystemVersions(): Observable<void> {
+    return this.http.get<void>(this.apiGeneralUrl + "/version");
   }
 
 }
