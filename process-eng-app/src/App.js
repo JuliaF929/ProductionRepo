@@ -36,7 +36,7 @@ function App() {
       })
       .catch(err => {
         console.error("Version check failed:", err);
-        alert("Cannot reach backend /api/version");
+        alert("Cannot reach server /api/version");
       });
   }, [processEngAppVersion]);
 

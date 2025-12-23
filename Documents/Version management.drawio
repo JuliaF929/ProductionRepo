@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" version="29.2.3">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36" version="29.2.4">
   <diagram name="Page-1" id="GLbVwuvdVR-bFlrkucZr">
-    <mxGraphModel dx="983" dy="536" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1426" dy="777" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -63,6 +63,24 @@
         </mxCell>
         <mxCell id="4t-aDHyvLRFrtTtwTQRl-19" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=default;fillColor=#DFFDFF;align=center;verticalAlign=middle;rounded=0;" value="&lt;b&gt;3.&lt;/b&gt;" vertex="1">
           <mxGeometry height="30" width="60" x="480" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="21Mqw_ujIjirfMz7D8up-1" parent="1" style="shape=or;whiteSpace=wrap;html=1;fillColor=#FFFFEB;" value="Manual" vertex="1">
+          <mxGeometry height="80" width="60" x="570" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="21Mqw_ujIjirfMz7D8up-3" parent="1" style="shape=dataStorage;whiteSpace=wrap;html=1;fixedSize=1;" value="&lt;span style=&quot;color: rgb(0, 0, 255); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11px; white-space: pre; background-color: rgb(255, 255, 255);&quot;&gt;Update &lt;/span&gt;&lt;br style=&quot;color: rgb(0, 0, 255); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11px; white-space: pre; background-color: rgb(255, 255, 255);&quot;&gt;&lt;span style=&quot;color: rgb(0, 0, 255); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11px; white-space: pre; background-color: rgb(255, 255, 255);&quot;&gt;CALIBRIX_SERVER_VERSION&lt;/span&gt;&lt;br style=&quot;color: rgb(0, 0, 255); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11px; white-space: pre; background-color: rgb(255, 255, 255);&quot;&gt;&lt;span style=&quot;color: rgb(0, 0, 255); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11px; white-space: pre; background-color: rgb(255, 255, 255);&quot;&gt;at &lt;/span&gt;&lt;br style=&quot;color: rgb(0, 0, 255); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11px; white-space: pre; background-color: rgb(255, 255, 255);&quot;&gt;&lt;span style=&quot;color: rgb(0, 0, 255); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-size: 11px; white-space: pre; background-color: rgb(255, 255, 255);&quot;&gt;server/.env&lt;/span&gt;" vertex="1">
+          <mxGeometry height="80" width="180" x="650" y="275" as="geometry" />
+        </mxCell>
+        <mxCell id="21Mqw_ujIjirfMz7D8up-4" edge="1" parent="1" source="21Mqw_ujIjirfMz7D8up-1" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="21Mqw_ujIjirfMz7D8up-3" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="400" y="430" as="sourcePoint" />
+            <mxPoint x="450" y="380" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="21Mqw_ujIjirfMz7D8up-5" edge="1" parent="1" source="4t-aDHyvLRFrtTtwTQRl-12" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="21Mqw_ujIjirfMz7D8up-1" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="400" y="430" as="sourcePoint" />
+            <mxPoint x="450" y="380" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>

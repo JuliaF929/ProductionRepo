@@ -5,6 +5,9 @@ const logger = require('../../logger');
 const s3 = new S3Client({ region: "us-east-2" });
 const bucketName = "production-julia-s3";
 
+const operatorAppName = "CalibrixOperatorWin_";
+const operatorAppExtension = ".exe";
+
 //TODO: the company name folder should be dynamic, not hardcoded
 
 /*
@@ -133,8 +136,42 @@ async function uploadReport(itemType, itemSerialNumber, actionName, actionVersio
   }
 }
 
+
+function getOperatorAppWinFileName(versionNumber) {
+  if (!versionNumber) {
+    throw new Error("Invalid version number to generate OperatorApp win installer file name.");
+  }
+  
+  const versionNumberNormalized = normalizePart(versionNumber);
+  return `${operatorAppName}${versionNumberNormalized}${operatorAppExtension}`;
+}
+
+function getOperatorAppWinS3Key(versionNumber) {
+  const fileName = getOperatorAppWinFileName(versionNumber);
+  return `operatorapps/windows/${fileName}`;
+}
+
+async function getOperatorAppWinDownloadSetup(versionNumber) {
+  
+  const fileName = getOperatorAppWinFileName(versionNumber);
+  let awsFilePathAndName = getOperatorAppWinS3Key(versionNumber); 
+
+  // Generate a presigned URL for the S3 object
+  const command = new GetObjectCommand({ Bucket: bucketName, Key: awsFilePathAndName, ResponseContentDisposition: `attachment; filename="${fileName}"`, });
+  // Link valid for 5 minutes
+  const url = await getSignedUrl(s3, command, { expiresIn: 300 });
+
+  logger.debug(`Generated presigned URL for OperatorApp download: ${url}, fileName: ${fileName}`);
+
+  return {
+    url,
+    fileName
+  };
+}
+
 module.exports = { getTestApplicationDownloadSetup, 
                    getTestApplicationUploadSetup, 
                    uploadReport, 
                    getReportDownloadSetup,
-                   getReportFileName };
+                   getReportFileName,
+                   getOperatorAppWinDownloadSetup };
