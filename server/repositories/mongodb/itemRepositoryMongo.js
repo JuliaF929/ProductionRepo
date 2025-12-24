@@ -18,8 +18,16 @@ module.exports = {
 
     getAllNarrowItems: async () => 
     {
-        // Exclude parameters array by setting them to 0
-        return await Item.find({}, { parameters: 0 });
+        try
+        {
+            // Exclude parameters array by setting them to 0
+            return await Item.find({}, { parameters: 0 });
+        } 
+        catch (error) 
+        {
+            logger.error(`Error retrieving narrow items: ${error.message}`);
+            throw error;
+        }
     },
     
     getActionsPassedForItem: async () => {},

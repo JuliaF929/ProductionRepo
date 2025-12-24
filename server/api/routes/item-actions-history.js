@@ -8,8 +8,40 @@ const itemActionService = require('../services/itemActionService');
 
 const ItemAction = require('../models/item-actions');
 
+const itemActionsHistoryRepository = require('../../repositories/mongodb/itemActionHistoryRepositoryMongo');
 
 const { v4: uuidv4 } = require('uuid');
+
+router.get('/', async (req, res, next) => {
+    logger.debug(`Start getting all runs (narrow, without parameters)`);
+    try 
+    {
+        const docs = await itemActionsHistoryRepository.getAllNarrowRuns();
+        res.status(HTTP_STATUS.OK).json(docs);
+    } 
+    catch (err) 
+    {
+        logger.error(`Exception during getting all runs: ${err}`);
+        res.status(HTTP_STATUS.BAD_REQUEST).json({ error: err.message });
+    }
+});
+
+router.get('/:itemSN/:actionName/:endExecutionDateTimeUTC', async (req, res, next) => {
+
+    logger.debug(`Start getting all parameters for action run for itemSN: ${req.params.itemSN}, actionName: ${req.params.actionName}, endExecutionDateTimeUTC: ${req.params.endExecutionDateTimeUTC}`); 
+
+    try 
+    {
+        const docs = await itemActionsHistoryRepository.getParametersForRun(req.params.itemSN, req.params.actionName, req.params.endExecutionDateTimeUTC);  
+        logger.debug(`Got parameters for run of itemSN ${req.params.itemSN}, actionName: ${req.params.actionName}, endExecutionDateTimeUTC: ${req.params.endExecutionDateTimeUTC} - ${JSON.stringify(docs, null, 2)}`);
+        res.status(HTTP_STATUS.OK).json(docs);
+    } 
+    catch (err) 
+    {
+        logger.error(`Exception during getting parameters for run for itemSN ${req.params.itemSN}, actionName: ${req.params.actionName}, endExecutionDateTimeUTC: ${req.params.endExecutionDateTimeUTC}: ${err}`);
+        res.status(HTTP_STATUS.BAD_REQUEST).json({ error: err.message });
+    }
+});
 
 router.post('/', async (req, res, next) => {
         

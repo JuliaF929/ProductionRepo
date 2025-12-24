@@ -12,6 +12,8 @@ using System.IO.Compression;
 using Backend.DTOs;
 using System.Text;
 using System.Globalization;
+using System.Reflection;
+using System;
 
 
 namespace Backend.Controllers;
@@ -44,6 +46,7 @@ public class ActionController : ControllerBase
 
     private string _pathForReport = string.Empty;
     private string _basePath = string.Empty;
+    private string _calibrixVersion = string.Empty;
     
     public ActionController(ILogger<ActionController> logger, IOptions<AppConfig> config, IHttpClientFactory factory)
     {
@@ -57,6 +60,12 @@ public class ActionController : ControllerBase
         //ensure folder exists
         if (!Directory.Exists(_pathForReport))
             Directory.CreateDirectory(_pathForReport);
+
+        _calibrixVersion =
+                Assembly.GetExecutingAssembly()
+                .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+                .InformationalVersion
+                ?? "unknown";
     }
 
     private Dictionary<string, string> GetOutputJsonData(string targetPath)
@@ -151,8 +160,8 @@ public class ActionController : ControllerBase
         Dictionary<string, string> reportMetaData = new Dictionary<string, string>();
         reportMetaData.Add("Item Serial Number", itemSN);
         reportMetaData.Add("Item Type", itemType);
-        reportMetaData.Add(actionName + " Version#:", actionVersionNumber);
-        reportMetaData.Add("JuliaSW " + "Version#:", "6.6.6.6"); //TODO: set the ver# of this application
+        reportMetaData.Add(actionName + " Version#", actionVersionNumber);
+        reportMetaData.Add("Calibrix " + "Version#", $"{calibrixVersion}");
         reportMetaData.Add("Site", "Rio de Janeiro;-)"); //TODO: fill real site name
         reportMetaData.Add("Operator Name", "Julia"); //TODO: fill real operator name
         reportMetaData.Add("Report Creation Date and Time Local", endExecutionDateTimeUTC.ToLocalTime().ToString("MMM dd, yyyy, h:mm tt", CultureInfo.InvariantCulture));
@@ -410,7 +419,7 @@ public class ActionController : ControllerBase
                 itemType = itemType,
                 actionName = actionName,
                 actionSWVersion = actionVersion,
-                calibrixOperatorAppSWVersion = "1111",//TODo: set real ver#
+                calibrixOperatorAppSWVersion = _calibrixVersion,
                 startExecutionDateTimeUTC = startExecutionDateTimeUTC,
                 endExecutionDateTimeUTC = endExecutionDateTimeUTC,
                 result = resultEntry.Value,

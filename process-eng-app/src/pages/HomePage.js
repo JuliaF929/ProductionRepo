@@ -6,6 +6,10 @@ import ItemTypesPage from './ItemTypesPage';
 import ItemTypePage from './ItemTypePage';
 import TestApplicationsPage from './TestApplicationsPage';
 import TestApplicationPage from './TestApplicationPage';
+import ItemsDashboardPage from './ItemsDashboardPage';
+import ItemDetailsPage from './ItemDetailsPage';
+import RunsDashboardPage from './RunsDashboardPage';
+import RunDetailsPage from './RunDetailsPage';
 import AboutPage from './AboutPage';
 
 function HomePage({ selectedMenu, setSelectedMenu }) {
@@ -13,6 +17,8 @@ function HomePage({ selectedMenu, setSelectedMenu }) {
   const [rightPanelContent, setRightPanelContent] = useState(null);
   const [selectedTestApp, setSelectedTestApp] = useState(null); 
   const [selectedItemType, setSelectedItemType] = useState(null); 
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedRun, setSelectedRun] = useState(null);
     let content;
 
   // Whenever selectedMenu changed (clear the right panel)
@@ -35,8 +41,14 @@ function HomePage({ selectedMenu, setSelectedMenu }) {
                                                       onSelectTestApp={(testApp) => { setSelectedTestApp(testApp); setRightPanelContent(<TestApplicationPage key={Date.now()} action="view" testAppData={testApp}/>); }}
                                                       />;
                                                       
-  else if (selectedMenu === 'items-dashboard') content = <div style={{ padding: 20 }}><h2>Items Dashboard</h2><p>This is the items dashboard.</p></div>;
-  else if (selectedMenu === 'runs-dashboard') content = <div style={{ padding: 20 }}><h2>Runs dashboard</h2><p>This is the runs dashboard.</p></div>;
+  else if (selectedMenu === 'items-dashboard') content = 
+                                                      <ItemsDashboardPage 
+                                                      onSelectItem={(item) => { setRightPanelContent(null); setSelectedItem(item); if (item) setRightPanelContent(<ItemDetailsPage key={Date.now()} item={item}/>); }}
+                                                      />;
+  else if (selectedMenu === 'runs-dashboard') content = 
+                                                      <RunsDashboardPage 
+                                                      onSelectRun={(run) => { setRightPanelContent(null); setSelectedRun(run); if (run) setRightPanelContent(<RunDetailsPage key={Date.now()} run={run}/>); }}
+                                                      />;
   else if (selectedMenu === 'settings-page') content = <div style={{ padding: 20 }}><h2>Settings</h2><p>This is the Settings section.</p></div>;
   else if (selectedMenu === 'about-page') content = <AboutPage/>;
 
