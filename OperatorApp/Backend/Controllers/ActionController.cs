@@ -161,7 +161,7 @@ public class ActionController : ControllerBase
         reportMetaData.Add("Item Serial Number", itemSN);
         reportMetaData.Add("Item Type", itemType);
         reportMetaData.Add(actionName + " Version#", actionVersionNumber);
-        reportMetaData.Add("Calibrix " + "Version#", $"{calibrixVersion}");
+        reportMetaData.Add("Calibrix " + "Version#", $"{_calibrixVersion}");
         reportMetaData.Add("Site", "Rio de Janeiro;-)"); //TODO: fill real site name
         reportMetaData.Add("Operator Name", "Julia"); //TODO: fill real operator name
         reportMetaData.Add("Report Creation Date and Time Local", endExecutionDateTimeUTC.ToLocalTime().ToString("MMM dd, yyyy, h:mm tt", CultureInfo.InvariantCulture));
