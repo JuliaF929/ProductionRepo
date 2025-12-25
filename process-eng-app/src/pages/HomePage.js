@@ -31,14 +31,14 @@ function HomePage({ selectedMenu, setSelectedMenu }) {
   if (selectedMenu === 'item-types-page') content = 
                                                       <ItemTypesPage 
                                                       onCreateNewItemType={() => setRightPanelContent(<ItemTypePage key={Date.now()} action="create"/>)}
-                                                      onEditItemType={(itemType) => {setSelectedItemType(itemType); setRightPanelContent(<ItemTypePage key={Date.now()} action="view" itemTypeData={itemType}/>);}}//TODO julia: edit item type
-                                                      onSelectItemType={(itemType) => { setSelectedTestApp(itemType); setRightPanelContent(<ItemTypePage key={Date.now()} action="view" itemTypeData={itemType}/>); }}
+                                                      onEditItemType={(itemType) => {if (itemType) {setSelectedItemType(itemType); setRightPanelContent(<ItemTypePage key={Date.now()} action="view" itemTypeData={itemType}/>);}}}//TODO julia: edit item type
+                                                      onSelectItemType={(itemType) => { setRightPanelContent(null); if (itemType) {setSelectedTestApp(itemType); setRightPanelContent(<ItemTypePage key={Date.now()} action="view" itemTypeData={itemType}/>); }}}
                                                       />;
   else if (selectedMenu === 'test-applications-page') content = 
                                                       <TestApplicationsPage 
                                                       onCreateNewTestApplication={() => setRightPanelContent(<TestApplicationPage key={Date.now()} action="create"/>)}
-                                                      onEditTestApplication={(testApp) => {setSelectedTestApp(testApp); setRightPanelContent(<TestApplicationPage key={Date.now()} action="view" testAppData={testApp}/>);}} //TODO julia: edit test application
-                                                      onSelectTestApp={(testApp) => { setSelectedTestApp(testApp); setRightPanelContent(<TestApplicationPage key={Date.now()} action="view" testAppData={testApp}/>); }}
+                                                      onEditTestApplication={(testApp) => {if (testApp) { setSelectedTestApp(testApp); setRightPanelContent(<TestApplicationPage key={Date.now()} action="view" testAppData={testApp}/>);}}} //TODO julia: edit test application
+                                                      onSelectTestApp={(testApp) => {setRightPanelContent(null); if (testApp) { setSelectedTestApp(testApp); setRightPanelContent(<TestApplicationPage key={Date.now()} action="view" testAppData={testApp}/>); }}}
                                                       />;
                                                       
   else if (selectedMenu === 'items-dashboard') content = 

@@ -39,6 +39,16 @@ function TestApplicationsPage({onCreateNewTestApplication, onEditTestApplication
     (testApp.versionNumber?.toLowerCase() || '').includes(filterVersion.toLowerCase()) &&
     (testApp.ECONumber?.toLowerCase() || '').includes(filterECO.toLowerCase())
   );
+
+  const selectedTestApplicationIsVisible = selectedId
+  ? filteredTestApplications.some(testApplication => testApplication._id === selectedId)
+  : false;
+
+  if (selectedId && !selectedTestApplicationIsVisible) {
+    // selection disappeared due to filtering
+    setSelectedId(null);
+    onSelectTestApp(null); // tell HomePage to clear right panel
+  }
   
   return (
     <div className="container mt-4">

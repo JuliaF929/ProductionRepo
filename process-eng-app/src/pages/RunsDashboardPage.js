@@ -51,6 +51,16 @@ function RunsDashboardPage({onSelectRun}) {
     (run.actionName?.toLowerCase() || '').includes(filteractionName.toLowerCase()) &&
     (run.result?.toLowerCase() || '').includes(filterresult.toLowerCase()) 
    );
+
+   const selectedRunIsVisible = selectedId
+   ? filteredRuns.some(run => run._id === selectedId)
+   : false;
+ 
+   if (selectedId && !selectedRunIsVisible) {
+     // selection disappeared due to filtering
+     setSelectedId(null);
+     onSelectRun(null); // tell HomePage to clear right panel
+   }
   
   return (
     <div className="container mt-4">

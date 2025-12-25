@@ -41,6 +41,16 @@ function ItemTypesPage({onCreateNewItemType, onEditItemType, onSelectItemType}) 
     (item.name?.toLowerCase() || '').includes(filterName.toLowerCase()) &&
     (item.description?.toLowerCase() || '').includes(filterDescription.toLowerCase())
   );
+
+  const selectedItemTypeIsVisible = selectedId
+  ? filteredItemTypes.some(itemType => itemType._id === selectedId)
+  : false;
+
+  if (selectedId && !selectedItemTypeIsVisible) {
+    // selection disappeared due to filtering
+    setSelectedId(null);
+    onSelectItemType(null); // tell HomePage to clear right panel
+  }
   
   return (
     <div className="container mt-4">

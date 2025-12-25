@@ -45,6 +45,16 @@ function ItemsDashboardPage({onSelectItem}) {
     (item.creationdate?.toLowerCase() || '').includes(filterCreationDate.toLowerCase()) &&
     (item.releasedate?.toLowerCase() || '').includes(filterReleaseDate.toLowerCase())
   );
+
+  const selectedItemIsVisible = selectedId
+  ? filteredItems.some(item => item._id === selectedId)
+  : false;
+
+  if (selectedId && !selectedItemIsVisible) {
+    // selection disappeared due to filtering
+    setSelectedId(null);
+    onSelectItem(null); // tell HomePage to clear right panel
+  }
   
   return (
     <div className="container mt-4">
