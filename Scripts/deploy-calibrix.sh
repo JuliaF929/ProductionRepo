@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #usage:
-#bash deploy-calibrix.sh CalibrixEC2 1.0.22 ProductionServer
+#bash deploy-calibrix.sh CalibrixEC2 1.0.22.0 ProductionServer
 
 # -----------------------------
 # PARAMETERS
