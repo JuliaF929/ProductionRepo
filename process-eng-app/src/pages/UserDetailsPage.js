@@ -3,12 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import TextComponent from '../components/TextComponent';
 import constants from '../constants';
 import validator from "validator";
+import MultiSelectChips from '../components/MultiSelectChips'
 
 
 function UserDetailsPage({action, userData, availableRoles}) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [roles, setRoles] = useState('');
+  const [roles, setRoles] = useState([]);
   const [status, setStatus] = useState('');
   const [invitedBy, setInvitedBy] = useState('');
   const addTriggered = useRef(false);
@@ -20,7 +21,7 @@ function UserDetailsPage({action, userData, availableRoles}) {
       if (userData) {
         setName(userData.name || '');
         setEmail(userData.email || '');
-        setRoles(userData.roles || '');
+        setRoles(Array.isArray(userData.roles) ? userData.roles : []);
         setStatus(userData.status || '');
         setInvitedBy(userData.invitedBy || '');
       }
@@ -29,12 +30,12 @@ function UserDetailsPage({action, userData, availableRoles}) {
   const clearFields = () => {
     setName('');
     setEmail('');
-    setRoles('');
+    setRoles([]);
     setStatus('');
     setInvitedBy('');
   };
 
-    const validateUserData = (name, email, roles) => {
+    const validateUserData = (name, email) => {
 
       //validations before pushing to the server
       if (!name) {
@@ -113,7 +114,7 @@ function UserDetailsPage({action, userData, availableRoles}) {
     document.body.style.cursor = "wait";
 
     console.log(`before handleInviteUserOnServer, new user name: ${name}, email: ${email}.`);  
-    const { isValid, message } = validateUserData(name, email, roles);
+    const { isValid, message } = validateUserData(name, email);
     if (isValid == false) {
         alert(message);
         console.log(message);
@@ -121,7 +122,7 @@ function UserDetailsPage({action, userData, availableRoles}) {
         return;
     }
 
-    await handleInviteUserOnServer(name, email, roles, "sysAdmin" /*TODO: change to the active user*/);
+    await handleInviteUserOnServer(name, email, roles, "sysAdminName" /*TODO: change to the active user*/);
 
     addTriggered.current = false;
 
@@ -153,9 +154,15 @@ function UserDetailsPage({action, userData, availableRoles}) {
     <TextComponent text={email} onChange={setEmail} label={'Email'} isDisabled={action === 'view'}/>
   </div>
 
-  <div className="mb-4">
-    <TextComponent text={roles} onChange={setRoles} label={'Roles'} isDisabled={action === 'view'}/>
-  </div>
+  <label className="form-label">Roles</label>
+      <MultiSelectChips
+        options={["Operator", "Process Engineer", "Manager", "Auditor", "Admin"]}
+        value={roles}
+        onChange={setRoles}
+        placeholder="Select roles..."
+        isDisabled={action === 'view'}
+        searchable={false}   // ✅ no typing, only dropdown selection
+      />
 
   {/* show status and invitedBy only for view or edit, but always disabled*/}
   {action !== "invite" && (

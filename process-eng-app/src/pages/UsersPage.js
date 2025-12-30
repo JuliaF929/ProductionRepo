@@ -162,7 +162,9 @@ function UsersPage({onInviteNewUser, onEditUser, onSelectUser}) {
               >
                 <td>{user.name}</td>
                 <td>{user.email}</td>
-                <td>{user.roles}</td>
+                <td style={{ whiteSpace: "pre-line" }}>
+                  {Array.isArray(user.roles) ? user.roles.join("\n") : (user.roles || "")}
+                </td>                
                 <td>{user.status}</td>
                 <td>{user.invitedBy}</td>
                 <td>

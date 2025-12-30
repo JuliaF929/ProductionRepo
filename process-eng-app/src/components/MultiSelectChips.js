@@ -16,6 +16,7 @@ export default function MultiSelectChips({
   onChange,
   placeholder = "Select...",
   disabled = false,
+  searchable = true,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -29,10 +30,11 @@ export default function MultiSelectChips({
 
   function addItem(item) {
     if (disabled) return;
+    if (!(options || []).includes(item)) return; // ✅ only allow from list
     if (!value.includes(item)) onChange([...value, item]);
     setQuery("");
     setIsOpen(true);
-    if (inputRef.current) inputRef.current.focus();
+    inputRef.current?.focus();
   }
 
   function removeItem(item) {
@@ -43,21 +45,15 @@ export default function MultiSelectChips({
 
   function handleKeyDown(e) {
     if (disabled) return;
-
+  
     if (e.key === "Backspace" && query === "" && value.length > 0) {
       removeItem(value[value.length - 1]);
     }
-
+  
     if (e.key === "Enter") {
-      e.preventDefault();
-      const q = query.trim().toLowerCase();
-      if (!q) return;
-
-      const exact = filtered.find((o) => o.toLowerCase() === q);
-      if (exact) addItem(exact);
-      else if (filtered.length === 1) addItem(filtered[0]);
+      e.preventDefault(); // ✅ do nothing (no free strings)
     }
-
+  
     if (e.key === "Escape") setIsOpen(false);
   }
 
@@ -104,20 +100,39 @@ export default function MultiSelectChips({
           </span>
         ))}
 
-        <input
-          ref={inputRef}
-          className="border-0 flex-grow-1"
-          style={{ outline: "none", minWidth: 140, background: "transparent" }}
-          value={query}
-          placeholder={value.length === 0 ? placeholder : ""}
-          disabled={disabled}
-          onFocus={() => !disabled && setIsOpen(true)}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setIsOpen(true);
-          }}
-          onKeyDown={handleKeyDown}
-        />
+<input
+  ref={inputRef}
+  className="border-0 flex-grow-1"
+  style={{ outline: "none", minWidth: 140, background: "transparent" }}
+  value={searchable ? query : ""}          // ✅ don't show typed text
+  placeholder={value.length === 0 ? placeholder : ""}
+  disabled={disabled}
+  readOnly={!searchable}                   // ✅ block typing
+  spellCheck={false}                       // ✅ removes red underline
+  onFocus={() => !disabled && setIsOpen(true)}
+  onChange={
+    searchable
+      ? (e) => {
+          setQuery(e.target.value);
+          setIsOpen(true);
+        }
+      : undefined
+  }
+  onKeyDown={(e) => {
+    if (!searchable) {
+      // still allow backspace to remove last chip if you want
+      if (e.key === "Backspace" && value.length > 0) {
+        e.preventDefault();
+        removeItem(value[value.length - 1]);
+      } else {
+        e.preventDefault();
+      }
+      return;
+    }
+    handleKeyDown(e);
+  }}
+/>
+
       </div>
 
       {!disabled && isOpen && (
