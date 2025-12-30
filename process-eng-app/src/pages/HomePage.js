@@ -11,6 +11,8 @@ import ItemDetailsPage from './ItemDetailsPage';
 import RunsDashboardPage from './RunsDashboardPage';
 import RunDetailsPage from './RunDetailsPage';
 import AboutPage from './AboutPage';
+import UsersPage from './UsersPage';
+import UserDetailsPage from './UserDetailsPage';
 
 function HomePage({ selectedMenu, setSelectedMenu }) {
   //const [leftPanelSelected, setLeftPanelSelected] = useState(null);
@@ -19,6 +21,7 @@ function HomePage({ selectedMenu, setSelectedMenu }) {
   const [selectedItemType, setSelectedItemType] = useState(null); 
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedRun, setSelectedRun] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
     let content;
 
   // Whenever selectedMenu changed (clear the right panel)
@@ -51,6 +54,12 @@ function HomePage({ selectedMenu, setSelectedMenu }) {
                                                       />;
   else if (selectedMenu === 'settings-page') content = <div style={{ padding: 20 }}><h2>Settings</h2><p>This is the Settings section.</p></div>;
   else if (selectedMenu === 'about-page') content = <AboutPage/>;
+  else if (selectedMenu === 'users') content = 
+                                                     <UsersPage 
+                                                      onInviteNewUser={() => setRightPanelContent(<UserDetailsPage key={Date.now()} action="invite"/>)}
+                                                      onEditUser={(user) => {if (user) { setSelectedUser(user); setRightPanelContent(<UserDetailsPage key={Date.now()} action="view" userData={user}/>);}}} //TODO julia: edit user
+                                                      onSelectUser={(user) => {setRightPanelContent(null); if (user) { setSelectedUser(user); setRightPanelContent(<UserDetailsPage key={Date.now()} action="view" userData={user}/>); }}}
+                                                      />;
 
   return (
     <div className="container-fluid" style={{ display: 'flex', height: '100vh' }}>

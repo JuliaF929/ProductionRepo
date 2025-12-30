@@ -7,7 +7,8 @@ const menuItems = [
   { label: 'Items Dashboard', key: 'items-dashboard'},
   { label: 'Runs Dashboard', key: 'runs-dashboard'},
   { label: 'Settings', key: 'settings-page' },
-  { label: 'About', key: 'about-page' }
+  { label: 'About', key: 'about-page' },
+  { label: 'Users', key: 'users' }
 ];
 
 function VerticalMenu({ selected, onSelect }) {

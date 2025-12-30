@@ -11,6 +11,8 @@ const HTTP_STATUS = {
   const STRING_CONSTANTS = {
     STAMSTRING_1: "This is a dummy string 1",
     STAMSTRING_2: "This is a dummy string 2",
+    UNKNOWN_ROLE: "unknown-role",
+    USER_STATUS_INVITED: "INVITED"
   };
 
  

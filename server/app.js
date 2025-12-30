@@ -20,5 +20,6 @@ app.use('/api/parameter-defaults', require('./api/routes/parameter-defaults'));
 app.use('/api/item-actions-history', require('./api/routes/item-actions-history'));
 app.use('/api/version', require('./api/routes/version'));
 app.use('/api/general', require('./api/routes/general'));
+app.use('/api/users', require('./api/routes/users'));
 
 module.exports = app; 

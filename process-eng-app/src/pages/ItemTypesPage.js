@@ -121,7 +121,7 @@ function ItemTypesPage({onCreateNewItemType, onEditItemType, onSelectItemType}) 
                     className="btn btn-sm btn-outline-secondary"
                     onClick={e => { e.stopPropagation(); handleEdit(itemType); }}
                   >
-                    <span class="material-symbols-outlined">
+                    <span className="material-symbols-outlined">
                       edit
                     </span>  
                   </button>
