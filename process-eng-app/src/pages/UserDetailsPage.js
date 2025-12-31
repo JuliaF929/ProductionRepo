@@ -160,7 +160,7 @@ function UserDetailsPage({action, userData, availableRoles}) {
         value={roles}
         onChange={setRoles}
         placeholder="Select roles..."
-        isDisabled={action === 'view'}
+        disabled={action === 'view'}
         searchable={false}   // ✅ no typing, only dropdown selection
       />
 
