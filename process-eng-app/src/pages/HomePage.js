@@ -13,6 +13,8 @@ import RunDetailsPage from './RunDetailsPage';
 import AboutPage from './AboutPage';
 import UsersPage from './UsersPage';
 import UserDetailsPage from './UserDetailsPage';
+import constants from '../constants';
+
 
 function HomePage({ selectedMenu, setSelectedMenu }) {
   //const [leftPanelSelected, setLeftPanelSelected] = useState(null);
@@ -22,6 +24,8 @@ function HomePage({ selectedMenu, setSelectedMenu }) {
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedRun, setSelectedRun] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [availableRoles, setAvailableRoles] = useState([]);
+
     let content;
 
   // Whenever selectedMenu changed (clear the right panel)
@@ -29,6 +33,18 @@ function HomePage({ selectedMenu, setSelectedMenu }) {
     console.log("HomePage detected menu change, clearing right panel");
     setRightPanelContent(null);
   }, [selectedMenu]);
+
+  useEffect(() => {
+    // Fetch roles from server
+    console.log(`useEffect for fetching available roles from server called.`)
+    async function fetchRoles() {
+      const response = await fetch(`${constants.API_BASE}/users/roles`);
+      const data = await response.json();
+
+      setAvailableRoles(data.roles || []);
+    }
+    fetchRoles();
+  }, []);
 
   console.log("HomePage render, selectedMenu:", selectedMenu);
   if (selectedMenu === 'item-types-page') content = 
@@ -56,9 +72,9 @@ function HomePage({ selectedMenu, setSelectedMenu }) {
   else if (selectedMenu === 'about-page') content = <AboutPage/>;
   else if (selectedMenu === 'users') content = 
                                                      <UsersPage 
-                                                      onInviteNewUser={() => setRightPanelContent(<UserDetailsPage key={Date.now()} action="invite"/>)}
-                                                      onEditUser={(user) => {if (user) { setSelectedUser(user); setRightPanelContent(<UserDetailsPage key={Date.now()} action="view" userData={user}/>);}}} //TODO julia: edit user
-                                                      onSelectUser={(user) => {setRightPanelContent(null); if (user) { setSelectedUser(user); setRightPanelContent(<UserDetailsPage key={Date.now()} action="view" userData={user}/>); }}}
+                                                      onInviteNewUser={() => setRightPanelContent(<UserDetailsPage key={Date.now()} action="invite" availableRoles={availableRoles}/>)}
+                                                      onEditUser={(user) => {if (user) { setSelectedUser(user); setRightPanelContent(<UserDetailsPage key={Date.now()} action="view" userData={user} availableRoles={availableRoles}/>);}}} //TODO julia: edit user
+                                                      onSelectUser={(user) => {setRightPanelContent(null); if (user) { setSelectedUser(user); setRightPanelContent(<UserDetailsPage key={Date.now()} action="view" userData={user} availableRoles={availableRoles}/>); }}}
                                                       />;
 
   return (

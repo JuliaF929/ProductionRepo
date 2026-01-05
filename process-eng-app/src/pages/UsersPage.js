@@ -11,27 +11,17 @@ function UsersPage({onInviteNewUser, onEditUser, onSelectUser}) {
   const [filterRoles, setFilterRoles] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [filterInvitedBy, setFilterInvitedBy] = useState('');
-  const [roles, setRoles] = useState([]);
 
 
   useEffect(() => {
     // Fetch users from server
+    console.log(`useEffect for fetching users from server called.`)
     async function fetchUsers() {
       const response = await fetch(`${constants.API_BASE}/users`);
       const data = await response.json();
       setUsers(data);
     }
     fetchUsers();
-  }, []);
-
-  useEffect(() => {
-    // Fetch roles from server
-    async function fetchRoles() {
-      const response = await fetch(`${constants.API_BASE}/users/roles`);
-      const data = await response.json();
-      setRoles(data);
-    }
-    fetchRoles();
   }, []);
 
   const handleEdit = (user) => {

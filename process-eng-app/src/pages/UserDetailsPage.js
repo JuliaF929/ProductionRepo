@@ -156,7 +156,7 @@ function UserDetailsPage({action, userData, availableRoles}) {
 
   <label className="form-label">Roles</label>
       <MultiSelectChips
-        options={["Operator", "Process Engineer", "Manager", "Auditor", "Admin"]}
+        options={Array.isArray(availableRoles) ? availableRoles : []}
         value={roles}
         onChange={setRoles}
         placeholder="Select roles..."

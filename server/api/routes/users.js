@@ -67,7 +67,7 @@ router.post('/', async (req, res, next) => {
     //const existingUser = await itemRepository.itemExists(req.body.email);
     const existingUser = false; //TODO julia: implement user existence check
 
-    if (existingItem) {
+    if (existingUser) {
       // Duplicate found, abort
       logger.debug(`User with this email ${req.body.email} already exists.`);
       return res.status(HTTP_STATUS.BAD_REQUEST).send(`User with email '${req.body.email}' already exists.`);
@@ -81,6 +81,8 @@ router.post('/', async (req, res, next) => {
       status: STRING_CONSTANTS.USER_STATUS_INVITED,
       invitedBy: req.body.invitedBy || 'system'
     });
+
+    logger.debug(`Dummy user added successfully.`);
 
     //2. TODO: save user to DB (already SQL)
     //3. use Auth0 Management API to create user in Auth0 with M2M apis
