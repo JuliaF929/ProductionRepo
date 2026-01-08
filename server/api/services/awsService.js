@@ -3,7 +3,7 @@ const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const logger = require('../../logger');
 
 const s3 = new S3Client({ region: "us-east-2" });
-const bucketName = "production-julia-s3";
+const bucketName = "calibrix-s3";
 
 const operatorAppName = "CalibrixOperatorWin_";
 const operatorAppExtension = ".exe";
